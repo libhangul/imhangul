@@ -204,7 +204,7 @@ static GdkAtom          input_mode_info_atom;
 static GdkAtom          input_mode_info_type;
 static gboolean         manual_mode = FALSE;
 static gint		input_mode = INPUT_MODE_DIRECT;
-static gint		output_mode = OUTPUT_MODE_AUTOMATIC;
+/* static gint		output_mode = OUTPUT_MODE_AUTOMATIC; */
 
 /* preferences */
 static gboolean		pref_use_global_state = TRUE;
@@ -236,6 +236,8 @@ static guint16 im_hangul_ignore_table[] = {
   GDK_Mode_switch,
   0
 };
+
+static const gunichar *keyboard_table;
 
 static void
 im_hangul_register_type(GTypeModule *type_module, const gchar *type_name)
@@ -1114,6 +1116,93 @@ im_hangul_dvorak_to_qwerty(guint code)
   if (code < GDK_exclam || code > GDK_asciitilde)
     return code;
   return table[code - GDK_exclam];
+}
+
+struct combination {
+  guint32 key;
+  gunichar code;
+};
+
+static struct combination compose_table_default[] = {
+  { 0x11001100, 0x1101 }, /* choseong  kiyeok + kiyeok  = ssangkiyeok	*/
+  { 0x11031103, 0x1104 }, /* choseong  tikeut + tikeut  = ssangtikeut	*/
+  { 0x11071107, 0x1108 }, /* choseong  pieup  + pieup   = ssangpieup 	*/
+  { 0x11091109, 0x110a }, /* choseong  sios   + sios    = ssangsios	*/
+  { 0x110c110c, 0x110d }, /* choseong  cieuc  + cieuc   = ssangcieuc	*/
+  { 0x11691161, 0x116a }, /* jungseong o      + a       = wa		*/
+  { 0x11691162, 0x116b }, /* jungseong o      + ae      = wae		*/
+  { 0x11691175, 0x116c }, /* jungseong o      + i       = oe		*/
+  { 0x116e1165, 0x116f }, /* jungseong u      + eo      = weo		*/
+  { 0x116e1166, 0x1170 }, /* jungseong u      + e       = we		*/
+  { 0x116e1175, 0x1171 }, /* jungseong u      + i       = wi		*/
+  { 0x11731175, 0x1174 }, /* jungseong eu     + i       = yi		*/
+  { 0x11a811a8, 0x11a9 }, /* jongseong kiyeok + kiyeok  = ssangekiyeok 	*/
+  { 0x11a811ba, 0x11aa }, /* jongseong kiyeok + sios    = kiyeok-sois	*/
+  { 0x11ab11bd, 0x11ac }, /* jongseong nieun  + cieuc   = nieun-cieuc	*/
+  { 0x11ab11c2, 0x11ad }, /* jongseong nieun  + hieuh   = nieun-hieuh	*/
+  { 0x11af11a8, 0x11b0 }, /* jongseong rieul  + kiyeok  = rieul-kiyeok	*/
+  { 0x11af11b7, 0x11b1 }, /* jongseong rieul  + mieum   = rieul-mieum 	*/
+  { 0x11af11b8, 0x11b2 }, /* jongseong rieul  + pieup   = rieul-pieup	*/
+  { 0x11af11ba, 0x11b3 }, /* jongseong rieul  + sios    = rieul-sios	*/
+  { 0x11af11c0, 0x11b4 }, /* jongseong rieul  + thieuth = rieul-thieuth	*/
+  { 0x11af11c1, 0x11b5 }, /* jongseong rieul  + phieuph = rieul-phieuph	*/
+  { 0x11af11c2, 0x11b6 }, /* jongseong rieul  + hieuh   = rieul-hieuh	*/
+  { 0x11b811ba, 0x11b9 }, /* jongseong pieup  + sios    = pieup-sios	*/
+  { 0x11ba11ba, 0x11bb }, /* jongseong sios   + sios    = ssangsios	*/
+};
+
+static int compose_table_size = G_N_ELEMENTS(compose_table_default);
+static struct combination *compose_table = compose_table_default;
+
+static gunichar
+im_hangul_compose(gunichar first, gunichar last)
+{
+  int min, max, mid;
+  guint32 key;
+ 
+  /* make key */
+  key = first << 16 | last;
+
+  /* binary search in table */
+  min = 0;
+  max = compose_table_size - 1;
+
+  while (max >= min) {
+    mid = (min + max) / 2;
+    if (compose_table[mid].key < key)
+      min = mid + 1;
+    else if (compose_table[mid].key > key)
+      max = mid - 1;
+    else
+      return compose_table[mid].code;
+  }
+  return 0;
+}
+
+static gunichar
+im_hangul_mapping(guint keyval, guint state)
+{
+  if (keyboard_table == NULL)
+    return 0;
+
+  /* hangul jamo keysym */
+  if (keyval >= 0x01001100 && keyval <= 0x010011ff)
+    return keyval & 0x0000ffff;
+
+  if (keyval >= GDK_exclam  && keyval <= GDK_asciitilde) {
+    /* treat capslock, as capslock is not on */
+    if (state & GDK_LOCK_MASK) {
+      if (state & GDK_SHIFT_MASK) {
+        if (keyval >= GDK_a && keyval <= GDK_z)
+          keyval -= (GDK_a - GDK_A);
+      } else {
+        if (keyval >= GDK_A && keyval <= GDK_Z)
+          keyval += (GDK_a - GDK_A);
+      }
+    }
+    return keyboard_table[keyval - GDK_exclam];
+  } else
+    return 0;
 }
 
 /* use hangul automata */

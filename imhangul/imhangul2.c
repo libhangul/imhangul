@@ -50,6 +50,105 @@ static const GtkIMContextInfo *info_list[] = {
   &hangul2_info
 };
 
+/* Hangul keyboard map table:
+ * 2set keyboard (dubulsik) */
+static const gunichar keyboard_table_2[] = {
+  0x0021,	/* GDK_exclam:		exclamation mark		*/
+  0x0022,	/* GDK_quotedbl:	quotation mark 			*/
+  0x0023,	/* GDK_numbersign:	number sign	 		*/
+  0x0024,	/* GDK_dollar:		dollar sign			*/
+  0x0025,	/* GDK_percent:		percent sign			*/
+  0x0026,	/* GDK_ampersand:	ampersand		 	*/
+  0x0027,	/* GDK_apostrophe:	apostrophe			*/
+  0x0028,	/* GDK_parenleft:	left parenthesis		*/
+  0x0029,	/* GDK_parenright:	right parenthesis		*/
+  0x002a,	/* GDK_asterisk:	asterisk			*/
+  0x002b,	/* GDK_plus:		plus sign			*/
+  0x002c,	/* GDK_comma:		comma				*/
+  0x002d,	/* GDK_minus:		minus sign			*/
+  0x002e,	/* GDK_period:		period				*/
+  0x002f,	/* GDK_slash:		slash				*/
+  0x0030,	/* GDK_0:		0				*/
+  0x0031,	/* GDK_1:		1				*/
+  0x0032,	/* GDK_2:		2				*/
+  0x0033,	/* GDK_3:		3				*/
+  0x0034,	/* GDK_4:		4				*/
+  0x0035,	/* GDK_5:		5				*/
+  0x0036,	/* GDK_6:		6				*/
+  0x0037,	/* GDK_7:		7				*/
+  0x0038,	/* GDK_8:		8				*/
+  0x0039,	/* GDK_9:		9				*/
+  0x003a,	/* GDK_colon:		colon				*/
+  0x003b,	/* GDK_semicolon:	semicolon			*/
+  0x003c,	/* GDK_less:		less-than sign			*/
+  0x003d,	/* GDK_equal:		equals sign			*/
+  0x003e,	/* GDK_greater:		greater-than sign		*/
+  0x003f,	/* GDK_question:	question mark	 		*/
+  0x0040,	/* GDK_at:		commercial at			*/
+  0x1106,	/* GDK_A:		choseong mieum			*/
+  0x1172,	/* GDK_B:		jungseong yu			*/
+  0x110e,	/* GDK_C:		choseong chieuch		*/
+  0x1106,	/* GDK_D:		choseong ieung			*/
+  0x1104,	/* GDK_E:		choseong ssangtikeut		*/
+  0x1105,	/* GDK_F:		choseong rieul			*/
+  0x1112,	/* GDK_G:		choseong hieuh			*/
+  0x1169,	/* GDK_H:		jungseong o			*/
+  0x1163,	/* GDK_I:		jungseong ya			*/
+  0x1165,	/* GDK_J:		jungseong eo			*/
+  0x1161,	/* GDK_K:		jungseong a			*/
+  0x1175,	/* GDK_L:		jungseong i			*/
+  0x1173,	/* GDK_M:		jungseong eu			*/
+  0x116e,	/* GDK_N:		jungseong u			*/
+  0x1164,	/* GDK_O:		jungseong yae			*/
+  0x1168,	/* GDK_P:		jungseong ye			*/
+  0x1108,	/* GDK_Q:		choseong ssangpieup		*/
+  0x1101,	/* GDK_R:		choseong ssangkiyeok		*/
+  0x1102,	/* GDK_S:		choseong nieun			*/
+  0x110a,	/* GDK_T:		choseong ssangsios		*/
+  0x1167,	/* GDK_U:		jungseong yeo			*/
+  0x1111,	/* GDK_V:		choseong phieuph		*/
+  0x110d,	/* GDK_W:		choseong ssangcieuc		*/
+  0x1110,	/* GDK_X:		choseong thieuth		*/
+  0x116d,	/* GDK_Y:		jungseong yo			*/
+  0x110f,	/* GDK_Z:		choseong khieukh		*/
+  0x005b,	/* GDK_bracketleft:	left bracket			*/
+  0x005c,	/* GDK_backslash:	backslash			*/
+  0x005d,	/* GDK_bracketright:	right bracket			*/
+  0x005e,	/* GDK_asciicircum:	circumflex accent		*/
+  0x005f,	/* GDK_underscore:	underscore			*/
+  0x0060,	/* GDK_quoteleft:	grave accent			*/
+  0x1106,	/* GDK_a:		choseong  mieum			*/
+  0x1172,	/* GDK_b:		jungseong yu			*/
+  0x110e,	/* GDK_c:		choseong  chieuch		*/
+  0x110b,	/* GDK_d:		choseong  ieung			*/
+  0x1103,	/* GDK_e:		choseong  tikeut		*/
+  0x1105,	/* GDK_f:		choseong  rieul			*/
+  0x1112,	/* GDK_g:		choseong  hieuh			*/
+  0x1169,	/* GDK_h:		jungseong o			*/
+  0x1163,	/* GDK_i:		jungseong ya			*/
+  0x1165,	/* GDK_j:		jungseong eo			*/
+  0x1161,	/* GDK_k:		jungseong a			*/
+  0x1175,	/* GDK_l:		jungseong i			*/
+  0x1173,	/* GDK_m:		jungseong eu			*/
+  0x116e,	/* GDK_n:		jungseong u			*/
+  0x1162,	/* GDK_o:		jungseong ae			*/
+  0x1166,	/* GDK_p:		jungseong e			*/
+  0x1107,	/* GDK_q:		choseong  pieup			*/
+  0x1100,	/* GDK_r:		choseong  kiyeok		*/
+  0x1102,	/* GDK_s:		choseong  nieun			*/
+  0x1109, 	/* GDK_t:		choseong  sios			*/
+  0x1167,	/* GDK_u:		jungseong yeo			*/
+  0x1111,	/* GDK_v:		choseong  phieuph		*/
+  0x110c,	/* GDK_w:		choseong  cieuc			*/
+  0x1110,	/* GDK_x:		choseong  thieuth		*/
+  0x116d,	/* GDK_y:		jungseong yo			*/
+  0x110f,	/* GDK_z:		choseong  khieukh		*/
+  0x007b,	/* GDK_braceleft:	left brace			*/
+  0x007c,	/* GDK_bar:		vertical bar			*/
+  0x007d,	/* GDK_braceright:	right brace			*/
+  0x007e,	/* GDK_asciitilde:	tilde				*/
+};
+
 static gunichar
 im_hangul_compjungseong_to_single(gunichar ch)
 {
@@ -92,407 +191,34 @@ im_hangul_compjongseong_to_single(gunichar ch)
   return 0;
 }
 
-/* return ucs4 code jamo choseong value(U+1100 ~ U+1112) in 2bul keyboard
- * if it is not hangul key, return 0 */
 static gunichar
-im_hangul2_choseong(guint keyval, guint state) {
-  if (is_set(state, GDK_SHIFT_MASK)) {
-    switch (keyval) {
-      case GDK_R:
-      case GDK_r:
-        return 0x1101;			/* choseong ssangkiyeok */
-      case GDK_S:
-      case GDK_s:
-        return 0x1102;  		/* choseong nieun */
-      case GDK_E:
-      case GDK_e:
-        return 0x1104;  		/* choseong ssangtikeut */
-      case GDK_F:
-      case GDK_f:
-        return 0x1105;  		/* choseong rieul */
-      case GDK_A:
-      case GDK_a:
-        return 0x1106;  		/* choseong mieum */
-      case GDK_Q:
-      case GDK_q:
-        return 0x1108;  		/* choseong ssangpieup */
-      case GDK_T:
-      case GDK_t:
-        return 0x110a;  		/* choseong ssangsios */
-      case GDK_D:
-      case GDK_d:
-        return 0x110b;  		/* choseong ieung */
-      case GDK_W:
-      case GDK_w:
-        return 0x110d;  		/* choseong ssangcieuc */
-      case GDK_C:
-      case GDK_c:
-        return 0x110e;  		/* choseong chieuch */
-      case GDK_Z:
-      case GDK_z:
-        return 0x110f;  		/* choseong khieukh */
-      case GDK_X:
-      case GDK_x:
-        return 0x1110;  		/* choseong thieuth */
-      case GDK_V:
-      case GDK_v:
-        return 0x1111;  		/* choseong phieuph */
-      case GDK_G:
-      case GDK_g:
-        return 0x1112;  		/* choseong hieuh */
-    }
-  } else {
-    switch (keyval) {
-      case GDK_R:
-      case GDK_r:
-        return 0x1100;			/* choseong kiyeok */
-      case GDK_S:
-      case GDK_s:
-        return 0x1102;  		/* choseong nieun */
-      case GDK_E:
-      case GDK_e:
-        return 0x1103;  		/* choseong tikeut */
-      case GDK_F:
-      case GDK_f:
-        return 0x1105;  		/* choseong rieul */
-      case GDK_A:
-      case GDK_a:
-        return 0x1106;  		/* choseong mieum */
-      case GDK_Q:
-      case GDK_q:
-        return 0x1107;  		/* choseong pieup */
-      case GDK_T:
-      case GDK_t:
-        return 0x1109;  		/* choseong sios */
-      case GDK_D:
-      case GDK_d:
-        return 0x110b;  		/* choseong ieung */
-      case GDK_W:
-      case GDK_w:
-        return 0x110c;  		/* choseong cieuc */
-      case GDK_C:
-      case GDK_c:
-        return 0x110e;  		/* choseong chieuch */
-      case GDK_Z:
-      case GDK_z:
-        return 0x110f;  		/* choseong khieukh */
-      case GDK_X:
-      case GDK_x:
-        return 0x1110;  		/* choseong thieuth */
-      case GDK_V:
-      case GDK_v:
-        return 0x1111;  		/* choseong phieuph */
-      case GDK_G:
-      case GDK_g:
-        return 0x1112;  		/* choseong hieuh */
-    }
-  }
-  return 0;
-}
+im_hangul2_choseong_to_jongseong(gunichar ch)
+{
+  static gunichar table[] = {
+    0x11a8,	/* choseong kiyeok	  ->	jongseong kiyeok */
+    0x11a9,	/* choseong ssangkiyeok	  ->	jongseong ssangkiyeok */
+    0x11ab,	/* choseong nieun	  ->	jongseong nieun */
+    0x11ae,	/* choseong tikeut	  ->	jongseong tikeut */
+    0x0,	/* choseong ssangtikeut	  ->	jongseong tikeut */
+    0x11af,	/* choseong rieul	  ->	jongseong rieul */
+    0x11b7,	/* choseong mieum 	  ->	jongseong mieum */
+    0x11b8,	/* choseong pieup	  ->	jongseong pieup */
+    0x0,	/* choseong ssangpieup	  ->	jongseong pieup */
+    0x11ba,	/* choseong sios	  ->	jongseong sios */
+    0x11bb,	/* choseong ssangsios     ->	jongseong ssangsios */
+    0x11bc,	/* choseong ieung	  ->	jongseong ieung */
+    0x11bd,	/* choseong cieuc	  ->	jongseong cieuc */
+    0x0,	/* choseong ssangcieuc	  ->	jongseong cieuc */
+    0x11be,	/* choseong chieuch	  ->	jongseong chieuch */
+    0x11bf,	/* choseong khieukh	  ->	jongseong khieukh */
+    0x11c0,	/* choseong thieuth	  ->	jongseong thieuth */
+    0x11c1,	/* choseong phieuph	  ->	jongseong phieuph */
+    0x11c2	/* choseong hieuh	  ->	jongseong hieuh */
+  };
 
-/* return unicode jamo jungseong value(U+1161 ~ U+1173) in 2bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul2_jungseong(guint keyval, guint state) {
-  if (is_set(state, GDK_SHIFT_MASK)) {
-    switch (keyval) {
-      case GDK_K:
-      case GDK_k:
-        return 0x1161;			/* jungseong a */
-      case GDK_O:
-      case GDK_o:
-        return 0x1164;			/* jungseong yae */
-      case GDK_I:
-      case GDK_i:
-        return 0x1163;			/* jungseong ya */
-      case GDK_J:
-      case GDK_j:
-        return 0x1165;			/* jungseong eo */
-      case GDK_P:
-      case GDK_p:
-        return 0x1168;			/* jungseong ye */
-      case GDK_U:
-      case GDK_u:
-        return 0x1167;			/* jungseong yeo */
-      case GDK_H:
-      case GDK_h:
-        return 0x1169;			/* jungseong o */
-      case GDK_Y:
-      case GDK_y:
-        return 0x116d;			/* jungseong yo */
-      case GDK_N:
-      case GDK_n:
-        return 0x116e;			/* jungseong u */
-      case GDK_B:
-      case GDK_b:
-        return 0x1172;			/* jungseong yu */
-      case GDK_M:
-      case GDK_m:
-        return 0x1173;			/* jungseong eu */
-      case GDK_L:
-      case GDK_l:
-        return 0x1175;			/* jungseong i */
-    }
-  } else {
-    switch (keyval) {
-      case GDK_K:
-      case GDK_k:
-        return 0x1161;			/* jungseong a */
-      case GDK_O:
-      case GDK_o:
-        return 0x1162;			/* jungseong ae */
-      case GDK_I:
-      case GDK_i:
-        return 0x1163;			/* jungseong ya */
-      case GDK_J:
-      case GDK_j:
-        return 0x1165;			/* jungseong eo */
-      case GDK_P:
-      case GDK_p:
-        return 0x1166;			/* jungseong e */
-      case GDK_U:
-      case GDK_u:
-        return 0x1167;			/* jungseong yeo */
-      case GDK_H:
-      case GDK_h:
-        return 0x1169;			/* jungseong o */
-      case GDK_Y:
-      case GDK_y:
-        return 0x116d;			/* jungseong yo */
-      case GDK_N:
-      case GDK_n:
-        return 0x116e;			/* jungseong u */
-      case GDK_B:
-      case GDK_b:
-        return 0x1172;			/* jungseong yu */
-      case GDK_M:
-      case GDK_m:
-        return 0x1173;			/* jungseong eu */
-      case GDK_L:
-      case GDK_l:
-        return 0x1175;			/* jungseong i */
-    }
-  }
-  return 0;
-}
-
-/* return unicode jamo jungseong value(U+1161 ~ U+1173) in 2bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul2_comp_jungseong(gunichar ch, guint keyval, guint state) {
-  if (is_set(state, GDK_SHIFT_MASK))
-    return 0;
-  switch (ch) {
-    case 0x1169:
-      switch (keyval) {
-        case GDK_K:
-        case GDK_k:
-          return 0x116a;	/* jungseong wa */
-        case GDK_O:
-        case GDK_o:
-          return 0x116b;        /* jungseong wae */
-        case GDK_L:
-        case GDK_l:
-          return 0x116c;        /* jungseong oe */
-      }
-      break;
-    case 0x116e:
-      switch (keyval) {
-        case GDK_J:
-        case GDK_j:
-          return 0x116f;	/* jungseong weo */
-        case GDK_P:
-        case GDK_p:
-          return 0x1170;        /* jungseong we */
-        case GDK_L:
-        case GDK_l:
-          return 0x1171;        /* jungseong wi */
-      }
-      break;
-    case 0x1173:
-      switch (keyval) {
-        case GDK_L:
-        case GDK_l:
-          return 0x1174;	/* jungseong yi */
-      }
-      break;
-  }
-  return 0;
-}
-
-/* return unicode jamo jongseong value(U+11a8 ~ U+11c2) in 2bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul2_jongseong(guint keyval, guint state) {
-  if (is_set(state, GDK_SHIFT_MASK)) {
-    switch (keyval) {
-      case GDK_R:
-      case GDK_r:
-        return 0x11a9;			/* jongseong ssangkiyeok */
-      case GDK_S:
-      case GDK_s:
-        return 0x11ab;			/* jongseong nieun */
-      case GDK_F:
-      case GDK_f:
-        return 0x11af;			/* jongseong rieul */
-      case GDK_A:
-      case GDK_a:
-        return 0x11b7;			/* jongseong mieum */
-      case GDK_T:
-      case GDK_t:
-        return 0x11bb;			/* jongseong ssangsios */
-      case GDK_D:
-      case GDK_d:
-        return 0x11bc;			/* jongseong ieung */
-      case GDK_C:
-      case GDK_c:
-        return 0x11be;			/* jongseong chieuch */
-      case GDK_Z:
-      case GDK_z:
-        return 0x11bf;			/* jongseong khieukh */
-      case GDK_X:
-      case GDK_x:
-        return 0x11c0;			/* jongseong thieuth */
-      case GDK_V:
-      case GDK_v:
-        return 0x11c1;			/* jongseong phieuph */
-      case GDK_G:
-      case GDK_g:
-        return 0x11c2;			/* jongseong hieuh */      
-    }
-  } else {
-    switch (keyval) {
-      case GDK_R:
-      case GDK_r:
-        return 0x11a8;			/* jongseong kiyeok */
-      case GDK_S:
-      case GDK_s:
-        return 0x11ab;			/* jongseong nieun */
-      case GDK_E:
-      case GDK_e:
-        return 0x11ae;			/* jongseong tikeut */
-      case GDK_F:
-      case GDK_f:
-        return 0x11af;			/* jongseong rieul */
-      case GDK_A:
-      case GDK_a:
-        return 0x11b7;			/* jongseong mieum */
-      case GDK_Q:
-      case GDK_q:
-        return 0x11b8;			/* jongseong pieup */
-      case GDK_T:
-      case GDK_t:
-        return 0x11ba;			/* jongseong sios */
-      case GDK_D:
-      case GDK_d:
-        return 0x11bc;			/* jongseong ieung */
-      case GDK_W:
-      case GDK_w:
-        return 0x11bd;			/* jongseong cieuc */
-      case GDK_C:
-      case GDK_c:
-        return 0x11be;			/* jongseong chieuch */
-      case GDK_Z:
-      case GDK_z:
-        return 0x11bf;			/* jongseong khieukh */
-      case GDK_X:
-      case GDK_x:
-        return 0x11c0;			/* jongseong thieuth */
-      case GDK_V:
-      case GDK_v:
-        return 0x11c1;			/* jongseong phieuph */
-      case GDK_G:
-      case GDK_g:
-        return 0x11c2;			/* jongseong hieuh */      
-    }
-  }
-  return 0;
-}
-
-/* return unicode jamo jongseong value(U+11a8 ~ U+11c2) in 2bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul2_comp_jongseong(gunichar ch, guint keyval, guint state) {
-  if (is_set(state, GDK_SHIFT_MASK)) {
-    switch (ch) {
-      case 0x11ab:		/* jongseong nieun */
-        switch (keyval) {
-          case GDK_G:
-          case GDK_g:
-            return 0x11ad;	/* jongseong nieun-hieuh */
-        }
-        break;
-      case 0x11af:		/* jongseong rieul */
-        switch (keyval) {
-          case GDK_A:
-          case GDK_a:
-            return 0x11b1;	/* jongseong rieul-mieum */
-          case GDK_X:
-          case GDK_x:
-            return 0x11b4;	/* jongseong rieul-thieuth */
-          case GDK_V:
-          case GDK_v:
-            return 0x11b5;	/* jongseong rieul-phieuph */
-          case GDK_G:
-          case GDK_g:
-            return 0x11b6;	/* jongseong rieul-hieuh */
-        }
-        break;
-    }
-  } else {
-    switch (ch) {
-      case 0x11a8:		/* jongseong kiyeok */
-        switch (keyval) {
-          case GDK_T:
-          case GDK_t:
-            return 0x11aa;	/* jongseong kiyeok-sios */
-        }
-        break;
-      case 0x11ab:		/* jongseong nieun */
-        switch (keyval) {
-          case GDK_W:
-          case GDK_w:
-            return 0x11ac;	/* jongseong nieun-cieuc */
-          case GDK_G:
-          case GDK_g:
-            return 0x11ad;	/* jongseong nieun-hieuh */
-        }
-        break;
-      case 0x11af:		/* jongseong rieul */
-        switch (keyval) {
-          case GDK_R:
-          case GDK_r:
-            return 0x11b0;	/* jongseong rieul-kiyeok */
-          case GDK_A:
-          case GDK_a:
-            return 0x11b1;	/* jongseong rieul-mieum */
-          case GDK_Q:
-          case GDK_q:
-            return 0x11b2;	/* jongseong rieul-pieup */
-          case GDK_T:
-          case GDK_t:
-            return 0x11b3;	/* jongseong rieul-sios */
-          case GDK_X:
-          case GDK_x:
-            return 0x11b4;	/* jongseong rieul-thieuth */
-          case GDK_V:
-          case GDK_v:
-            return 0x11b5;	/* jongseong rieul-phieuph */
-          case GDK_G:
-          case GDK_g:
-            return 0x11b6;	/* jongseong rieul-hieuh */
-        }
-        break;
-      case 0x11b8:		/* jongseong pieup */
-        switch (keyval) {
-          case GDK_T:
-          case GDK_t:
-            return 0x11b9;	/* jongseong pieup-sios */
-        }
-        break;
-    }
-  }
-  return 0;
+  if (ch < 0x1100 || ch > 0x1112)
+  	return 0;
+  return table[ch - 0x1100];
 }
 
 static gunichar
@@ -536,6 +262,8 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
 {
   guint keyval, state;
   gunichar ch;
+  gunichar comp_ch;
+  gunichar jong_ch;
 
   if (pref_use_dvorak) {
     keyval = im_hangul_dvorak_to_qwerty(key->keyval);
@@ -545,14 +273,14 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
     state = key->state;
   }
 
+  ch = im_hangul_mapping(keyval, state);
+
   if (hcontext->state == 0) {
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       hcontext->state = 1;
       hcontext->choseong[0] = ch;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       hcontext->state = 2;
       hcontext->choseong[0] = 0;
@@ -562,14 +290,12 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
     if (im_hangul_is_backspace(key))
       return FALSE;
   } else if (hcontext->state == 1) {
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->state = 1;
       hcontext->choseong[0] = ch;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       hcontext->jungseong[0] = ch;
       hcontext->state = 3;
@@ -581,7 +307,6 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 2) {
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       if (pref_enable_inverse_sequence) {
         hcontext->state = 3;
@@ -592,13 +317,12 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       hcontext->choseong[0] = ch;
       goto done;
     }
-    ch = im_hangul2_comp_jungseong(hcontext->jungseong[0], keyval, state);
-    if (im_hangul_is_jungseong(ch)) {
-      hcontext->jungseong[0] = ch;
+    comp_ch = im_hangul_compose(hcontext->jungseong[0], ch);
+    if (im_hangul_is_jungseong(comp_ch)) {
+      hcontext->jungseong[0] = comp_ch;
       hcontext->state = 4;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->jungseong[0] = ch;
@@ -611,26 +335,24 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 3) {
-    ch = im_hangul2_jongseong(keyval, state);
-    if (im_hangul_is_jongseong(ch)) {
-      hcontext->jongseong[0] = ch;
+    jong_ch = im_hangul2_choseong_to_jongseong(ch);
+    if (im_hangul_is_jongseong(jong_ch)) {
+      hcontext->jongseong[0] = jong_ch;
       hcontext->state = 5;
       goto done;
     }
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->choseong[0] = ch;
       hcontext->state = 1;
       goto done;
     }
-    ch = im_hangul2_comp_jungseong(hcontext->jungseong[0], keyval, state);
-    if (im_hangul_is_jungseong(ch)) {
-      hcontext->jungseong[0] = ch;
+    comp_ch = im_hangul_compose(hcontext->jungseong[0], ch);
+    if (im_hangul_is_jungseong(comp_ch)) {
+      hcontext->jungseong[0] = comp_ch;
       hcontext->state = 6;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->jungseong[0] = ch;
@@ -643,7 +365,6 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 4) {
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       if (pref_enable_inverse_sequence) {
         hcontext->state = 3;
@@ -654,7 +375,6 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       hcontext->choseong[0] = ch;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->jungseong[0] = ch;
@@ -668,20 +388,19 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 5) {
-    ch = im_hangul2_comp_jongseong(hcontext->jongseong[0], keyval, state);
-    if (im_hangul_is_jongseong(ch)) {
-      hcontext->jongseong[0] = ch;
+    jong_ch = im_hangul2_choseong_to_jongseong(ch);
+    comp_ch = im_hangul_compose(hcontext->jongseong[0], jong_ch);
+    if (im_hangul_is_jongseong(comp_ch)) {
+      hcontext->jongseong[0] = comp_ch;
       hcontext->state = 7;
       goto done;
     }
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->choseong[0] = ch;
       hcontext->state = 1;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       gunichar choseong = 
 		im_hangul2_jongseong_to_choseong(hcontext->jongseong[0]);
@@ -698,20 +417,18 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 6) {
-    ch = im_hangul2_jongseong(keyval, state);
-    if (im_hangul_is_jongseong(ch)) {
-      hcontext->jongseong[0] = ch;
+    jong_ch = im_hangul2_choseong_to_jongseong(ch);
+    if (im_hangul_is_jongseong(jong_ch)) {
+      hcontext->jongseong[0] = jong_ch;
       hcontext->state = 8;
       goto done;
     }
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->choseong[0] = ch;
       hcontext->state = 1;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->jungseong[0] = ch;
@@ -725,14 +442,12 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 7) {
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->choseong[0] = ch;
       hcontext->state = 1;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       /* complex final consonant
        * to single final consonant and initial consonant */
@@ -753,20 +468,19 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 8) {
-    ch = im_hangul2_comp_jongseong(hcontext->jongseong[0], keyval, state);
-    if (im_hangul_is_jongseong(ch)) {
-      hcontext->jongseong[0] = ch;
+    jong_ch = im_hangul2_choseong_to_jongseong(ch);
+    comp_ch = im_hangul_compose(hcontext->jongseong[0], jong_ch);
+    if (im_hangul_is_jongseong(comp_ch)) {
+      hcontext->jongseong[0] = comp_ch;
       hcontext->state = 9;
       goto done;
     }
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->choseong[0] = ch;
       hcontext->state = 1;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       gunichar choseong = 
 		im_hangul2_jongseong_to_choseong(hcontext->jongseong[0]);
@@ -783,14 +497,12 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
   } else if (hcontext->state == 9) {
-    ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(hcontext);
       hcontext->state = 1;
       hcontext->choseong[0] = ch;
       goto done;
     }
-    ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       /* complex final consonant
        * to single final consonant and initial consonant */
@@ -860,6 +572,9 @@ im_module_create (const gchar *context_id)
     if (context) {
       GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
       im_hangul_set_automata(hcontext, im_hangul2_automata);
+
+      keyboard_table = keyboard_table_2;
+
       return context;
     }
   }
