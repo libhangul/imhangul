@@ -6,7 +6,9 @@ EXTRA_DIST = test.sh gtkrc gen.py
 INCLUDES = -DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"
 LDADDS = @GTK_LIBS@
 
-moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
+# now we do not use @GTK_BINARY_VERSION@ string
+# moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
+moduledir = @GTK_PREFIX@/lib/gtk-2.0/immodules
 
 GTK_IMMODULES= $(sysconfdir)/gtk-2.0/gtk.immodules
 
@@ -33,10 +35,6 @@ im_hangul3y_la_LIBADD = $(LDADDS)
 im_hangul32_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 im_hangul32_la_SOURCES = imhangul32.c imhangul.h imhangul3.h hanjatable.h
 im_hangul32_la_LIBADD = $(LDADDS)
-
-#im_hangul3x_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-#im_hangul3x_la_SOURCES = imhangul3x.c imhangul.h hanjatable.h
-#im_hangul3x_la_LIBADD = $(LDADDS)
 
 CFLAGS = @GTK_CFLAGS@ -g -Wall
 
