@@ -55,6 +55,18 @@ enum {
   INPUT_MODE_INFO_HANGUL
 } IMHangulInputModeInfo;
 
+typedef struct _DesktopInfo DesktopInfo;
+
+struct _DesktopInfo
+{
+  GdkScreen *screen;
+  GtkSettings *settings;
+  guint status_window_cb;
+  guint use_capslock_cb;
+  guint use_dvorak_cb;
+  guint preedit_style_cb;
+};
+
 typedef struct _StatusWindow StatusWindow;
 
 /* Status window: mostly copied from gtkimcontextxim.c */
@@ -182,10 +194,7 @@ static GtkWidget       *char_table_window = NULL;
 static gint		input_mode = INPUT_MODE_DIRECT;
 static gint		output_mode = OUTPUT_MODE_SYLLABLE;
 
-static guint		notify_cb_status_window;
-static guint		notify_cb_use_capslock;
-static guint		notify_cb_use_dvorak;
-static guint		notify_cb_style_change;
+static GSList	       *desktops = NULL;
 
 /* preferences */
 static gboolean		pref_use_global_state = TRUE;
@@ -448,12 +457,46 @@ use_dvorak_change (GtkSettings *settings, gpointer data)
 		NULL);
 }
 
+static DesktopInfo*
+find_desktop (GdkScreen *screen)
+{
+  GSList *item;
+  DesktopInfo *desktop_info;
+
+  item = desktops;
+  while (item != NULL)
+    {
+      desktop_info = (DesktopInfo*)(item->data);
+      if (desktop_info->screen == screen)
+	return desktop_info;
+      item = item->next;
+    }
+  return NULL;
+}
+
+static DesktopInfo*
+add_desktop (GdkScreen *screen)
+{
+  DesktopInfo *desktop_info = find_desktop (screen);
+
+  if (desktop_info == NULL)
+    {
+      desktop_info = g_new0 (DesktopInfo, 1);
+      desktop_info->screen = screen;
+      desktop_info->settings = gtk_settings_get_for_screen (screen);
+      desktops = g_slist_prepend (desktops, desktop_info);
+    }
+
+  return desktop_info;
+}
+
 static void
 im_hangul_set_client_window (GtkIMContext *context,
 			     GdkWindow *client_window)
 {
   GdkScreen *screen;
   GtkSettings *settings;
+  DesktopInfo *desktop_info;
   GtkIMContextHangul *hcontext;
 
   g_return_if_fail (GTK_IS_IM_CONTEXT_HANGUL (context));
@@ -471,7 +514,8 @@ im_hangul_set_client_window (GtkIMContext *context,
   /* install settings */
   /* check whether installed or not */
   screen = gdk_drawable_get_screen (GDK_DRAWABLE (client_window));
-  settings = gtk_settings_get_for_screen (screen);
+  desktop_info = add_desktop (screen);
+  settings = desktop_info->settings;
   g_return_if_fail (GTK_IS_SETTINGS (settings));
 
   if (!have_property (settings, "gtk-im-hangul-status-window"))
@@ -481,11 +525,12 @@ im_hangul_set_client_window (GtkIMContext *context,
 							   "Whether to show status window or not",
 							   FALSE,
 							   G_PARAM_READWRITE));
-      notify_cb_status_window =
+      desktop_info->status_window_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-status-window",
 			  G_CALLBACK(status_window_change),
 			  NULL);
+      status_window_change (settings, NULL);
     }
   if (!have_property (settings, "gtk-im-hangul-use-capslock"))
     {
@@ -494,11 +539,12 @@ im_hangul_set_client_window (GtkIMContext *context,
 							   "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
 							   FALSE,
 							   G_PARAM_READWRITE));
-      notify_cb_use_capslock =
+      desktop_info->use_capslock_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-use-capslock",
 			  G_CALLBACK(use_capslock_change),
 			  NULL);
+      use_capslock_change (settings, NULL);
     }
   if (!have_property (settings, "gtk-im-hangul-use-dvorak"))
     {
@@ -508,11 +554,12 @@ im_hangul_set_client_window (GtkIMContext *context,
 							   FALSE,
 							   G_PARAM_READWRITE));
 
-      notify_cb_use_dvorak =
+      desktop_info->use_dvorak_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-use-dvorak",
 			  G_CALLBACK(use_dvorak_change),
 			  NULL);
+      use_dvorak_change (settings, NULL);
     }
   if (!have_property (settings, "gtk-im-hangul-preedit-style"))
     {
@@ -523,17 +570,14 @@ im_hangul_set_client_window (GtkIMContext *context,
 						       4,
 						       0,
 						       G_PARAM_READWRITE));
-      notify_cb_style_change =
+      desktop_info->preedit_style_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-preedit-style",
 			  G_CALLBACK(preedit_style_change),
 			  hcontext->toplevel);
+      preedit_style_change (settings, hcontext->toplevel);
     }
 
-  status_window_change (settings, NULL);
-  use_capslock_change (settings, NULL);
-  use_dvorak_change (settings, NULL);
-  preedit_style_change (settings, hcontext->toplevel);
   current_root_window = gdk_screen_get_root_window(screen);
 }
 
@@ -2028,6 +2072,8 @@ popup_char_table_window (GtkIMContextHangul *hcontext)
 void
 gtk_im_context_hangul_shutdown (void)
 {
+  GSList *item;
+
   /* remove status window */
   while (status_windows)
     status_window_free (status_windows->data);
@@ -2045,6 +2091,18 @@ gtk_im_context_hangul_shutdown (void)
       gtk_widget_destroy (char_table_window);
       char_table_window = NULL;
     }
+
+  /* remove desktop info */
+  for (item = desktops; item != NULL; item = item->next)
+    {
+      DesktopInfo *info = (DesktopInfo*)(item->data);
+      g_signal_handler_disconnect (info->settings, info->status_window_cb);
+      g_signal_handler_disconnect (info->settings, info->use_capslock_cb);
+      g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
+      g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
+      g_free(info);
+    }
+  g_slist_free(desktops);
 
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
 }
