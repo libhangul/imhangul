@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  *
  * Author: Choe Hwanjin <krisna@kldp.org>
- * this module is for hangul 2bul sik mode users
+ * this module is for hangul(Korean)
  */
 
 #include <string.h>
