@@ -1217,7 +1217,7 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
   gulong id;
 
   if (pref_hanja_font)
-  	desc = pango_font_description_from_string(pref_hanja_font);
+    desc = pango_font_description_from_string(pref_hanja_font);
 
   index = get_index_of_hanjatable(ch);
   g_print("index: %d\n", index);
@@ -1241,9 +1241,9 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
     label = GTK_BIN(button)->child;
     attrs = pango_attr_list_new();
     if (desc)
-    	attr = pango_attr_font_desc_new(desc);
+      attr = pango_attr_font_desc_new(desc);
     else
-    	attr = pango_attr_scale_new(PANGO_SCALE_XX_LARGE);
+      attr = pango_attr_scale_new(PANGO_SCALE_XX_LARGE);
     attr->start_index = 0;
     attr->end_index = n;
     pango_attr_list_insert(attrs, attr);
