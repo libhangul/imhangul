@@ -33,7 +33,7 @@
 #include "imhangul.h"
 
 
-static const GtkIMContextInfo hangul3f_info = {
+static const GtkIMContextInfo hangul32_info = {
   "hangul32",
   "Hangul 3bul 2bul-shifted",
   "gtk+",
@@ -42,14 +42,14 @@ static const GtkIMContextInfo hangul3f_info = {
 };
 
 static const GtkIMContextInfo *info_list[] = {
-  &hangul3f_info
+  &hangul32_info
 };
 
 #include "imhangul3.h"
 
 /* Hangul keyboard map table:
  * 3set keyboard 2bul shifted (sebulsik dubulsik badchim) */
-static const gunichar keyboard_table_3final[] = {
+static const gunichar keyboard_table_32[] = {
   0x0021,	/* GDK_exclam:		exclamation mark		*/
   0x0022,	/* GDK_quotedbl:	quotation mark 			*/
   0x0023,	/* GDK_numbersign:	number sign	 		*/
@@ -175,7 +175,7 @@ im_module_create (const gchar *context_id)
       GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
       im_hangul_set_automata(hcontext, im_hangul3_automata);
 
-      keyboard_table = keyboard_table_3final;
+      keyboard_table = keyboard_table_32;
 
       return context;
     }
