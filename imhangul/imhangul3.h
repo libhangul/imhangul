@@ -87,7 +87,7 @@ im_hangul_add_jongseong(GtkIMContextHangul *hcontext, gunichar ch)
 }
 
 static gboolean
-sub_cho(GtkIMContextHangul *hcontext)
+im_hangul_sub_choseong(GtkIMContextHangul *hcontext)
 {
   hcontext->choseong[hcontext->lindex] = 0;
   if (hcontext->lindex <= 0)
@@ -97,7 +97,7 @@ sub_cho(GtkIMContextHangul *hcontext)
 }
 
 static gboolean
-sub_jung(GtkIMContextHangul *hcontext)
+im_hangul_sub_jungseong(GtkIMContextHangul *hcontext)
 {
   hcontext->jungseong[hcontext->vindex] = 0;
   if (hcontext->vindex <= 0)
@@ -107,7 +107,7 @@ sub_jung(GtkIMContextHangul *hcontext)
 }
 
 static gboolean
-sub_jong(GtkIMContextHangul *hcontext)
+im_hangul_sub_jongseong(GtkIMContextHangul *hcontext)
 {
   hcontext->jongseong[hcontext->tindex] = 0;
   if (hcontext->tindex <= 0)
@@ -322,15 +322,15 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
         return FALSE;
  
       if (im_hangul_is_choseong(ch)) {
-        sub_cho(hcontext);
+        im_hangul_sub_choseong(hcontext);
         goto done;
       }
       if (im_hangul_is_jungseong(ch)) {
-        sub_jung(hcontext);
+        im_hangul_sub_jungseong(hcontext);
         goto done;
       }
       if (im_hangul_is_jongseong(ch)) {
-        sub_jong(hcontext);
+        im_hangul_sub_jongseong(hcontext);
         goto done;
       }
       return FALSE;
