@@ -535,9 +535,13 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
   } else if (context_hangul->state == 2) {
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
-      im_hangul_commit(context_hangul);
+      if (pref_enable_inverse_sequence) {
+        context_hangul->state = 3;
+      } else {
+        im_hangul_commit(context_hangul);
+        context_hangul->state = 1;
+      }
       context_hangul->choseong = ch;
-      context_hangul->state = 1;
       goto done;
     }
     ch = im_hangul2_comp_jungseong(context_hangul->jungseong, keyval, state);
@@ -593,9 +597,13 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
   } else if (context_hangul->state == 4) {
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
-      im_hangul_commit(context_hangul);
+      if (pref_enable_inverse_sequence) {
+        context_hangul->state = 3;
+      } else {
+        im_hangul_commit(context_hangul);
+        context_hangul->state = 1;
+      }
       context_hangul->choseong = ch;
-      context_hangul->state = 1;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
