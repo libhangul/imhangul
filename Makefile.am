@@ -10,30 +10,32 @@ LDADDS = @GTK_LIBS@
 # moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
 moduledir = @GTK_PREFIX@/lib/gtk-2.0/immodules
 
-GTK_IMMODULES= $(sysconfdir)/gtk-2.0/gtk.immodules
+GTK_IMMODULES = $(sysconfdir)/gtk-2.0/gtk.immodules
+
+IMHANGUL_HEADER = imhangul.h hanjatable.h chartable.h
 
 im_hangul2_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul2_la_SOURCES = imhangul2.c imhangul.h hanjatable.h
+im_hangul2_la_SOURCES = imhangul2.c $(IMHANGUL_HEADER)
 im_hangul2_la_LIBADD = $(LDADDS)
 
 im_hangul3f_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul3f_la_SOURCES = imhangul3f.c imhangul.h hanjatable.h imhangul3.h
+im_hangul3f_la_SOURCES = imhangul3f.c imhangul3.h $(IMHANGUL_HEADER)
 im_hangul3f_la_LIBADD = $(LDADDS)
 
 im_hangul3s_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul3s_la_SOURCES = imhangul3s.c imhangul.h hanjatable.h imhangul3.h
+im_hangul3s_la_SOURCES = imhangul3s.c imhangul3.h $(IMHANGUL_HEADER)
 im_hangul3s_la_LIBADD = $(LDADDS)
 
 im_hangul39_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul39_la_SOURCES = imhangul39.c imhangul.h hanjatable.h imhangul3.h
+im_hangul39_la_SOURCES = imhangul39.c imhangul3.h $(IMHANGUL_HEADER)
 im_hangul39_la_LIBADD = $(LDADDS)
 
 im_hangul3y_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul3y_la_SOURCES = imhangul3y.c imhangul.h imhangul3.h hanjatable.h
+im_hangul3y_la_SOURCES = imhangul3y.c imhangul3.h $(IMHANGUL_HEADER)
 im_hangul3y_la_LIBADD = $(LDADDS)
 
 im_hangul32_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul32_la_SOURCES = imhangul32.c imhangul.h imhangul3.h hanjatable.h
+im_hangul32_la_SOURCES = imhangul32.c imhangul3.h $(IMHANGUL_HEADER)
 im_hangul32_la_LIBADD = $(LDADDS)
 
 CFLAGS = @GTK_CFLAGS@ -g -Wall
