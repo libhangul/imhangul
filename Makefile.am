@@ -15,6 +15,7 @@ im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
 	gtkimcontexthangul.h 	\
 	hangulcandidate.h	\
+	gettext.h		\
 	imhangul.c
 
 im_hangul_la_CFLAGS = \
