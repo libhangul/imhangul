@@ -31,7 +31,7 @@ module_LTLIBRARIES = im-hangul.la
 
 noinst_PROGRAMS = entry
 entry_SOURCES = entry.c
-entry_CFLAGS = -Wall @GTK_CFLAGS@
+entry_CFLAGS = @GTK_CFLAGS@
 entry_LDADD = @GTK_LIBS@
 
 install-data-hook:
