@@ -1,3 +1,6 @@
+2002. 07. 11. (목) 19:47:34 KST
+	* hanja select dialog에 gtk_window_set_transient_for() 함수를 적용
+
 2002. 07. 09. (화) 14:39:29 KST
 	* hanja select dialog에서 한자 폰트를 설정한 값을 쓰도록 변경
 	  (현재 설정 값을 바꿀수 있는 방법은 없음)
