@@ -12,9 +12,11 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(THEMES_DIR); \
 	for dir in $(THEMES) ; do \
 		$(mkinstalldirs) $(DESTDIR)$(THEMES_DIR)/$$dir; \
-		for i in `find $(srcdir)/$$dir -type f` ; do \
-			$(INSTALL_DATA) $$i $(DESTDIR)$(THEMES_DIR)/$$dir; \
-		done \
+		$(INSTALL_DATA) $(srcdir)/$$dir/none.png $(DESTDIR)$(THEMES_DIR)/$$dir; \
+		$(INSTALL_DATA) $(srcdir)/$$dir/hangul.png $(DESTDIR)$(THEMES_DIR)/$$dir; \
+		$(INSTALL_DATA) $(srcdir)/$$dir/english.png $(DESTDIR)$(THEMES_DIR)/$$dir; \
+		test -f $(srcdir)/$$dir/README && \
+			$(INSTALL_DATA) $(srcdir)/$$dir/README $(DESTDIR)$(THEMES_DIR)/$$dir; \
 	done
 
 EXTRA_DIST = \
