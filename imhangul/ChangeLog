@@ -1,3 +1,9 @@
+2002-11-29 (Fri) 20:53 Choe Hwanjin  <krisna@kldp.org>
+	* 0.9.5 버젼 준비
+	* 두벌식 자판의 키값을 테이블에서 가져오도록 수정
+	  관련 함수를 imhangul3.h에서 imhangul.h 로 이동 
+	  imhangul_mapping(), imhangul_compose()
+
 2002. 11. 08. (금) 23:48:44 KST
 	* imhangul.h: X 서버에게 한영 상태를 알려주는
 	  im_hangul_set_input_mode_info() 함수를 추가
