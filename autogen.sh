@@ -4,7 +4,7 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-PKG_NAME="Soribada"
+PKG_NAME="Gtk+ 2.0 hangul input module"
 
 DIE=0
 
