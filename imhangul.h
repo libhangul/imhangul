@@ -73,7 +73,7 @@ struct _GtkIMContextHangul
   gunichar jungseong;
   gunichar jongseong;
   GtkIMContextHangulAutomata automata;
-  GdkWindow *client_window;
+  GtkWidget *toplevel;
 };
 
 struct _GtkIMContextHangulClass
@@ -145,7 +145,7 @@ static void im_hangul_get_preedit_string(GtkIMContext *ic,
 static void im_hangul_focus_in	(GtkIMContext *context);
 static void im_hangul_focus_out	(GtkIMContext *context);
 
-
+static GtkWidget* get_toplevel_window (GdkWindow *window);
 static void im_hangul_set_client_window	(GtkIMContext *context,
 				         GdkWindow *client_window);
 static void status_window_show     (GtkIMContextHangul *context_hangul);
@@ -161,7 +161,7 @@ static void popup_hanja_window	   (GtkIMContextHangul *context_hangul);
 #define STATE_HANGUL 0 
 static GObjectClass *parent_class;
 
-static StatusWindow *status_window = NULL;
+static GSList *status_windows = NULL;
 static GtkWidget *hanja_window = NULL;
 
 #define MODE_HANJA	-2
@@ -253,7 +253,7 @@ im_hangul_init (GtkIMContextHangul *context_hangul)
   context_hangul->jungseong = 0;
   context_hangul->jongseong = 0;
   context_hangul->automata = NULL;	/* initial value: automata == null */
-  context_hangul->client_window = NULL;
+  context_hangul->toplevel = NULL;
 }
 
 static void
@@ -268,7 +268,7 @@ im_hangul_set_client_window(GtkIMContext *context,
 {
   GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(context);
 
-  context_hangul->client_window = client_window;
+  context_hangul->toplevel = get_toplevel_window(client_window);
 }
 
 static GtkIMContext *
@@ -1051,17 +1051,18 @@ status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
 }
 
 static void
-status_window_free(StatusWindow *_status_window)
+status_window_free(StatusWindow *status_window)
 {
-  if (status_window) {
-    g_signal_handler_disconnect(status_window->toplevel,
-				status_window->destroy_handler_id);
-    g_signal_handler_disconnect(status_window->toplevel,
-				status_window->configure_handler_id);
-    gtk_widget_destroy(status_window->window);
-    g_free(status_window);
-    status_window = NULL;
-  }
+  status_windows = g_slist_remove(status_windows, status_window);
+  
+  g_signal_handler_disconnect(status_window->toplevel,
+			      status_window->destroy_handler_id);
+  g_signal_handler_disconnect(status_window->toplevel,
+			      status_window->configure_handler_id);
+  gtk_widget_destroy(status_window->window);
+  g_object_set_data(G_OBJECT(status_window->toplevel),
+  		    "gtk-imhangul-status-window", NULL);
+  g_free(status_window);
 }
 
 static gboolean
@@ -1150,8 +1151,18 @@ get_toplevel_window(GdkWindow *window)
   return toplevel;
 }
 
-static GtkWidget *
-status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
+static StatusWindow*
+status_window_get(GtkIMContextHangul *context_hangul)
+{
+  if (context_hangul->toplevel == NULL)
+    return NULL;
+
+  return g_object_get_data (G_OBJECT(context_hangul->toplevel),
+  			    "gtk-imhangul-status-window");
+}
+
+static GtkWidget*
+status_window_get_window(GtkIMContextHangul *context_hangul, gboolean create)
 {
   GtkWidget *toplevel;
   GtkWidget *window;
@@ -1159,27 +1170,28 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
   GtkWidget *ebox;
   GtkWidget *frame;
   GtkWidget *label;
+  StatusWindow *status_window;
 
   if (!pref_use_status_window)
     return NULL;
 
-  if (status_window) {
-    /*
-    status_window_configure(status_window->toplevel, NULL,
-    			    status_window->window);
-    */
-    return status_window->window;
-  } else if (!create)
+  toplevel = context_hangul->toplevel;
+  if (toplevel == NULL)
     return NULL;
 
-  toplevel = get_toplevel_window(context_hangul->client_window);
-  if (toplevel == NULL)
+  status_window = status_window_get (context_hangul);
+  if (status_window)
+    return status_window->window;
+  else if (!create)
     return NULL;
 
   status_window = g_new(StatusWindow, 1);
   status_window->window = gtk_window_new(GTK_WINDOW_POPUP);
-  window = status_window->window;
   status_window->toplevel = toplevel;
+
+  status_windows = g_slist_prepend(status_windows, status_window);
+
+  window = status_window->window;
 
   gtk_container_set_border_width(GTK_CONTAINER(window), 1);
   /* gtk_window_set_decorated(GTK_WINDOW(window), FALSE); */
@@ -1242,6 +1254,8 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 		   G_CALLBACK(status_window_expose_event), NULL);
 
   status_window_set_label(context_hangul);
+  g_object_set_data(G_OBJECT(toplevel),
+  		    "gtk-imhangul-status-window", status_window);
 
   return window;
 }
@@ -1249,7 +1263,7 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 static void
 status_window_show(GtkIMContextHangul *context_hangul)
 {
-  GtkWidget *window = status_window_get (context_hangul, TRUE);
+  GtkWidget *window = status_window_get_window (context_hangul, TRUE);
 
   if (window) {
     status_window_set_label(context_hangul);
@@ -1260,7 +1274,7 @@ status_window_show(GtkIMContextHangul *context_hangul)
 static void
 status_window_hide(GtkIMContextHangul *context_hangul)
 {
-  GtkWidget *window = status_window_get (context_hangul, FALSE);
+  GtkWidget *window = status_window_get_window (context_hangul, FALSE);
 
   if (window) {
     gtk_widget_hide(window);
@@ -1284,6 +1298,8 @@ status_window_set_label(GtkIMContextHangul *context_hangul)
   };
  
   GtkWidget *label;
+  StatusWindow *status_window = status_window_get(context_hangul);
+
   if (status_window == NULL)
     return;
 
@@ -1432,7 +1448,7 @@ create_hanja_window(GtkIMContextHangul *context_hangul, gunichar ch)
   g_signal_connect (G_OBJECT(window), "destroy",
 		    G_CALLBACK (on_destroy), NULL);
 
-  parent = get_toplevel_window(context_hangul->client_window);
+  parent = context_hangul->toplevel;
   if (parent)
     gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent));
 
@@ -1468,8 +1484,8 @@ void
 im_hangul_shutdown(void)
 {
   /* remove status window */
-  status_window_free(status_window);
-  status_window = NULL;
+  while (status_windows)
+    status_window_free(status_windows->data);
 
   /* remove hanja selection dialog */
   if (hanja_window) {

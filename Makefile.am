@@ -47,11 +47,11 @@ entry_SOURCES = entry.c
 entry_LDADD = @GTK_LIBS@
 
 install-data-local:
-	if [ -z "$(DISTDIR)" ]; then
-		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES)
+	if [ -z "$(DISTDIR)" ]; then \
+		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES); \
 	fi
 
 uninstall:
-	if [ -z "$(DISTDIR)" ]; then
-		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES)
+	if [ -z "$(DISTDIR)" ]; then \
+		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES); \
 	fi
