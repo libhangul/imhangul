@@ -63,7 +63,6 @@ struct _DesktopInfo
 
 struct _Toplevel
 {
-  int ref_count;
   int input_mode;
   GtkWidget *widget;
   GtkWidget *status;
@@ -180,6 +179,8 @@ static void     im_hangul_set_toplevel_input_mode(GtkIMContextHangul *hcontext,
 static Toplevel*  toplevel_new(GtkWidget *toplevel_widget);
 static Toplevel*  toplevel_get(GdkWindow *window);
 static void       toplevel_append_context(Toplevel *toplevel,
+					  GtkIMContextHangul *context);
+static void       toplevel_remove_context(Toplevel *toplevel,
 					  GtkIMContextHangul *context);
 static void       toplevel_delete(Toplevel *toplevel);
 static GtkWidget* status_window_new(GtkWidget *parent);
@@ -495,12 +496,6 @@ add_desktop (GdkScreen *screen)
 }
 
 static void
-on_client_window_destroy(GdkWindow *window, GtkIMContext *context)
-{
-  im_hangul_set_client_window(context, window);
-}
-
-static void
 im_hangul_set_client_window (GtkIMContext *context,
 			     GdkWindow *client_window)
 {
@@ -519,11 +514,17 @@ im_hangul_set_client_window (GtkIMContext *context,
   if (hcontext->client_window == client_window)
     return;
 
+  if (hcontext->toplevel != NULL)
+    toplevel_remove_context(hcontext->toplevel, hcontext);
+
+  if (client_window == NULL) {
+    hcontext->client_window = NULL;
+    hcontext->toplevel = NULL;
+    return;
+  }
+
   hcontext->client_window = client_window;
   hcontext->toplevel = toplevel_get (client_window);
-  if (client_window == NULL)
-    return;
-
   toplevel_append_context(hcontext->toplevel, hcontext);
 
   gdk_window_get_user_data (client_window, &ptr);
@@ -702,10 +703,6 @@ im_hangul_set_input_mode_info (GdkWindow *window, int state)
 static void
 im_hangul_set_input_mode(GtkIMContextHangul *hcontext, int mode)
 {
-  GdkScreen *screen = NULL;
-  if (hcontext->client_window != NULL)
-    screen = gdk_drawable_get_screen(hcontext->client_window);
-
   switch (mode) {
     case INPUT_MODE_DIRECT:
       im_hangul_set_input_mode_info (hcontext->client_window,
@@ -1815,10 +1812,9 @@ get_toplevel_widget (GdkWindow *window)
 }
 
 static void
-on_toplevel_destroy(gpointer data)
+toplevel_destroy(Toplevel *toplevel)
 {
-  if (data != NULL) {
-    Toplevel *toplevel = (Toplevel*)data;
+  if (toplevel != NULL) {
     toplevel_delete(toplevel);
     toplevels = g_slist_remove(toplevels, toplevel);
   }
@@ -1830,14 +1826,13 @@ toplevel_new(GtkWidget *toplevel_widget)
   Toplevel *toplevel = NULL;
 
   toplevel = g_new(Toplevel, 1);
-  toplevel->ref_count = 1;
   toplevel->input_mode = INPUT_MODE_DIRECT;
   toplevel->widget = toplevel_widget;
   toplevel->status = NULL;
   toplevel->contexts = NULL;
   toplevel->destroy_handler_id = 
 	    g_signal_connect_swapped (G_OBJECT(toplevel->widget), "destroy",
-			     G_CALLBACK(on_toplevel_destroy), toplevel);
+			     G_CALLBACK(toplevel_destroy), toplevel);
   toplevel->configure_handler_id = 
 	    g_signal_connect (G_OBJECT(toplevel->widget), "configure-event",
 			     G_CALLBACK(status_window_configure),
@@ -1870,6 +1865,15 @@ toplevel_get(GdkWindow *window)
 }
 
 static void
+toplevel_remove_context(Toplevel *toplevel, GtkIMContextHangul *context)
+{
+  if (toplevel == NULL || context == NULL)
+    return;
+
+  toplevel->contexts = g_slist_remove(toplevel->contexts, context);
+}
+
+static void
 toplevel_append_context(Toplevel *toplevel, GtkIMContextHangul *context)
 {
   if (toplevel == NULL || context == NULL)
@@ -1884,10 +1888,6 @@ toplevel_delete(Toplevel *toplevel)
   if (toplevel != NULL) {
     if (toplevel->status != NULL) {
       gtk_widget_destroy(toplevel->status);
-      g_signal_handler_disconnect (toplevel->widget,
-				   toplevel->destroy_handler_id);
-      g_signal_handler_disconnect (toplevel->widget,
-				   toplevel->configure_handler_id);
     }
     if (toplevel->contexts != NULL) {
       GSList *item = toplevel->contexts;
@@ -1898,6 +1898,10 @@ toplevel_delete(Toplevel *toplevel)
       }
       g_slist_free(toplevel->contexts);
     }
+    g_signal_handler_disconnect (toplevel->widget,
+				 toplevel->configure_handler_id);
+    g_signal_handler_disconnect (toplevel->widget,
+				 toplevel->destroy_handler_id);
     g_object_set_data (G_OBJECT(toplevel->widget),
 		       "gtk-imhangul-toplevel-info", NULL);
     g_free(toplevel);
