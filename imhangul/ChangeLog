@@ -1,3 +1,6 @@
+일  9월 29 13:34:02 KST 2002
+	* imhangul.h: status window를 toplevel마다 하나씩 가지도록 수정
+
 일  9월 29 11:28:15 KST 2002
 	* version up: 0.9.3
 	* imhangul2.c imhangul3.h imhangul3f.c imhangul3s.c imhangul39.c
