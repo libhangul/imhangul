@@ -846,6 +846,8 @@ im_module_create (const gchar *context_id)
       im_hangul3_comp_choseong = im_hangul3y_comp_choseong;
       im_hangul3_comp_jungseong = im_hangul3y_comp_jungseong;
       im_hangul3_comp_jongseong = im_hangul3y_comp_jongseong;
+      use_caps_lock = FALSE;
+      pref_use_hangul_jamo = TRUE;
       return context;
     }
   }

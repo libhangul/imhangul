@@ -170,6 +170,7 @@ static GtkWidget *hanja_window = NULL;
 #define MODE_DIRECT	-1
 #define MODE_HANGUL	 0
 static gint		input_mode = MODE_DIRECT;
+static gboolean		use_caps_lock = TRUE;
 
 /* preferences */
 static gboolean		pref_use_hangul_jamo = FALSE;
@@ -251,7 +252,7 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
 						   "Preedit string style",
 						   0,
 						   4,
-						   1,
+						   0,
 						   G_PARAM_READWRITE));
 }
 
@@ -681,7 +682,7 @@ im_hangul_preedit_foreground (PangoAttrList **attrs, gint start, gint end)
   PangoAttribute *attr;
 
   *attrs = pango_attr_list_new();
-  attr = pango_attr_foreground_new(0xFFFF, 0x0000, 0x0000);
+  attr = pango_attr_foreground_new(0xeeee, 0x0, 0x0);
   attr->start_index = start;
   attr->end_index = end;
   pango_attr_list_insert (*attrs, attr);
@@ -1069,11 +1070,8 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return FALSE;
 
   /* on capslock, we use Hangul Jamo */
-  if (key->keyval == GDK_Caps_Lock) {
+  if (use_caps_lock && key->keyval == GDK_Caps_Lock)
     pref_use_hangul_jamo = !pref_use_hangul_jamo;
-    if (pref_use_hangul_jamo)
-      g_print ("Using Hangul Jamo\n");
-  }
 
   /* some keys are ignored: Ctrl, Alt, Meta */
   /* we flush out all preedit text */
