@@ -44,15 +44,16 @@ enum {
 } IMHangulInputMode;
 
 enum {
+  OUTPUT_MODE_SYLLABLE = 0,
+  OUTPUT_MODE_JAMO     = 1 << 1,
+  OUTPUT_MODE_JAMO2    = 1 << 2
+} IMHangulOutputMode;
+
+enum {
   INPUT_MODE_INFO_NONE,
   INPUT_MODE_INFO_ENGLISH,
   INPUT_MODE_INFO_HANGUL
 } IMHangulInputModeInfo;
-
-enum {
-  IM_HANGUL_STATE_DIRECT,
-  IM_HANGUL_STATE_HANGUL
-};
 
 typedef struct _StatusWindow StatusWindow;
 
@@ -177,17 +178,12 @@ static GSList *status_windows = NULL;
 static GtkWidget *hanja_window = NULL;
 static GtkWidget *char_table_window = NULL;
 
-#define OUTPUT_MODE_AUTOMATIC	0 
-#define OUTPUT_MODE_MANUAL	1
-
-static gboolean		manual_mode = FALSE;
 static gint		input_mode = INPUT_MODE_DIRECT;
-/* static gint		output_mode = OUTPUT_MODE_AUTOMATIC; */
+static gint		output_mode = OUTPUT_MODE_SYLLABLE;
 
 /* preferences */
 static gboolean		pref_use_global_state = TRUE;
 static gboolean		pref_use_caps_lock = FALSE;
-static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
 static gchar*		pref_hanja_font = NULL;
@@ -334,7 +330,7 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 
   hcontext->toplevel = NULL;
 
-  hcontext->state = IM_HANGUL_STATE_DIRECT;	/* english mode */
+  hcontext->input_mode = INPUT_MODE_DIRECT;	/* english mode */
   hcontext->composer = NULL;		/* initial value: composer == null */
   hcontext->keyboard_table = NULL;
   hcontext->compose_table_size = G_N_ELEMENTS(compose_table_default);
@@ -486,6 +482,16 @@ gtk_im_context_hangul_set_compose_table (GtkIMContextHangul        *hcontext,
   hcontext->compose_table_size = compose_table_size;
 }
 
+void
+gtk_im_context_hangul_set_use_jamo (GtkIMContextHangul *hcontext,
+    				    gboolean		use_jamo)
+{
+  if (use_jamo)
+    output_mode |= OUTPUT_MODE_JAMO;
+  else
+    output_mode &= ~OUTPUT_MODE_JAMO;
+}
+
 static void
 im_hangul_set_input_mode_info (int state)
 {
@@ -502,7 +508,7 @@ static void
 im_hangul_mode_hangul (GtkIMContextHangul *hcontext)
 {
   input_mode = INPUT_MODE_HANGUL;
-  hcontext->state = IM_HANGUL_STATE_HANGUL;
+  hcontext->input_mode = INPUT_MODE_HANGUL;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
   status_window_set_label (hcontext);
 }
@@ -511,7 +517,7 @@ static void
 im_hangul_mode_direct (GtkIMContextHangul *hcontext)
 {
   input_mode = INPUT_MODE_DIRECT;
-  hcontext->state = IM_HANGUL_STATE_DIRECT;
+  hcontext->input_mode = INPUT_MODE_DIRECT;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
   status_window_set_label (hcontext);
 }
@@ -669,7 +675,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
     return 0;
   }
 
-  if (manual_mode)
+  if (output_mode & OUTPUT_MODE_JAMO2)
     {
       /* we use conjoining jamo, U+1100 - U+11FF */
       if (hcontext->choseong[0] == 0)
@@ -695,7 +701,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
 	}
       buf[n] = '\0';
     }
-  else if (pref_use_hangul_jamo)
+  else if (output_mode & OUTPUT_MODE_JAMO)
     {
       /* we use conjoining jamo, U+1100 - U+11FF */
       if (hcontext->choseong[0] == 0)
@@ -878,13 +884,13 @@ im_hangul_focus_in (GtkIMContext *context)
     {
       im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
       if (pref_use_global_state)
-	hcontext->state = IM_HANGUL_STATE_DIRECT;
+	hcontext->input_mode = INPUT_MODE_DIRECT;
     }
   else
     {
       im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
       if (pref_use_global_state)
-	hcontext->state = IM_HANGUL_STATE_HANGUL;
+	hcontext->input_mode = INPUT_MODE_HANGUL;
     }
 
   current_context = hcontext;
@@ -901,7 +907,7 @@ im_hangul_focus_out (GtkIMContext *context)
       if (im_hangul_commit (hcontext))
 	{
 	  g_signal_emit_by_name (hcontext, "preedit_changed");
-	  hcontext->state = IM_HANGUL_STATE_HANGUL;
+	  hcontext->input_mode = INPUT_MODE_HANGUL;
 	}
     }
 
@@ -991,7 +997,7 @@ im_hangul_commit (GtkIMContextHangul *hcontext)
   if (im_hangul_is_empty (hcontext))
     return FALSE;
 
-  if (manual_mode)
+  if (output_mode & OUTPUT_MODE_JAMO2)
     {
       /* we use conjoining jamo, U+1100 - U+11FF */
       if (hcontext->choseong[0] == 0)
@@ -1017,7 +1023,7 @@ im_hangul_commit (GtkIMContextHangul *hcontext)
 	}
       buf[n] = '\0';
     }
-  else if (pref_use_hangul_jamo)
+  else if (output_mode & OUTPUT_MODE_JAMO)
     {
       /* we use conjoining jamo, U+1100 - U+11FF */
       if (hcontext->choseong[0] == 0)
@@ -1285,11 +1291,11 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 
   /* on Ctrl-Hangul we turn on/off manual_mode */
   if (key->keyval == GDK_Hangul && (key->state & GDK_CONTROL_MASK))
-    manual_mode = !manual_mode;
+    output_mode ^= OUTPUT_MODE_JAMO2;
 
   /* on capslock, we use Hangul Jamo */
   if (pref_use_caps_lock && key->keyval == GDK_Caps_Lock)
-    pref_use_hangul_jamo = !pref_use_hangul_jamo;
+    output_mode ^= OUTPUT_MODE_JAMO;
 
   /* some keys are ignored: Ctrl, Alt, Meta */
   /* we flush out all preedit text */
@@ -1301,7 +1307,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     }
 
   /* handle direct mode */
-  if (hcontext->state == IM_HANGUL_STATE_DIRECT)
+  if (hcontext->input_mode == INPUT_MODE_DIRECT)
     return im_hangul_handle_direct_mode (hcontext, key);
 
   /* handle Escape key: automaticaly change to direct mode */
@@ -1346,12 +1352,12 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
       return TRUE;
     }
 
-  /* here we must hangul mode, so set IM_HANGUL_STATE_HANGUL
+  /* here we must hangul mode, so set INPUT_MODE_HANGUL
    * static variable input_mode is not yet applied so we change it
    * below line must not removed */
-  if (hcontext->state == IM_HANGUL_STATE_DIRECT)
+  if (hcontext->input_mode == INPUT_MODE_DIRECT)
     {
-      hcontext->state = IM_HANGUL_STATE_HANGUL;
+      hcontext->input_mode = INPUT_MODE_HANGUL;
       g_print ("This is really a error: our input mode is currupted\n");
     }
 
@@ -1423,7 +1429,7 @@ on_click_hangul (GtkWidget *widget,
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(data);
 
-  if (hcontext->state == IM_HANGUL_STATE_DIRECT)
+  if (hcontext->input_mode == INPUT_MODE_DIRECT)
     {
       /* english mode change to hangul mode */
       im_hangul_mode_hangul (hcontext);
@@ -1608,7 +1614,7 @@ status_window_set_label (GtkIMContextHangul *hcontext)
   label = status_window->hangul_label;
   if (label)
     {
-      if (hcontext->state == IM_HANGUL_STATE_DIRECT)
+      if (hcontext->input_mode == INPUT_MODE_DIRECT)
 	gtk_label_set_text (GTK_LABEL(label), yeongeo);
       else
 	gtk_label_set_text (GTK_LABEL(label), hangul);
@@ -1670,7 +1676,7 @@ on_hanja_button_clicked (GtkButton *button, gpointer data)
   if (str)
     {
       im_hangul_commit_utf8 (hcontext, str);
-      hcontext->state = IM_HANGUL_STATE_HANGUL;
+      hcontext->input_mode = INPUT_MODE_HANGUL;
       hcontext->index = -1;
       g_signal_emit_by_name (hcontext, "preedit_changed");
     }
@@ -2281,7 +2287,7 @@ im_hangul_composer_3 (GtkIMContextHangul *hcontext,
 
   ch = im_hangul_mapping (hcontext, key->keyval, key->state);
 
-  if (manual_mode)
+  if (output_mode & OUTPUT_MODE_JAMO2)
     {
       if (hcontext->jongseong[0])
 	{
@@ -2522,7 +2528,7 @@ im_hangul_composer_3 (GtkIMContextHangul *hcontext,
     {
       im_hangul_commit (hcontext);
       im_hangul_commit_unicode (hcontext, ch);
-      hcontext->state = IM_HANGUL_STATE_HANGUL;
+      hcontext->input_mode = INPUT_MODE_HANGUL;
       goto done;
     }
 
