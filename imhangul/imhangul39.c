@@ -172,18 +172,11 @@ im_module_create (const gchar *context_id)
   if (strcmp (context_id, "hangul39") == 0) {
     GtkIMContext *context = im_hangul_new();
     if (context) {
-      GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(context);
-      im_hangul_set_automata(context_hangul, im_hangul3_automata);
+      GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+      im_hangul_set_automata(hcontext, im_hangul3_automata);
 
       keyboard_table = keyboard_table_390;
 
-//      im_hangul3_choseong = im_hangul3_choseong_90;
-//      im_hangul3_jungseong = im_hangul3_jungseong_90;
-//      im_hangul3_jongseong = im_hangul3_jongseong_90;
-//      im_hangul3_punct = im_hangul3_punct_90;
-//      im_hangul3_comp_choseong = im_hangul3_comp_choseong_90;
-//      im_hangul3_comp_jungseong = im_hangul3_comp_jungseong_90;
-//      im_hangul3_comp_jongseong = im_hangul3_comp_jongseong_90;
       return context;
     }
   }

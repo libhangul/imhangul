@@ -200,7 +200,7 @@ static void (*im_hangul_preedit_attr)(PangoAttrList **attrs, gint start, gint en
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
 
-static guint16 gtk_compose_ignore[] = {
+static guint16 im_hangul_ignore_table[] = {
   GDK_Control_L,
   GDK_Control_R,
   GDK_Caps_Lock,
@@ -793,8 +793,8 @@ static gboolean
 im_hangul_is_ignore_key(guint16 key)
 {
   int i;
-  for (i = 0; gtk_compose_ignore[i]; i++) {
-    if (key == gtk_compose_ignore[i]) {
+  for (i = 0; im_hangul_ignore_table[i]; i++) {
+    if (key == im_hangul_ignore_table[i]) {
       return TRUE;
     }
   }
@@ -1079,6 +1079,10 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   /* we silently ignore shift keys */
   if (key->keyval == GDK_Shift_L || key->keyval == GDK_Shift_R)
     return FALSE;
+
+  /* on Ctrl-Hangul we turn on/off manual_mode */
+  if (key->keyval == GDK_Hangul && key->state & GDK_CONTROL_MASK)
+    manual_mode = !manual_mode;
 
   /* on capslock, we use Hangul Jamo */
   if (pref_use_caps_lock && key->keyval == GDK_Caps_Lock)
