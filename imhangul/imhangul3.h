@@ -19,6 +19,13 @@
  * Author: Choe Hwanjin <krisna@kldp.org>
  * this module is for hangul 3bul sik mode users
  */
+
+static gunichar	im_hangul_compchoseong_to_single	(gunichar ch);
+
+static gunichar	im_hangul_pop	(GtkIMContextHangul *context_hangul);
+static gunichar	im_hangul_peek	(GtkIMContextHangul *context_hangul);
+static void	im_hangul_push	(GtkIMContextHangul *context_hangul, gunichar ch);
+
 static gunichar (*im_hangul3_choseong)		(guint, guint);
 static gunichar (*im_hangul3_jungseong)		(guint, guint);
 static gunichar (*im_hangul3_jongseong)		(guint, guint);
@@ -26,6 +33,76 @@ static gunichar (*im_hangul3_punct)		(guint, guint);
 static gunichar (*im_hangul3_comp_choseong)	(gunichar, guint, guint);
 static gunichar (*im_hangul3_comp_jungseong)	(gunichar, guint, guint);
 static gunichar (*im_hangul3_comp_jongseong)	(gunichar, guint, guint);
+
+static void
+im_hangul_push(GtkIMContextHangul *context_hangul, gunichar ch)
+{
+  context_hangul->stack[++context_hangul->index] = ch;
+}
+
+static gunichar
+im_hangul_peek(GtkIMContextHangul *context_hangul)
+{
+  if (context_hangul->index < 0)
+    return 0;
+  return context_hangul->stack[context_hangul->index];
+}
+
+static gunichar
+im_hangul_pop(GtkIMContextHangul *context_hangul)
+{
+  if (context_hangul->index < 0)
+    return 0;
+  return context_hangul->stack[context_hangul->index--];
+}
+
+/* this funcs used for backspace in hangul 3 set keyboard */
+static gunichar
+im_hangul_compchoseong_to_single(gunichar ch)
+{
+  switch (ch) {
+    case 0x1101:	/* hangul choseong ssangkiyeok */
+      return 0x1100;	/* hangul choseong kiyeok */
+    case 0x1104:	/* hangul choseong ssangtikeut */
+    case 0x1117:	/* hangul choseong tikeut-kiyeok */
+      return 0x1103;	/* hangul choseong tikeut */
+    case 0x1108:	/* hangul choseong ssangpieup */
+    case 0x111e:	/* hangul choseong pieup-kiyeok */
+    case 0x111f:	/* hangul choseong pieup-nieun */
+    case 0x1120:	/* hangul choseong pieup-tikeut */
+    case 0x1121:	/* hangul choseong pieup-sios */
+    case 0x1127:	/* hangul choseong pieup-cieuc */
+    case 0x1128:	/* hangul choseong pieup-chieuch */
+    case 0x1129:	/* hangul choseong pieup-thieuth */
+    case 0x112a:	/* hangul choseong pieup-phieuph */
+    case 0x112b:	/* hangul choseong kapyeounpieup */
+      return 0x1107;	/* hangul choseong pieup */
+    case 0x110a:	/* hangul choseong ssangsios */
+      return 0x1109;	/* hangul choseong sios */
+    case 0x110d:	/* hangul choseong ssangcieuc */
+      return 0x110c;	/* hangul choseong cieuc */
+    case 0x1113:	/* hangul choseong nieun-kiyeok */
+    case 0x1114:	/* hangul choseong ssangnieun */
+    case 0x1115:	/* hangul choseong nieun-tikeut */
+    case 0x1116:	/* hangul choseong nieun-pieup */
+      return 0x1102;	/* hangul choseong nieun */
+    case 0x1118:	/* hangul choseong rieul-neiun */
+    case 0x1119:	/* hangul choseong ssangrieul */
+    case 0x111a:	/* hangul choseong rieul-hieuh */
+    case 0x111b:	/* hangul choseong kapyeounrieul */
+      return 0x1105;	/* hangul choseong rieul */
+    case 0x111c:	/* hangul choseong mieum-pieup */
+    case 0x111d:	/* hangul choseong kapyeounmieum */
+      return 0x1106;	/* hangul choseong mieum */
+    case 0x1122:	/* hangul choseong pieup-sios-kiyeok */
+    case 0x1123:	/* hangul choseong pieup-sios-tikeut */
+    case 0x1124:	/* hangul choseong pieup-sios-pieup */
+    case 0x1125:	/* hangul choseong pieup-ssangsois */
+    case 0x1126:	/* hangul choseong pieup-sios-cieuc */
+      return 0x1121;	/* hangul choseong pieup-sios */
+  }
+  return 0;
+}
 
 static gboolean
 im_hangul3_automata(GtkIMContextHangul *context_hangul,

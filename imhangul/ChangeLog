@@ -1,5 +1,8 @@
 화 10월  8 20:44:36 KST 2002
 	* imhangul.h: 상태창에서 [완성/조합] 라벨을 없앰
+	* imhangul.h, imhangul3.h: im_hangul_pop, im_hangul_peek,
+	  im_hangul_push, im_hangul_compchoseong_to_single를 
+	  imhangul.h 에서 imhangul3.h로 옮김
 
 2002. 10. 08. (화) 14:26:25 KST
 	* imhangul.h: 환경설정값 "gtk-imhangul-style" 추가, pref_fg, pref_bg를

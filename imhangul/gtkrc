@@ -33,4 +33,4 @@ gtk-imhangul-status = 1
 # 1 : ¾¸
 gtk-imhangul-dvorak = 0
 
-gtk-imhangul-style = 3
+gtk-imhangul-style = 1
