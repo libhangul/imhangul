@@ -199,7 +199,7 @@ static GSList	       *desktops = NULL;
 /* preferences */
 static gboolean		pref_use_global_state = TRUE;
 static gboolean		pref_use_capslock = FALSE;
-static gboolean		pref_use_status_window = TRUE;
+static gboolean		pref_use_status_window = FALSE;
 static gboolean		pref_use_dvorak = FALSE;
 static gchar           *pref_hanja_font = NULL;
 static gint		pref_preedit_style = 0;
@@ -2075,10 +2075,14 @@ gtk_im_context_hangul_shutdown (void)
   for (item = desktops; item != NULL; item = item->next)
     {
       DesktopInfo *info = (DesktopInfo*)(item->data);
-      g_signal_handler_disconnect (info->settings, info->status_window_cb);
-      g_signal_handler_disconnect (info->settings, info->use_capslock_cb);
-      g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
-      g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
+      if (info->status_window_cb > 0)
+	g_signal_handler_disconnect (info->settings, info->status_window_cb);
+      if (info->use_capslock_cb > 0)
+	g_signal_handler_disconnect (info->settings, info->use_capslock_cb);
+      if (info->use_dvorak_cb > 0)
+	g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
+      if (info->preedit_style_cb > 0)
+	g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
       g_free(info);
     }
   g_slist_free(desktops);
