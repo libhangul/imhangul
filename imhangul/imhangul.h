@@ -851,7 +851,7 @@ im_hangul_handle_direct_mode(GtkIMContextHangul *hcontext,
     if (im_hangul_commit(hcontext))
       g_signal_emit_by_name (hcontext, "preedit_changed");
     im_hangul_mode_hangul(hcontext);
-    return FALSE;
+    return TRUE;
   }
   return im_hangul_process_nonhangul(hcontext, key);
 }
