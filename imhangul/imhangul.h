@@ -1009,14 +1009,14 @@ status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
 }
 
 static void
-status_window_style_set(GtkWidget *toplevel,
+status_window_style_set(GtkWidget *window,
 			GtkStyle *previous_style,
 			GtkWidget *label)
 {
   gint i;
 
   for (i = 0; i < 5; i++)
-    gtk_widget_modify_fg(label, i, &toplevel->style->text[i]);
+    gtk_widget_modify_fg(label, i, &window->style->text[i]);
 }
 
 static void
@@ -1121,8 +1121,10 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 
   status_window_configure(toplevel, NULL, status_window);
 
+/*
   g_signal_connect(window, "style_set",
 		   G_CALLBACK(status_window_style_set), label);
+*/
   g_signal_connect(window, "expose_event",
 		   G_CALLBACK(status_window_expose_event), NULL);
 
