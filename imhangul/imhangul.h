@@ -725,6 +725,9 @@ static gboolean
 im_hangul_process_nonhangul(GtkIMContextHangul *context_hangul,
 		            GdkEventKey *key)
 {
+  if (key->keyval == GDK_Tab)
+    return FALSE;
+
   if (!im_hangul_is_modifier(key->state)) {
     gunichar ch = gdk_keyval_to_unicode(key->keyval);
     if (ch != 0) {
