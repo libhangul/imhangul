@@ -1,0 +1,10 @@
+.libs
+.deps
+Makefile
+Makefile.in
+*.o
+CVS
+GNOME_IMHangulStatusApplet.server
+GNOME_IMHangulStatusApplet.server.in
+imhangul-status-applet
+imhangul_status.schemas

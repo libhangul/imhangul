@@ -4,9 +4,16 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+config.h
 config.log
 config.status
 config.cache
+config.guess
+config.sub
+stamp-h
+stamp-h.in
 configure
 libtool
 intltool-*
+imhangul_status_applet-*.tar.gz
+imhangul_status_applet-*.tar.bz2
