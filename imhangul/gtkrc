@@ -1,9 +1,11 @@
+# status 윈도우에서 나타나는 글자의 색과 크기모양을 정할 수 있습니다.
+
 style "imhangul-style"
 {
-	fg[NORMAL]	= "#FFFFFF"
-	bg[NORMAL]	= "#EEEEE0"
-	text[NORMAL]	= "#FF0000"
-	font_name = "Sans 8"
+	fg[NORMAL]	= "#003300"	# 글자색입니다.
+	bg[NORMAL]	= "#EEEEE0"	# 바탕색입니다.
+	text[NORMAL]	= "#330000"	# 테두리선색입니다.
+	font_name = "Sans 20"		# 글자의 모양 크기입니다.
 }
 
 widget "*imhangul*" style "imhangul-style"
