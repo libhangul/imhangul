@@ -1,0 +1,17 @@
+.libs
+.deps
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+libtool
+entry
+im-hangul2.la
+imhangul2.lo
+imhangul2.o
+im-hangul3.la
+imhangul3.lo
+imhangul3.o
