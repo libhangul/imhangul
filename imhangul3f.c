@@ -306,10 +306,10 @@ im_module_create (const gchar *context_id)
 
       keyboard_table = keyboard_table_final;
 
-      im_hangul3_choseong = im_hangul3_choseong_final;
-      im_hangul3_jungseong = im_hangul3_jungseong_final;
-      im_hangul3_jongseong = im_hangul3_jongseong_final;
-      im_hangul3_punct = im_hangul3_punct_final;
+//      im_hangul3_choseong = im_hangul3_choseong_final;
+//      im_hangul3_jungseong = im_hangul3_jungseong_final;
+//      im_hangul3_jongseong = im_hangul3_jongseong_final;
+//      im_hangul3_punct = im_hangul3_punct_final;
       im_hangul3_comp_choseong = im_hangul3_comp_choseong_final;
       im_hangul3_comp_jungseong = im_hangul3_comp_jungseong_final;
       im_hangul3_comp_jongseong = im_hangul3_comp_jongseong_final;
