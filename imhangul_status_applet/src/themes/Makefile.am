@@ -2,7 +2,8 @@ THEMES = \
 	SimplyRed \
 	MSWindows \
 	Mac \
-	keyboard
+	keyboard \
+	Onion
 
 THEMES_DIR = @IMHANGUL_STATUS_THEMES_DIR@
 

@@ -7,4 +7,4 @@ EXTRA_DIST =	\
 	$(pixmap_DATA)
 
 pixmapdir = $(datadir)/pixmaps
-pixmap_DATA = imhangul-status-applet.png
+pixmap_DATA = imhangul-status-applet.png imhangul-status-applet-logo.png

@@ -382,7 +382,7 @@ about_cb (BonoboUIComponent *uic,
 	}
 
 	pixmap_file = gnome_program_locate_file(NULL, GNOME_FILE_DOMAIN_PIXMAP,
-						"imhangul-status-applet.png",
+						"imhangul-status-applet-logo.png",
 						TRUE, NULL);
 	pixbuf = gdk_pixbuf_new_from_file (pixmap_file, NULL);
 	g_free(pixmap_file);
