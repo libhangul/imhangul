@@ -648,6 +648,13 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
       context_hangul->state = 8;
       goto done;
     }
+    ch = im_hangul2_choseong(keyval, state);
+    if (im_hangul_is_choseong(ch)) {
+      im_hangul_commit(context_hangul);
+      context_hangul->choseong = ch;
+      context_hangul->state = 1;
+      goto done;
+    }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(context_hangul);
