@@ -3,8 +3,8 @@ style "mydefault"
 #	fg[NORMAL]	= "#00FF00"	# 글자, 테두리색
 #	bg[NORMAL]	= "#DDDDDD"	# 바탕색
 #	text[NORMAL]	= "#0000FF"	# 글자
-#	font_name = "code2000 20"
-	font_name = "sans 20"
+	font_name = "code2000 20"
+#	font_name = "sans 20"
 #	font_name = "Andale Sans UI 20"
 }
 
