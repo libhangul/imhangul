@@ -27,6 +27,8 @@
 #include <gdk/gdkkeysyms.h>
 
 /*
+#include "gtk/gtkmain.h"
+#include "gtk/gtkbutton.h"
 #include "gtk/gtklabel.h"
 #include "gtk/gtksignal.h"
 #include "gtk/gtkwindow.h"
@@ -96,9 +98,12 @@ static void im_hangul_set_automata(GtkIMContextHangul *context_hangul,
 #define is_set(state, mask)		((state & mask) == mask)
 #define im_hangul_is_modifier(state)	(is_set(state, GDK_CONTROL_MASK) || \
 					 is_set(state, GDK_MOD1_MASK))
-#define im_hangul_is_choseong(c)	((c) >=0x1100 && (c) <=0x1112)
-#define im_hangul_is_jungseong(c)	((c) >=0x1161 && (c) <=0x1175)
-#define im_hangul_is_jongseong(c)	((c) >=0x11a7 && (c) <=0x11c2)
+#define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1112)
+#define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x1175)
+#define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11C2)
+#define im_hangul_is_empty(ctx)		((ctx)->choseong  == 0 &&	\
+					 (ctx)->jungseong == 0 &&	\
+					 (ctx)->jongseong == 0 )
 
 static gboolean	im_hangul_is_trigger			(GdkEventKey *key);
 static gboolean	im_hangul_is_backspace			(GdkEventKey *key);
