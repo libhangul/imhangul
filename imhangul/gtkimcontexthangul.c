@@ -358,6 +358,9 @@ preedit_style_change (GtkSettings *settings, GtkWidget *widget)
   if (window == NULL)
     return;
 
+  if (window->style == NULL)
+    return;
+
   /* set preedit style attributes */
   g_object_get (settings,
 		"gtk-im-hangul-preedit-style", &pref_preedit_style,
