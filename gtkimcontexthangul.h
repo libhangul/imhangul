@@ -65,6 +65,9 @@ struct _GtkIMContextHangul
   gunichar jongseong[4];
 
   GtkWidget *toplevel;
+
+  /* options */
+  gboolean always_use_jamo : 1;
 };
 
 struct _GtkIMContextHangulClass
