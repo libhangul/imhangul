@@ -2,8 +2,8 @@
 
 style "imhangul-style"
 {
-	fg[NORMAL]	= "#990000"
-	bg[NORMAL]	= "#EEEEE0"
+	fg[NORMAL]	= "#990000"	# 글자, 테두리색
+	bg[NORMAL]	= "#EEEEE0"	# 바탕색
 	font_name	= "Sans 20"
 }
 
