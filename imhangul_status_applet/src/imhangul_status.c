@@ -60,6 +60,9 @@ struct _AppletData {
 
 enum {
 	THEMES_LIST_PATH = 0,
+	THEMES_LIST_NONE,
+	THEMES_LIST_HANGUL,
+	THEMES_LIST_ENGLISH,
 	THEMES_LIST_NAME,
 	N_COLS
 };
@@ -199,12 +202,23 @@ get_themes_list(AppletData *data)
 {
 	gchar *path;
 	gchar *theme_dir;
+	gchar *file_none;
+	gchar *file_hangul;
+	gchar *file_english;
+	GdkPixbuf *pixbuf_none;
+	GdkPixbuf *pixbuf_hangul;
+	GdkPixbuf *pixbuf_english;
 	GtkListStore *store;
 	GtkTreeIter iter;
 	DIR *dir;
 	struct dirent *dent;
 
-	store = gtk_list_store_new(N_COLS, G_TYPE_STRING, G_TYPE_STRING);
+	store = gtk_list_store_new(N_COLS,
+				   G_TYPE_STRING,
+				   GDK_TYPE_PIXBUF,
+				   GDK_TYPE_PIXBUF,
+				   GDK_TYPE_PIXBUF,
+				   G_TYPE_STRING);
 
 	path = IMHANGUL_STATUS_THEMES_DIR;
 
@@ -219,12 +233,27 @@ get_themes_list(AppletData *data)
 			continue;
 
 		theme_dir = g_build_filename(path, dent->d_name, NULL);
+		file_none = g_build_filename(theme_dir, "none.png", NULL);
+		file_hangul = g_build_filename(theme_dir, "hangul.png", NULL);
+		file_english = g_build_filename(theme_dir, "english.png", NULL);
+		pixbuf_none = gdk_pixbuf_new_from_file(file_none, NULL);
+		pixbuf_hangul = gdk_pixbuf_new_from_file(file_hangul, NULL);
+		pixbuf_english = gdk_pixbuf_new_from_file(file_english, NULL);
 		gtk_list_store_append(store, &iter);
 		gtk_list_store_set (store, &iter,
 				    THEMES_LIST_PATH, theme_dir,
+				    THEMES_LIST_NONE, pixbuf_none,
+				    THEMES_LIST_HANGUL, pixbuf_hangul,
+				    THEMES_LIST_ENGLISH, pixbuf_english,
 				    THEMES_LIST_NAME, dent->d_name,
 				    -1);
 		g_free(theme_dir);
+		g_free(file_none);
+		g_free(file_hangul);
+		g_free(file_english);
+		gdk_pixbuf_unref(pixbuf_none);
+		gdk_pixbuf_unref(pixbuf_hangul);
+		gdk_pixbuf_unref(pixbuf_english);
 	}
 
 	return GTK_TREE_MODEL(store);
@@ -298,6 +327,7 @@ themes_cb (BonoboUIComponent *uic,
 	GtkCellRenderer *renderer;
 	GtkTreeSelection *selection;
 	GtkTreePath *path;
+	GtkRequisition treeview_size;
 
 	if (dialog != NULL) {
 		gtk_window_present(GTK_WINDOW(dialog));
@@ -310,7 +340,6 @@ themes_cb (BonoboUIComponent *uic,
 					     GTK_STOCK_CLOSE,
 					     GTK_RESPONSE_CLOSE,
 					     NULL);
-	gtk_window_set_default_size(GTK_WINDOW(dialog), 200, 250);
 
 	vbox = GTK_DIALOG(dialog)->vbox;
 	gtk_widget_show(vbox);
@@ -330,6 +359,34 @@ themes_cb (BonoboUIComponent *uic,
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(treeview), FALSE);
 	gtk_widget_show(treeview);
 	gtk_container_add(GTK_CONTAINER(scrolledwindow), treeview);
+
+	/* theme icons */
+	/* state None */
+	column = gtk_tree_view_column_new();
+	gtk_tree_view_column_set_title(column, _("None"));
+	renderer = gtk_cell_renderer_pixbuf_new();
+	gtk_tree_view_column_pack_start(column, renderer, FALSE);
+	gtk_tree_view_column_add_attribute(column, renderer,
+					   "pixbuf", THEMES_LIST_NONE);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+
+	/* state Hangul */
+	column = gtk_tree_view_column_new();
+	gtk_tree_view_column_set_title(column, _("Hangul"));
+	renderer = gtk_cell_renderer_pixbuf_new();
+	gtk_tree_view_column_pack_start(column, renderer, FALSE);
+	gtk_tree_view_column_add_attribute(column, renderer,
+					   "pixbuf", THEMES_LIST_HANGUL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+
+	/* state English */
+	column = gtk_tree_view_column_new();
+	gtk_tree_view_column_set_title(column, _("English"));
+	renderer = gtk_cell_renderer_pixbuf_new();
+	gtk_tree_view_column_pack_start(column, renderer, FALSE);
+	gtk_tree_view_column_add_attribute(column, renderer,
+					   "pixbuf", THEMES_LIST_ENGLISH);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Theme Name"),
@@ -354,6 +411,9 @@ themes_cb (BonoboUIComponent *uic,
 		gtk_tree_path_free(path);
 	}
 
+	gtk_widget_size_request(treeview, &treeview_size);
+	gtk_widget_set_size_request(scrolledwindow,
+		CLAMP(treeview_size.width + 50, 200, gdk_screen_width()), 250);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 	dialog = NULL;
