@@ -549,14 +549,14 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       context_hangul->state = 1;
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       context_hangul->state = 2;
-      context_hangul->choseong = 0;
-      context_hangul->jungseong = ch;
+      context_hangul->choseong[0] = 0;
+      context_hangul->jungseong[0] = ch;
       goto done;
     }
     if (im_hangul_is_backspace(key))
@@ -566,17 +566,17 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
       context_hangul->state = 1;
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 3;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->choseong = 0;
+      context_hangul->choseong[0] = 0;
       context_hangul->state = 0;
       goto done;
     }
@@ -589,56 +589,56 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
         im_hangul_commit(context_hangul);
         context_hangul->state = 1;
       }
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       goto done;
     }
-    ch = im_hangul2_comp_jungseong(context_hangul->jungseong, keyval, state);
+    ch = im_hangul2_comp_jungseong(context_hangul->jungseong[0], keyval, state);
     if (im_hangul_is_jungseong(ch)) {
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 4;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 2;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jungseong = 0;
+      context_hangul->jungseong[0] = 0;
       context_hangul->state = 0;
       goto done;
     }
   } else if (context_hangul->state == 3) {
     ch = im_hangul2_jongseong(keyval, state);
     if (im_hangul_is_jongseong(ch)) {
-      context_hangul->jongseong = ch;
+      context_hangul->jongseong[0] = ch;
       context_hangul->state = 5;
       goto done;
     }
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       context_hangul->state = 1;
       goto done;
     }
-    ch = im_hangul2_comp_jungseong(context_hangul->jungseong, keyval, state);
+    ch = im_hangul2_comp_jungseong(context_hangul->jungseong[0], keyval, state);
     if (im_hangul_is_jungseong(ch)) {
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 6;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 2;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jungseong = 0;
+      context_hangul->jungseong[0] = 0;
       context_hangul->state = 1;
       goto done;
     }
@@ -651,76 +651,76 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
         im_hangul_commit(context_hangul);
         context_hangul->state = 1;
       }
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 2;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jungseong = 
-		im_hangul_compjungseong_to_single(context_hangul->jungseong);
+      context_hangul->jungseong[0] = 
+		im_hangul_compjungseong_to_single(context_hangul->jungseong[0]);
       context_hangul->state = 2;
       goto done;
     }
   } else if (context_hangul->state == 5) {
-    ch = im_hangul2_comp_jongseong(context_hangul->jongseong, keyval, state);
+    ch = im_hangul2_comp_jongseong(context_hangul->jongseong[0], keyval, state);
     if (im_hangul_is_jongseong(ch)) {
-      context_hangul->jongseong = ch;
+      context_hangul->jongseong[0] = ch;
       context_hangul->state = 7;
       goto done;
     }
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       context_hangul->state = 1;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       gunichar choseong = 
-		im_hangul2_jongseong_to_choseong(context_hangul->jongseong);
-      context_hangul->jongseong = 0;
+		im_hangul2_jongseong_to_choseong(context_hangul->jongseong[0]);
+      context_hangul->jongseong[0] = 0;
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = choseong;
-      context_hangul->jungseong = ch;
+      context_hangul->choseong[0] = choseong;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 3;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jongseong = 0;
+      context_hangul->jongseong[0] = 0;
       context_hangul->state = 3;
       goto done;
     }
   } else if (context_hangul->state == 6) {
     ch = im_hangul2_jongseong(keyval, state);
     if (im_hangul_is_jongseong(ch)) {
-      context_hangul->jongseong = ch;
+      context_hangul->jongseong[0] = ch;
       context_hangul->state = 8;
       goto done;
     }
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       context_hangul->state = 1;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->jungseong = ch;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 2;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jungseong = 
-       im_hangul_compjungseong_to_single(context_hangul->jungseong);
+      context_hangul->jungseong[0] = 
+       im_hangul_compjungseong_to_single(context_hangul->jungseong[0]);
       context_hangul->state = 3;
       goto done;
     }
@@ -728,7 +728,7 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       context_hangul->state = 1;
       goto done;
     }
@@ -737,49 +737,49 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
       /* complex final consonant
        * to single final consonant and initial consonant */
       gunichar choseong = 
-		im_hangul2_jongseong_to_choseong(context_hangul->jongseong);
-      context_hangul->jongseong = 
-		im_hangul_compjongseong_to_single(context_hangul->jongseong);
+		im_hangul2_jongseong_to_choseong(context_hangul->jongseong[0]);
+      context_hangul->jongseong[0] = 
+		im_hangul_compjongseong_to_single(context_hangul->jongseong[0]);
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = choseong;
-      context_hangul->jungseong = ch;
+      context_hangul->choseong[0] = choseong;
+      context_hangul->jungseong[0] = ch;
       context_hangul->state = 3;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jongseong = 
-		im_hangul_compjongseong_to_single(context_hangul->jongseong);
+      context_hangul->jongseong[0] = 
+		im_hangul_compjongseong_to_single(context_hangul->jongseong[0]);
       context_hangul->state = 5;
       goto done;
     }
   } else if (context_hangul->state == 8) {
-    ch = im_hangul2_comp_jongseong(context_hangul->jongseong, keyval, state);
+    ch = im_hangul2_comp_jongseong(context_hangul->jongseong[0], keyval, state);
     if (im_hangul_is_jongseong(ch)) {
-      context_hangul->jongseong = ch;
+      context_hangul->jongseong[0] = ch;
       context_hangul->state = 9;
       goto done;
     }
     ch = im_hangul2_choseong(keyval, state);
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       context_hangul->state = 1;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
     if (im_hangul_is_jungseong(ch)) {
       gunichar choseong = 
-		im_hangul2_jongseong_to_choseong(context_hangul->jongseong);
-      context_hangul->jongseong = 0;
+		im_hangul2_jongseong_to_choseong(context_hangul->jongseong[0]);
+      context_hangul->jongseong[0] = 0;
       im_hangul_commit(context_hangul);
       context_hangul->state = 3;
-      context_hangul->choseong = choseong;
-      context_hangul->jungseong = ch;
+      context_hangul->choseong[0] = choseong;
+      context_hangul->jungseong[0] = ch;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
       context_hangul->state = 6;
-      context_hangul->jongseong = 0;
+      context_hangul->jongseong[0] = 0;
       goto done;
     }
   } else if (context_hangul->state == 9) {
@@ -787,7 +787,7 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
     if (im_hangul_is_choseong(ch)) {
       im_hangul_commit(context_hangul);
       context_hangul->state = 1;
-      context_hangul->choseong = ch;
+      context_hangul->choseong[0] = ch;
       goto done;
     }
     ch = im_hangul2_jungseong(keyval, state);
@@ -795,18 +795,18 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
       /* complex final consonant
        * to single final consonant and initial consonant */
       gunichar choseong = 
-		im_hangul2_jongseong_to_choseong(context_hangul->jongseong);
-      context_hangul->jongseong = 
-      		im_hangul_compjongseong_to_single(context_hangul->jongseong);
+		im_hangul2_jongseong_to_choseong(context_hangul->jongseong[0]);
+      context_hangul->jongseong[0] = 
+      		im_hangul_compjongseong_to_single(context_hangul->jongseong[0]);
       im_hangul_commit(context_hangul);
       context_hangul->state = 3;
-      context_hangul->choseong = choseong;
-      context_hangul->jungseong = ch;
+      context_hangul->choseong[0] = choseong;
+      context_hangul->jungseong[0] = ch;
       goto done;
     }
     if (im_hangul_is_backspace(key)) {
-      context_hangul->jongseong = 
-      		im_hangul_compjongseong_to_single(context_hangul->jongseong);
+      context_hangul->jongseong[0] = 
+      		im_hangul_compjongseong_to_single(context_hangul->jongseong[0]);
       context_hangul->state = 8;
       goto done;
     }
