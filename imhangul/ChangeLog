@@ -1,3 +1,7 @@
+2003-02-09  Choe Hwanjin <krisna@kldp.org>
+	* GtkSettings 관련 부분을 im_hangul_set_client_window 안쪽으로 옮김
+	* GtkSettings 설정값이 바뀔때 실행될 콜백 연결
+
 2003-02-05 (Wed) 22:43 Choe Hwanjin <krisna@kldp.org>
 	* pref_use_jamo를 없애고 output_mode로 통일
 	* hcontext->state를 hcontext->input_mode로 변경

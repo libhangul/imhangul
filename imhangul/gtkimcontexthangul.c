@@ -46,7 +46,7 @@ enum {
 enum {
   OUTPUT_MODE_SYLLABLE = 0,
   OUTPUT_MODE_JAMO     = 1 << 1,
-  OUTPUT_MODE_JAMO2    = 1 << 2
+  OUTPUT_MODE_JAMO_EXT = 1 << 2
 } IMHangulOutputMode;
 
 enum {
@@ -183,12 +183,11 @@ static gint		output_mode = OUTPUT_MODE_SYLLABLE;
 
 /* preferences */
 static gboolean		pref_use_global_state = TRUE;
-static gboolean		pref_use_caps_lock = FALSE;
-static gboolean		pref_always_use_jamo = FALSE;
+static gboolean		pref_use_capslock = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
 static gchar*		pref_hanja_font = NULL;
-static gint		pref_preedit_style = 1;
+static gint		pref_preedit_style = 0;
 static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
 						  gint start,
 						  gint end) = NULL;
@@ -235,11 +234,9 @@ gtk_im_context_hangul_register_type (GTypeModule *type_module)
 }
 
 static gboolean
-have_property (const gchar* str)
+have_property (GtkSettings *settings, const gchar* str)
 {
-  GtkSettingsClass *klass = gtk_type_class (GTK_TYPE_SETTINGS);
-
-  return (g_object_class_find_property (G_OBJECT_CLASS (klass), str) != NULL);
+  return (g_object_class_find_property (G_OBJECT_GET_CLASS (settings), str) != NULL);
 }
 
 static void 
@@ -257,35 +254,6 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
   im_context_class->focus_out = im_hangul_focus_out;
   im_context_class->get_preedit_string = im_hangul_get_preedit_string;
   gobject_class->finalize = im_hangul_finalize;
-
-  /* install settings */
-  /* check whether installed or not */
-  if (!have_property ("gtk-imhangul-status"))
-    gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-status",
-							 "Status Window",
-							 "Whether to show status window or not",
-							 FALSE,
-							 G_PARAM_READWRITE));
-  if (!have_property ("gtk-imhangul-use-capslock"))
-    gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-use-capslock",
-							 "Use Caps Lock",
-							 "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
-							 FALSE,
-							 G_PARAM_READWRITE));
-  if (!have_property ("gtk-imhangul-dvorak"))
-    gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-dvorak",
-							 "Dvorak Keyboard",
-							 "Whether to use dvorak keyboard or not",
-							 FALSE,
-							 G_PARAM_READWRITE));
-  if (!have_property ("gtk-imhangul-style"))
-    gtk_settings_install_property (g_param_spec_int ("gtk-imhangul-style",
-						     "Preedit Style",
-						     "Preedit string style",
-						     0,
-						     4,
-						     0,
-						     G_PARAM_READWRITE));
 }
 
 static void
@@ -337,30 +305,8 @@ im_hangul_init (GtkIMContextHangul *hcontext)
   hcontext->compose_table_size = G_N_ELEMENTS(compose_table_default);
   hcontext->compose_table = compose_table_default;
 
-  g_object_get (gtk_settings_get_default (),
-		"gtk-imhangul-status", &pref_use_status_window,
-		"gtk-imhangul-use-capslock", &pref_use_caps_lock,
-		"gtk-imhangul-dvorak", &pref_use_dvorak,
-		"gtk-imhangul-style", &pref_preedit_style,
-		NULL);
-
-  switch (pref_preedit_style) {
-    case 0:
-      im_hangul_preedit_attr = im_hangul_preedit_underline;
-      break;
-    case 1:
-      im_hangul_preedit_attr = im_hangul_preedit_foreground;
-      break;
-    case 2:
-    case 3:
-      im_hangul_preedit_attr = im_hangul_preedit_background;
-      break;
-    case 4:
-      im_hangul_preedit_attr = im_hangul_preedit_nothing;
-      break;
-    default:
-      im_hangul_preedit_attr = im_hangul_preedit_foreground;
-  }
+  /* options */
+  hcontext->always_use_jamo = FALSE;
 }
 
 static void
@@ -374,68 +320,177 @@ im_hangul_finalize (GObject *obj)
 }
 
 static void
-im_hangul_push (GtkIMContextHangul *hcontext, gunichar ch)
+status_window_change (GtkSettings *settings, gpointer data)
 {
-  hcontext->stack[++hcontext->index] = ch;
+  GSList *list;
+  StatusWindow *status_window;
+
+  g_object_get (settings,
+		"gtk-im-hangul-status-window", &pref_use_status_window,
+		NULL);
+
+  list = status_windows;
+  if (!pref_use_status_window)
+    {
+      while (list)
+	{
+	  status_window = (StatusWindow*)(list->data);
+	  gtk_widget_hide (status_window->window);
+	  list = list->next;
+	}
+    }
 }
 
-static gunichar
-im_hangul_peek (GtkIMContextHangul *hcontext)
+static void
+preedit_style_change (GtkSettings *settings, GtkWidget *widget)
 {
-  if (hcontext->index < 0)
-    return 0;
-  return hcontext->stack[hcontext->index];
+  static GtkWidget *window = NULL;
+  GtkStyle *style;
+
+  if (window == NULL)
+    window = widget;
+
+  if (window == NULL)
+    return;
+
+  /* set preedit style attributes */
+  g_object_get (settings,
+		"gtk-im-hangul-preedit-style", &pref_preedit_style,
+		NULL);
+
+  style = window->style;
+  pref_fg.red   = style->text[GTK_STATE_NORMAL].red;
+  pref_fg.green = style->text[GTK_STATE_NORMAL].green;
+  pref_fg.blue  = style->text[GTK_STATE_NORMAL].blue;
+  pref_bg.red   = style->base[GTK_STATE_NORMAL].red;
+  pref_bg.green = style->base[GTK_STATE_NORMAL].green;
+  pref_bg.blue  = style->base[GTK_STATE_NORMAL].blue;
+
+  switch (pref_preedit_style)
+    {
+    case 0:
+      im_hangul_preedit_attr = im_hangul_preedit_underline;
+      break;
+    case 1:
+      im_hangul_preedit_attr = im_hangul_preedit_foreground;
+      break;
+    case 2:
+      pref_fg.red   = style->base[GTK_STATE_NORMAL].red;
+      pref_fg.green = style->base[GTK_STATE_NORMAL].green;
+      pref_fg.blue  = style->base[GTK_STATE_NORMAL].blue;
+      pref_bg.red   = style->text[GTK_STATE_NORMAL].red;
+      pref_bg.green = style->text[GTK_STATE_NORMAL].green;
+      pref_bg.blue  = style->text[GTK_STATE_NORMAL].blue;
+      im_hangul_preedit_attr = im_hangul_preedit_background;
+      break;
+    case 3:
+      pref_fg.red   = style->text[GTK_STATE_NORMAL].red;
+      pref_fg.green = style->text[GTK_STATE_NORMAL].green;
+      pref_fg.blue  = style->text[GTK_STATE_NORMAL].blue;
+      pref_bg.red   = (style->base[GTK_STATE_NORMAL].red   * 90 + 
+		       style->text[GTK_STATE_NORMAL].red   * 10) / 100;
+      pref_bg.green = (style->base[GTK_STATE_NORMAL].green * 90 + 
+		       style->text[GTK_STATE_NORMAL].green * 10) / 100;
+      pref_bg.blue  = (style->base[GTK_STATE_NORMAL].blue  * 90 + 
+		       style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
+      im_hangul_preedit_attr = im_hangul_preedit_background;
+      break;
+    case 4:
+      im_hangul_preedit_attr = im_hangul_preedit_nothing;
+      break;
+    default:
+      im_hangul_preedit_attr = im_hangul_preedit_foreground;
+      break;
+    }
 }
 
-static gunichar
-im_hangul_pop (GtkIMContextHangul *hcontext)
+static void
+use_capslock_change (GtkSettings *settings, gpointer data)
 {
-  if (hcontext->index < 0)
-    return 0;
-  return hcontext->stack[hcontext->index--];
+  g_object_get (settings,
+		"gtk-im-hangul-use-capslock", &pref_use_capslock,
+		NULL);
+}
+
+static void
+use_dvorak_change (GtkSettings *settings, gpointer data)
+{
+  g_object_get (settings,
+		"gtk-im-hangul-use-dvorak", &pref_use_dvorak,
+		NULL);
 }
 
 static void
 im_hangul_set_client_window (GtkIMContext *context,
 			    GdkWindow *client_window)
 {
-  GtkStyle *style;
+  GdkScreen *screen;
+  GtkSettings *settings;
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
+  /* find toplevel window (GtkWidget) */
   hcontext->toplevel = get_toplevel_window (client_window);
 
-  if (hcontext->toplevel) {
-    /* set fg, bg colors */
-    style = hcontext->toplevel->style;
-    switch (pref_preedit_style) {
-      case 2:
-	pref_fg.red	= style->base[GTK_STATE_NORMAL].red;
-	pref_fg.green	= style->base[GTK_STATE_NORMAL].green;
-	pref_fg.blue	= style->base[GTK_STATE_NORMAL].blue;
-	pref_bg.red	= style->text[GTK_STATE_NORMAL].red;
-	pref_bg.green	= style->text[GTK_STATE_NORMAL].green;
-	pref_bg.blue	= style->text[GTK_STATE_NORMAL].blue;
-	break;
-      case 3:
-	pref_fg.red	= style->text[GTK_STATE_NORMAL].red;
-	pref_fg.green	= style->text[GTK_STATE_NORMAL].green;
-	pref_fg.blue	= style->text[GTK_STATE_NORMAL].blue;
-	pref_bg.red	= (style->base[GTK_STATE_NORMAL].red   * 90 + 
-			   style->text[GTK_STATE_NORMAL].red   * 10) / 100;
-	pref_bg.green	= (style->base[GTK_STATE_NORMAL].green * 90 + 
-			   style->text[GTK_STATE_NORMAL].green * 10) / 100;
-	pref_bg.blue	= (style->base[GTK_STATE_NORMAL].blue  * 90 + 
-			   style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
-	break;
-      default:
-	pref_fg.red	= style->text[GTK_STATE_NORMAL].red;
-	pref_fg.green	= style->text[GTK_STATE_NORMAL].green;
-	pref_fg.blue	= style->text[GTK_STATE_NORMAL].blue;
-	pref_bg.red	= style->base[GTK_STATE_NORMAL].red;
-	pref_bg.green	= style->base[GTK_STATE_NORMAL].green;
-	pref_bg.blue	= style->base[GTK_STATE_NORMAL].blue;
+  /* install settings */
+  /* check whether installed or not */
+  screen = gdk_drawable_get_screen (client_window);
+  settings = gtk_settings_get_for_screen (screen);
+  if (!have_property (settings, "gtk-im-hangul-status-window"))
+    {
+      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-status-window",
+							   "Status Window",
+							   "Whether to show status window or not",
+							   FALSE,
+							   G_PARAM_READWRITE));
+      g_signal_connect (G_OBJECT(settings),
+			"notify::gtk-im-hangul-status-window",
+			G_CALLBACK(status_window_change),
+			NULL);
     }
-  }
+  if (!have_property (settings, "gtk-im-hangul-use-capslock"))
+    {
+      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-capslock",
+							   "Use Caps Lock",
+							   "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
+							   FALSE,
+							   G_PARAM_READWRITE));
+      g_signal_connect (G_OBJECT(settings),
+			"notify::gtk-im-hangul-use-capslock",
+			G_CALLBACK(use_capslock_change),
+			NULL);
+    }
+  if (!have_property (settings, "gtk-im-hangul-use-dvorak"))
+    {
+      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-dvorak",
+							   "Dvorak Keyboard",
+							   "Whether to use dvorak keyboard or not",
+							   FALSE,
+							   G_PARAM_READWRITE));
+
+      g_signal_connect (G_OBJECT(settings),
+			"notify::gtk-im-hangul-use-dvorak",
+			G_CALLBACK(use_dvorak_change),
+			NULL);
+    }
+  if (!have_property (settings, "gtk-im-hangul-preedit-style"))
+    {
+      gtk_settings_install_property (g_param_spec_int ("gtk-im-hangul-preedit-style",
+						       "Preedit Style",
+						       "Preedit string style",
+						       0,
+						       4,
+						       0,
+						       G_PARAM_READWRITE));
+      g_signal_connect (G_OBJECT(settings),
+			"notify::gtk-im-hangul-preedit-style",
+			G_CALLBACK(preedit_style_change),
+			hcontext->toplevel);
+    }
+
+  status_window_change (settings, NULL);
+  use_capslock_change (settings, NULL);
+  use_dvorak_change (settings, NULL);
+  preedit_style_change (settings, hcontext->toplevel);
 }
 
 GtkIMContext *
@@ -489,14 +544,12 @@ gtk_im_context_hangul_set_use_jamo (GtkIMContextHangul *hcontext,
 {
   if (use_jamo)
     {
-      pref_use_caps_lock = FALSE;
-      pref_always_use_jamo = TRUE;
+      hcontext->always_use_jamo = TRUE;
       output_mode |= OUTPUT_MODE_JAMO;
     }
   else
     {
-      pref_use_caps_lock = TRUE;
-      pref_always_use_jamo = FALSE;
+      hcontext->always_use_jamo = FALSE;
       output_mode &= ~OUTPUT_MODE_JAMO;
     }
 }
@@ -529,6 +582,28 @@ im_hangul_mode_direct (GtkIMContextHangul *hcontext)
   hcontext->input_mode = INPUT_MODE_DIRECT;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
   status_window_set_label (hcontext);
+}
+
+static void
+im_hangul_push (GtkIMContextHangul *hcontext, gunichar ch)
+{
+  hcontext->stack[++hcontext->index] = ch;
+}
+
+static gunichar
+im_hangul_peek (GtkIMContextHangul *hcontext)
+{
+  if (hcontext->index < 0)
+    return 0;
+  return hcontext->stack[hcontext->index];
+}
+
+static gunichar
+im_hangul_pop (GtkIMContextHangul *hcontext)
+{
+  if (hcontext->index < 0)
+    return 0;
+  return hcontext->stack[hcontext->index--];
 }
 
 /* choseong to compatibility jamo */
@@ -684,7 +759,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
     return 0;
   }
 
-  if (output_mode & OUTPUT_MODE_JAMO2)
+  if (output_mode & OUTPUT_MODE_JAMO_EXT)
     {
       /* we use conjoining jamo, U+1100 - U+11FF */
       if (hcontext->choseong[0] == 0)
@@ -1006,7 +1081,7 @@ im_hangul_commit (GtkIMContextHangul *hcontext)
   if (im_hangul_is_empty (hcontext))
     return FALSE;
 
-  if (output_mode & OUTPUT_MODE_JAMO2)
+  if (output_mode & OUTPUT_MODE_JAMO_EXT)
     {
       /* we use conjoining jamo, U+1100 - U+11FF */
       if (hcontext->choseong[0] == 0)
@@ -1300,12 +1375,12 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 
   /* on Ctrl-Hangul we turn on/off manual_mode */
   if (key->keyval == GDK_Hangul && (key->state & GDK_CONTROL_MASK))
-    output_mode ^= OUTPUT_MODE_JAMO2;
+    output_mode ^= OUTPUT_MODE_JAMO_EXT;
 
   /* on capslock, we use Hangul Jamo */
-  if (!pref_always_use_jamo)
+  if (!hcontext->always_use_jamo)
     {
-      if (pref_use_caps_lock && key->state & GDK_LOCK_MASK)
+      if (pref_use_capslock && key->state & GDK_LOCK_MASK)
 	output_mode |= OUTPUT_MODE_JAMO;
       else
 	output_mode &= ~OUTPUT_MODE_JAMO;
@@ -1511,8 +1586,10 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   GtkWidget *label;
   StatusWindow *status_window;
 
+  /*
   if (!pref_use_status_window)
     return NULL;
+    */
 
   toplevel = hcontext->toplevel;
   if (toplevel == NULL)
@@ -1556,7 +1633,7 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   gtk_container_add (GTK_CONTAINER(ebox), label);
   gtk_box_pack_start (GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT(ebox), "button-press-event",
-		   G_CALLBACK(on_click_hangul), hcontext);
+		    G_CALLBACK(on_click_hangul), hcontext);
 
   /* hanja label */
   label = gtk_label_new ("[\355\225\234\354\236\220]");
@@ -1566,7 +1643,7 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   gtk_container_add (GTK_CONTAINER(ebox), label);
   gtk_box_pack_start (GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT(ebox), "button-press-event",
-		   G_CALLBACK(on_click_hanja), hcontext);
+		    G_CALLBACK(on_click_hanja), hcontext);
 
   status_window->destroy_handler_id =
 			g_signal_connect_swapped (G_OBJECT(toplevel), "destroy",
@@ -1596,7 +1673,10 @@ status_window_show (GtkIMContextHangul *hcontext)
   if (window)
     {
       status_window_set_label (hcontext);
-      gtk_widget_show (window);
+      if (pref_use_status_window)
+        gtk_widget_show (window);
+      else
+        gtk_widget_hide (window);
     }
 }
 
@@ -2301,7 +2381,7 @@ im_hangul_composer_3 (GtkIMContextHangul *hcontext,
 
   ch = im_hangul_mapping (hcontext, key->keyval, key->state);
 
-  if (output_mode & OUTPUT_MODE_JAMO2)
+  if (output_mode & OUTPUT_MODE_JAMO_EXT)
     {
       if (hcontext->jongseong[0])
 	{
