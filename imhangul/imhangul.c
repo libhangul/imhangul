@@ -174,7 +174,7 @@ static const gunichar keyboard_table_2[] = {
   0x1106,	/* GDK_A:		choseong mieum		*/
   0x1172,	/* GDK_B:		jungseong yu		*/
   0x110e,	/* GDK_C:		choseong chieuch	*/
-  0x1106,	/* GDK_D:		choseong ieung		*/
+  0x110b,	/* GDK_D:		choseong ieung		*/
   0x1104,	/* GDK_E:		choseong ssangtikeut	*/
   0x1105,	/* GDK_F:		choseong rieul		*/
   0x1112,	/* GDK_G:		choseong hieuh		*/
