@@ -1,6 +1,6 @@
 #!/bin/bash
 
-immodules_file=./immodules
+immodules_file=./gtk.immodules
 gtk-query-immodules-2.0 .libs/*.so > $immodules_file
 
 export GTK_IM_MODULE=hangul2
