@@ -23,18 +23,12 @@ http://gnome.or.kr/moin.cgi/imhangul
 
   hanjatable.h의 파일 형식은 다음과 같이 
 
-    unicode_t hanjatable[];
+    gunichar hanjatable[];
 
-  hanjatable이라는 unicode_t type의 static array로 선언되어 있습니다. 
+  hanjatable이라는 gunichar type의 static array로 선언되어 있습니다. 
   무조건 2개 이상의 값을 가지고 있게 되는데, 0 번째 데이터는 unicode의 
   한글 syllable 영역의 코드이고 1번째 이후부터는 그 한글 코드에 맞는 한자
   코드 값들입니다. 맨 마지막 원소는 0 을 두었습니다.
-
-  이 테이블을 사용하는 방법은 먼저 자신의 프로그램에서 사용하는 
-  unicode를 위한 type으로 unicode_t를 오버라이드 하는 것입니다.
-  imhangul의 경우는 다음과 같이 사용합니다.
-
-    typedef gunichar unicode_t;
 
   그리고 hanjatable[i][0] 중에서 binary search로 자신이 찾고자하는 한글 코드를 
   찾고 나면 그 hanjatable[i]에 있는 데이터가 한자의 배열이 됩니다. 
