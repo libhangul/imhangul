@@ -1,6 +1,7 @@
 #!/bin/sh
 
 glib-gettextize
+libtoolize
 aclocal
 autoheader
 automake --add-missing --copy
