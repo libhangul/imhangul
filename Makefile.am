@@ -18,7 +18,6 @@ im_hangul_la_SOURCES = \
 
 im_hangul_la_CFLAGS = @STRIP_BEGIN@ \
 	-Wall						\
-	-Wno-strict-aliasing				\
 	-DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"	\
         -DG_DISABLE_DEPRECATED                          \
 	-DGDK_PIXBUF_DISABLE_DEPRECATED                 \
