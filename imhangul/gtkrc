@@ -5,6 +5,7 @@ style "mydefault"
 #	text[NORMAL]	= "#0000FF"	# 글자
 #	font_name = "code2000 20"
 	font_name = "sans 20"
+#	font_name = "Andale Sans UI 20"
 }
 
 # 상태창에서 나타나는 글자의 색과 크기모양
