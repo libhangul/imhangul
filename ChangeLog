@@ -1,3 +1,10 @@
+일  8월 11 12:53:08 KST 2002
+	* version 0.9 로 올림: 특별히 바뀐건 없고 1.0을 위한 전초전
+
+일  8월 11 12:51:15 KST 2002
+	* imhangul.h: status_window에 "imhangul" widget name을 줌
+	  .gtkrc-2.0 파일에서 widget "*imhangul*"을 설정하여 변화를 줄수 있음
+
 2002. 08. 08. (목) 10:40:02 KST
 	* imhangul.h: status_window_get()함수에서 gtk_window_set_transient_for()
 	  를 호출하여 상태창을 toplevel의 transient로 설정, 이걸로 status

@@ -1000,7 +1000,7 @@ status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
 		      0, 0,
 		      widget->allocation.width, widget->allocation.height);
   gdk_draw_rectangle (widget->window,
-		      widget->style->text_gc[GTK_STATE_NORMAL],
+		      widget->style->fg_gc[GTK_STATE_NORMAL],
 		      FALSE,
 		      0, 0,
 		      widget->allocation.width - 1, widget->allocation.height - 1);
@@ -1008,6 +1008,7 @@ status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
   return FALSE;
 }
 
+/*
 static void
 status_window_style_set(GtkWidget *window,
 			GtkStyle *previous_style,
@@ -1018,6 +1019,7 @@ status_window_style_set(GtkWidget *window,
   for (i = 0; i < 5; i++)
     gtk_widget_modify_fg(label, i, &window->style->text[i]);
 }
+*/
 
 static void
 status_window_free(StatusWindow *swindow)
@@ -1115,21 +1117,18 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 					       G_CALLBACK(status_window_free),
 					       status_window);
   status_window->configure_handler_id = 
-			g_signal_connect(toplevel, "configure_event",
+			g_signal_connect(toplevel, "configure-event",
 					 G_CALLBACK(status_window_configure),
 					 status_window);
 
   status_window_configure(toplevel, NULL, status_window);
 
 /*
-  g_signal_connect(window, "style_set",
+  g_signal_connect(window, "style-set",
 		   G_CALLBACK(status_window_style_set), label);
 */
-  g_signal_connect(window, "expose_event",
+  g_signal_connect(window, "expose-event",
 		   G_CALLBACK(status_window_expose_event), NULL);
-
-  g_object_set_data(G_OBJECT(toplevel), "im-hangul-status-window",
-		    status_window);
 
   gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(toplevel));
   status_window_set_mode(context_hangul);
