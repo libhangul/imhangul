@@ -2,7 +2,6 @@ SUBDIRS = themes
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"		\
-	-I$(includedir)							\
 	-DIMHANGUL_STATUS_THEMES_DIR=\"@IMHANGUL_STATUS_THEMES_DIR@\"
 
 CFLAGS = -Wall -g @IMHANGUL_STATUS_CFLAGS@
