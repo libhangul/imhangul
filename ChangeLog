@@ -1,5 +1,5 @@
 2002-12-05 (Thu) 21:15 Choe Hwanjin <krisna@kldp.org>
-	* imhangul2.c: 기존의 automata 루틴을 완전이 바꿈 (stack 사용)
+	* imhangul2.c: 기존의 automata 루틴을 완전히 바꿈 (stack 사용)
 	* imhangul.h, imhangul3.h: 스택 관련 함수를 imhangul3.h에서
 	  imhangul.h 로 옮김
 
