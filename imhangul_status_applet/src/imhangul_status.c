@@ -376,7 +376,7 @@ about_cb (BonoboUIComponent *uic,
 		NULL
 	};
 
-	if (about) {
+	if (about != NULL) {
 		gtk_window_present (GTK_WINDOW(about));
 		return;
 	}
