@@ -34,6 +34,7 @@
 #include "gtk/gtkimcontext.h"
 */
 
+#include <gtk/gtkmain.h>
 #include <gtk/gtksignal.h>
 #include <gtk/gtkbutton.h>
 #include <gtk/gtklabel.h>
@@ -1195,6 +1196,7 @@ on_keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
 static void
 on_destroy(GtkWidget *widget, gpointer data)
 {
+  gtk_grab_remove(widget);
   hanja_window = NULL;
   input_mode = MODE_HANGUL;
 }
@@ -1237,10 +1239,6 @@ create_hanja_window(GtkIMContextHangul *context_hangul, gunichar ch)
 
   hanja_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   window = hanja_window;
-  parent = get_toplevel_window(context_hangul->client_window);
-  if (parent)
-    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent));
-
   table = gtk_table_new(10, 1, TRUE);
 
   if (pref_hanja_font)
@@ -1287,6 +1285,11 @@ create_hanja_window(GtkIMContextHangul *context_hangul, gunichar ch)
   g_signal_connect (G_OBJECT(window), "destroy",
 		    G_CALLBACK (on_destroy), NULL);
 
+  parent = get_toplevel_window(context_hangul->client_window);
+  if (parent)
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent));
+
+  gtk_grab_add(window);
   gtk_widget_show_all(window);
 
   pango_font_description_free(desc);
