@@ -1,3 +1,7 @@
+2003-02-23  Choe Hwanjin <krisna@kldp.org>
+	* update entry.c (add for GtkSettings)
+	* preedit style을 정하는데 gtk_widget_get_default_style()을 사용
+
 2003-02-22  Choe Hwanjin <krisna@kldp.org>
 	* preedit_style_change()에서 widget이 NULL인지 체크함
 	* DesktopInfo를 추가하여 모듈 종료할때 notify 콜백을 제거함
