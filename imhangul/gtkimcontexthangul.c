@@ -489,6 +489,7 @@ im_hangul_set_client_window (GtkIMContext *context,
 {
   GdkScreen *screen;
   GtkSettings *settings;
+  GtkWidget *widget = NULL;
   DesktopInfo *desktop_info;
   GtkIMContextHangul *hcontext;
 
@@ -503,6 +504,7 @@ im_hangul_set_client_window (GtkIMContext *context,
 
   /* find toplevel window (GtkWidget) */
   hcontext->toplevel = get_toplevel_window (client_window);
+  gdk_window_get_user_data (client_window, (gpointer *)&widget);
 
   /* install settings */
   /* check whether installed or not */
@@ -556,7 +558,6 @@ im_hangul_set_client_window (GtkIMContext *context,
     }
   if (!have_property (settings, "gtk-im-hangul-preedit-style"))
     {
-      GtkWidget *widget = NULL;
       gtk_settings_install_property (g_param_spec_int ("gtk-im-hangul-preedit-style",
 						       "Preedit Style",
 						       "Preedit string style",
@@ -564,7 +565,6 @@ im_hangul_set_client_window (GtkIMContext *context,
 						       4,
 						       1,
 						       G_PARAM_READWRITE));
-      gdk_window_get_user_data (client_window, (gpointer *)&widget);
       desktop_info->preedit_style_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-preedit-style",
@@ -574,13 +574,11 @@ im_hangul_set_client_window (GtkIMContext *context,
     }
   if (!have_property (settings, "gtk-im-hangul-use-manual-mode"))
     {
-      GtkWidget *widget = NULL;
       gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-manual-mode",
 						           "Use manual mode",
 						           "Whether use manual mode or not",
 						           FALSE,
 						           G_PARAM_READWRITE));
-      gdk_window_get_user_data (client_window, (gpointer *)&widget);
       desktop_info->use_manual_mode_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-use-manual-mode",
@@ -2804,4 +2802,4 @@ done:
   return TRUE;
 }
 
-/* vim: set cindent sw=2 : */
+/* vim: set cindent sw=2 sts=2 ts=8 : */
