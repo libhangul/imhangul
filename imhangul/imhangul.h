@@ -138,7 +138,12 @@ static void     im_hangul_reset(GtkIMContext *context);
 static void	im_hangul_mode_hangul(GtkIMContextHangul *hcontext);
 static void	im_hangul_mode_direct(GtkIMContextHangul *hcontext);
 
-/* commit function */
+/* stack functions */
+static gunichar	im_hangul_pop	(GtkIMContextHangul *hcontext);
+static gunichar	im_hangul_peek	(GtkIMContextHangul *hcontext);
+static void	im_hangul_push	(GtkIMContextHangul *hcontext, gunichar ch);
+
+/* commit functions */
 static void     im_hangul_clear_buf     (GtkIMContextHangul *hcontext);
 static gboolean	im_hangul_commit	(GtkIMContextHangul *hcontext);
 static void	im_hangul_commit_utf8	(GtkIMContextHangul *hcontext,
@@ -393,6 +398,28 @@ static void
 im_hangul_finalize(GObject *obj)
 {
   parent_class->finalize (obj);
+}
+
+static void
+im_hangul_push(GtkIMContextHangul *hcontext, gunichar ch)
+{
+  hcontext->stack[++hcontext->index] = ch;
+}
+
+static gunichar
+im_hangul_peek(GtkIMContextHangul *hcontext)
+{
+  if (hcontext->index < 0)
+    return 0;
+  return hcontext->stack[hcontext->index];
+}
+
+static gunichar
+im_hangul_pop(GtkIMContextHangul *hcontext)
+{
+  if (hcontext->index < 0)
+    return 0;
+  return hcontext->stack[hcontext->index--];
 }
 
 static void
