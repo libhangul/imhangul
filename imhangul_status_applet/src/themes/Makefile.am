@@ -30,10 +30,14 @@ EXTRA_DIST = \
 	SimplyRed/hangul.png		\
 	SimplyRed/none.png		\
 	Onion/english.png		\
-	Onion/README			\
 	Onion/hangul.png		\
 	Onion/none.png			\
+	Onion/README			\
 	keyboard/english.png		\
-	keyboard/README			\
 	keyboard/hangul.png		\
-	keyboard/none.png
+	keyboard/none.png		\
+	keyboard/README			\
+	KingSejong/english.png		\
+	KingSejong/hangul.png		\
+	KingSejong/none.png		\
+	KingSejong/README
