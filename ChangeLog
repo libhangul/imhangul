@@ -1,3 +1,6 @@
+2003-10-20  Choe Hwanjin <krisna@kldp.org>
+	* release 0.9.7
+
 2003-09-05  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: xkb compatibility
 
