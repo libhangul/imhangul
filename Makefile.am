@@ -36,7 +36,7 @@ noinst_PROGRAMS = entry
 entry_SOURCES = entry.c
 entry_LDADD = @GTK_LIBS@
 
-install-data-local: install-moduleLTLIBRARIES
+install-data-hook:
 	if test -z "$(DESTDIR)" ; then \
 		$(mkinstalldirs) $(sysconfdir)/gtk-2.0; \
 		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES); \
