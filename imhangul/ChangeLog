@@ -1,3 +1,6 @@
+2004-07-12  Choe Hwanjin <krisna@kldp.org>
+	* configure 할때 sysconfdir을 따로 지정하지 않아도 알아서 찾도록 함
+
 2004-07-09  Choe Hwanjin <krisna@kldp.org>
 	* toplevel 윈도우마다 한영 상태를 저장하도록 함
 
