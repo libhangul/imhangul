@@ -1136,21 +1136,22 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 static void
 status_window_show(GtkIMContextHangul *context_hangul)
 {
-  GtkWidget *status_window = status_window_get (context_hangul, TRUE);
+  GtkWidget *window = status_window_get (context_hangul, TRUE);
 
-  if (status_window) {
+  if (window) {
     status_window_set_mode(context_hangul);
-    gtk_widget_show(status_window);
+    gtk_widget_show(window);
   }
 }
 
 static void
 status_window_hide(GtkIMContextHangul *context_hangul)
 {
-  GtkWidget *status_window = status_window_get (context_hangul, FALSE);
+  GtkWidget *window = status_window_get (context_hangul, FALSE);
 
-  if (status_window)
-    gtk_widget_hide(status_window);
+  if (window) {
+    gtk_widget_hide(window);
+  }
 }
 
 static void
