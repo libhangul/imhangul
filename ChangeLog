@@ -1,3 +1,6 @@
+2003-03-30  Choe Hwanjin <krisna@kldp.org>
+	* 모듈 파일을 인스톨한 후 gtk-query-immodules-2.0를 실행함
+
 2003-02-23  Choe Hwanjin <krisna@kldp.org>
 	* update entry.c (add for GtkSettings)
 	* preedit style을 정하는데 gtk_widget_get_default_style()을 사용
