@@ -1,4 +1,4 @@
-unicode_t symbols[] = {
+gunichar symbols[] = {
     0x2600,  /* black sun with rays                                          */
     0x2601,  /* cloud                                                        */
     0x2602,  /* umbrella                                                     */
@@ -135,7 +135,7 @@ unicode_t symbols[] = {
     0
 };
 
-unicode_t char_symbol[] = {
+gunichar char_symbol[] = {
     0x00a2,  /* cent sign                                                    */
     0x00a3,  /* pound sign                                                   */
     0x00a4,  /* currency sign                                                */
@@ -239,7 +239,7 @@ unicode_t char_symbol[] = {
     0
 };
 
-unicode_t punctuation[] = {
+gunichar punctuation[] = {
     0x2018,  /* left single quotation mark                                   */
     0x2019,  /* right single quotation mark                                  */
     0x201a,  /* single low-9 quotation mark                                  */
@@ -291,7 +291,7 @@ unicode_t punctuation[] = {
     0
 };
 
-unicode_t number_form[] = {
+gunichar number_form[] = {
     0x2070,  /* superscript zero                                             */
     0x00b9,  /* superscript one                                              */
     0x00b2,  /* superscript two                                              */
@@ -378,7 +378,7 @@ unicode_t number_form[] = {
     0
 };
  
-unicode_t parenthesized[] = {
+gunichar parenthesized[] = {
     0x2474,  /* parenthesized digit one                                      */
     0x2475,  /* parenthesized digit two                                      */
     0x2476,  /* parenthesized digit three                                    */
@@ -493,7 +493,7 @@ unicode_t parenthesized[] = {
     0
 };
 
-unicode_t circled[] = {
+gunichar circled[] = {
     0x24ea,  /* circled digit zero                                           */
     0x2460,  /* circled digit one                                            */
     0x2461,  /* circled digit two                                            */
@@ -677,7 +677,7 @@ unicode_t circled[] = {
     0
 };                                            
 
-unicode_t math1[] = {                      
+gunichar math1[] = {                      
     0x00b1,  /* plus-minus sign                                              */
     0x00d7,  /* multiplication sign                                          */
     0x00f7,  /* division sign                                                */
@@ -814,7 +814,7 @@ unicode_t math1[] = {
     0
 };
 
-unicode_t math2[] = {                      
+gunichar math2[] = {                      
     0x2282,  /* subset of                                                    */
     0x2283,  /* superset of                                                  */
     0x2284,  /* not a subset of                                              */
@@ -944,7 +944,7 @@ unicode_t math2[] = {
     0
 };
 
-unicode_t greek[] = {                      
+gunichar greek[] = {                      
     0x0391,  /* greek capital letter alpha                                   */
     0x0392,  /* greek capital letter beta                                    */
     0x0393,  /* greek capital letter gamma                                   */
@@ -997,7 +997,7 @@ unicode_t greek[] = {
     0
 };
 
-unicode_t hangul_cjamo[] = {                      
+gunichar hangul_cjamo[] = {                      
     0x3131,  /* hangul letter kiyeok              */
     0x3132,  /* hangul letter ssangkiyeok         */
     0x3133,  /* hangul letter kiyeok-sios         */
@@ -1094,7 +1094,7 @@ unicode_t hangul_cjamo[] = {
     0
 };
 
-unicode_t katakana[] = {                      
+gunichar katakana[] = {                      
     0x30a1,  /* katakana small a      */      
     0x30a2,  /* katakana a            */
     0x30a3,  /* katakana small i      */
@@ -1204,7 +1204,7 @@ unicode_t katakana[] = {
     0
 };
 
-unicode_t hiragana[] = {
+gunichar hiragana[] = {
     0x3041,  /* hiragana small a      */
     0x3042,  /* hiragana a            */
     0x3043,  /* hiragana small i      */
@@ -1313,7 +1313,7 @@ unicode_t hiragana[] = {
     0
 };
 
-unicode_t shapes[] = {
+gunichar shapes[] = {
     0x25a0,  /* black square                                                 */
     0x25a1,  /* white square                                                 */
     0x25a2,  /* white square with rounded corners                            */
@@ -1415,7 +1415,7 @@ unicode_t shapes[] = {
 
 struct table_item {
     char* name;
-    unicode_t* list;
+    gunichar* list;
 };
 
 struct table_item char_table[] = {
