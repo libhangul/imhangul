@@ -1,3 +1,7 @@
+2002. 07. 12. (금) 11:02:20 KST
+	* im_hangul_shutdown(): im module이 shutdow할때 hanja_window가 열려
+	  있으면 그걸 닫도록 추가
+
 2002. 07. 11. (목) 19:47:34 KST
 	* hanja select dialog에 gtk_window_set_transient_for() 함수를 적용
 

@@ -1317,9 +1317,17 @@ popup_hanja_window(GtkIMContextHangul *context_hangul)
 void
 im_hangul_shutdown(void)
 {
+  /* remove status window */
   status_window_free(status_window);
   status_window = NULL;
-  /* g_print("im-hangul module is detroyed\n"); */
+
+  /* remove hanja selection dialog */
+  if (hanja_window) {
+    gtk_widget_destroy(hanja_window);
+    hanja_window = NULL;
+  }
+
+  g_print("im-hangul module shutdown\n");
 }
 
 #endif /* __GTK_IM_CONTEXT_HANGUL_H__ */
