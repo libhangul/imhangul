@@ -4,13 +4,13 @@
 EXTRA_DIST = test.sh gtkrc hanjatable.py
 
 INCLUDES = @STRIP_BEGIN@ \
-	-Wall -g 					\
-	@GTK_CFLAGS@					\
+	-Wall						\
 	-DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"	\
         -DG_DISABLE_DEPRECATED                          \
 	-DGDK_PIXBUF_DISABLE_DEPRECATED                 \
 	-DGDK_DISABLE_DEPRECATED                        \
 	-DGTK_DISABLE_DEPRECATED                        \
+	@GTK_CFLAGS@					\
 @STRIP_END@
 
 LDADDS = @GTK_LIBS@
@@ -36,8 +36,9 @@ noinst_PROGRAMS = entry
 entry_SOURCES = entry.c
 entry_LDADD = @GTK_LIBS@
 
-install-data-local:
+install-data-local: install-moduleLTLIBRARIES
 	if test -z "$(DESTDIR)" ; then \
+		$(mkinstalldirs) $(sysconfdir)/gtk-2.0 \
 		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES); \
 	fi
 
