@@ -18,3 +18,4 @@ imhangul3.lo
 imhangul3.o
 immodules
 imhangul.spec
+*.tar.gz
