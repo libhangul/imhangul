@@ -10,13 +10,10 @@ config.cache
 configure
 libtool
 entry
-im-hangul2.la
-imhangul2.lo
-imhangul2.o
-im-hangul3.la
-imhangul3.lo
-imhangul3.o
 immodules
 imhangul.spec
+*.lo
+*.la
+*.o
 *.tar.gz
 .*.swp
