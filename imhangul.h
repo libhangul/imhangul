@@ -278,12 +278,9 @@ im_hangul_init (GtkIMContextHangul *context_hangul)
   context_hangul->toplevel = NULL;
 
   g_object_get (gtk_settings_get_default(),
-  		"gtk-imhangul-status",
-		&pref_use_status_window,
-  		"gtk-imhangul-dvorak",
-		&pref_use_dvorak,
-  		"gtk-imhangul-style",
-		&pref_preedit_style,
+  		"gtk-imhangul-status", &pref_use_status_window,
+  		"gtk-imhangul-dvorak", &pref_use_dvorak,
+  		"gtk-imhangul-style", &pref_preedit_style,
 		NULL);
 
   switch (pref_preedit_style) {
