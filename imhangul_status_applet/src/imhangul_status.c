@@ -291,6 +291,7 @@ themes_cb (BonoboUIComponent *uic,
 					     GTK_STOCK_CLOSE,
 					     GTK_RESPONSE_CLOSE,
 					     NULL);
+	gtk_window_set_default_size(GTK_WINDOW(dialog), 200, 250);
 
 	vbox = GTK_DIALOG(dialog)->vbox;
 	gtk_widget_show(vbox);
