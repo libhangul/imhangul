@@ -1,9 +1,10 @@
 style "mydefault"
 {
-	fg[NORMAL]	= "#00FF00"	# 글자, 테두리색
-	bg[NORMAL]	= "#DDDDDD"	# 바탕색
-	text[NORMAL]	= "#0000FF"	# 글자
-	font_name = "code2000 20"
+#	fg[NORMAL]	= "#00FF00"	# 글자, 테두리색
+#	bg[NORMAL]	= "#DDDDDD"	# 바탕색
+#	text[NORMAL]	= "#0000FF"	# 글자
+#	font_name = "code2000 20"
+	font_name = "sans 20"
 }
 
 # 상태창에서 나타나는 글자의 색과 크기모양
@@ -21,7 +22,7 @@ style "imhangul-hanja-style"
 #	font_name	= "Andale Sans UI 20"
 }
 
-#class "GtkWidget" style "mydefault"
+class "GtkWidget" style "mydefault"
 widget "*imhangul_status*" style "imhangul-status-style"
 widget "*imhangul_hanja*" style "imhangul-hanja-style"
 
