@@ -1,4 +1,5 @@
 2003-03-30  Choe Hwanjin <krisna@kldp.org>
+	* release 0.9.6
 	* 모듈 파일을 인스톨한 후 gtk-query-immodules-2.0를 실행함
 
 2003-02-23  Choe Hwanjin <krisna@kldp.org>
