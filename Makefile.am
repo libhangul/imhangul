@@ -14,10 +14,6 @@ im_hangul2_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 im_hangul2_la_SOURCES = imhangul2.c imhangul.h hanjatable.h
 im_hangul2_la_LIBADD = $(LDADDS)
 
-#im_hangul3_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-#im_hangul3_la_SOURCES = imhangul3.c imhangul.h hanjatable.h
-#im_hangul3_la_LIBADD = $(LDADDS)
-
 im_hangul3f_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 im_hangul3f_la_SOURCES = imhangul3f.c imhangul.h hanjatable.h imhangul3.h
 im_hangul3f_la_LIBADD = $(LDADDS)
@@ -33,6 +29,10 @@ im_hangul39_la_LIBADD = $(LDADDS)
 im_hangul3y_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 im_hangul3y_la_SOURCES = imhangul3y.c imhangul.h imhangul3.h hanjatable.h
 im_hangul3y_la_LIBADD = $(LDADDS)
+
+#im_hangul3x_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
+#im_hangul3x_la_SOURCES = imhangul3x.c imhangul.h hanjatable.h
+#im_hangul3x_la_LIBADD = $(LDADDS)
 
 CFLAGS = @GTK_CFLAGS@ -g -Wall
 
