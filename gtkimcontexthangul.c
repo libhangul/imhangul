@@ -1831,7 +1831,7 @@ get_toplevel_window (GdkWindow *window)
   if (gtk_toplevel != NULL)
     gtk_toplevel = gtk_widget_get_toplevel(GTK_WIDGET(gtk_toplevel));
 
-  if (!GTK_WIDGET_TOPLEVEL (gtk_toplevel))
+  if (gtk_toplevel == NULL || !GTK_WIDGET_TOPLEVEL (gtk_toplevel))
     return NULL;
 
   return gtk_toplevel;
