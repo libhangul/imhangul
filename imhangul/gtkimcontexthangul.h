@@ -58,6 +58,7 @@ struct _GtkIMContextHangul
   GdkWindow *client_window;
   GtkWidget *toplevel;
   Candidate *candidate;
+  GdkRectangle cursor;
 
   /* hangul buffer */
   int input_mode;
@@ -85,6 +86,7 @@ struct _GtkIMContextHangulClass
 struct _Candidate {
     GtkWidget *window;
     GdkWindow *parent;
+    GdkRectangle cursor;
     gchar *label;
     GtkWidget **children;
     const gunichar *data;
