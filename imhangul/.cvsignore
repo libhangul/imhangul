@@ -19,3 +19,4 @@ imhangul3.o
 immodules
 imhangul.spec
 *.tar.gz
+.*.swp
