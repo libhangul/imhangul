@@ -672,6 +672,7 @@ im_hangul_mode_hangul (GtkIMContextHangul *hcontext)
   hcontext->input_mode = INPUT_MODE_HANGUL;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
   status_window_set_label (hcontext);
+  g_signal_emit_by_name (hcontext, "preedit_start");
 }
 
 static void 
@@ -681,6 +682,7 @@ im_hangul_mode_direct (GtkIMContextHangul *hcontext)
   hcontext->input_mode = INPUT_MODE_DIRECT;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
   status_window_set_label (hcontext);
+  g_signal_emit_by_name (hcontext, "preedit_end");
 }
 
 static void
@@ -1162,7 +1164,6 @@ im_hangul_handle_direct_mode (GtkIMContextHangul *hcontext,
     {
       if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
-      g_signal_emit_by_name (hcontext, "preedit_start");
       im_hangul_mode_hangul (hcontext);
       return TRUE;
     }
@@ -1505,7 +1506,6 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     {
       if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
-      g_signal_emit_by_name (hcontext, "preedit_end");
       im_hangul_mode_direct (hcontext);
       return FALSE;
     }
@@ -1539,7 +1539,6 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     {
       if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
-      g_signal_emit_by_name (hcontext, "preedit_end");
       im_hangul_mode_direct (hcontext);
       return TRUE;
     }
