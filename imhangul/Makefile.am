@@ -12,8 +12,7 @@ GTK_IMMODULES = $(sysconfdir)/gtk-2.0/gtk.immodules
 im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
 	gtkimcontexthangul.h 	\
-	hanjatable.h		\
-	chartable.h		\
+	hangulcandidate.h	\
 	imhangul.c
 
 im_hangul_la_CFLAGS = @STRIP_BEGIN@ \

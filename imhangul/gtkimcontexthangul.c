@@ -37,8 +37,7 @@
 #include <gtk/gtkimcontext.h>
 
 #include "gtkimcontexthangul.h"
-#include "hanjatable.h"
-#include "chartable.h"
+#include "hangulcandidate.h"
 
 enum {
   INPUT_MODE_DIRECT,
@@ -171,7 +170,6 @@ static StatusWindow* status_window_get (GtkIMContextHangul *hcontext);
 static void status_window_free      (StatusWindow *status_window);
 
 static void popup_candidate_window  (GtkIMContextHangul *hcontext);
-static void popup_char_table_window (GtkIMContextHangul *hcontext);
 
 static const IMHangulCombination compose_table_default[] = {
   { 0x11001100, 0x1101 }, /* choseong  kiyeok + kiyeok	= ssangkiyeok	*/
@@ -210,8 +208,6 @@ static GObjectClass *parent_class;
 static GtkIMContextHangul *current_context = NULL;
 static GdkWindow       *current_root_window = NULL;
 static GSList          *status_windows = NULL;
-static GtkWidget       *hanja_window = NULL;
-static GtkWidget       *char_table_window = NULL;
 
 static gint		input_mode = INPUT_MODE_DIRECT;
 static gint		output_mode = OUTPUT_MODE_SYLLABLE;
@@ -345,6 +341,7 @@ im_hangul_init (GtkIMContextHangul *hcontext)
   hcontext->cursor.y = 0;
   hcontext->cursor.width = -1;
   hcontext->cursor.height = -1;
+  hcontext->surrounding_delete_length = 0;
 
   hcontext->input_mode = INPUT_MODE_DIRECT;	/* english mode */
   hcontext->composer = NULL;		/* initial value: composer == null */
@@ -1134,14 +1131,8 @@ im_hangul_focus_out (GtkIMContext *context)
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
-  if (hanja_window == NULL)
-    {
-      if (im_hangul_commit (hcontext))
-	{
-	  im_hangul_emit_preedit_changed (hcontext);
-	  hcontext->input_mode = INPUT_MODE_HANGUL;
-	}
-    }
+  if (im_hangul_commit (hcontext))
+    im_hangul_emit_preedit_changed (hcontext);
 
   status_window_hide (hcontext);
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
@@ -1617,6 +1608,12 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
       im_hangul_commit_utf8(hcontext, buf);
       im_hangul_emit_preedit_changed (hcontext);
       candidate_delete(hcontext->candidate);
+      if (hcontext->surrounding_delete_length > 0)
+	{
+	  gtk_im_context_delete_surrounding (GTK_IM_CONTEXT(hcontext),
+				     0, hcontext->surrounding_delete_length);
+	  hcontext->surrounding_delete_length = 0;
+	}
       hcontext->candidate = NULL;
     }
 
@@ -1689,15 +1686,6 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (key->keyval == GDK_F9 || key->keyval == GDK_Hangul_Hanja)
     {
       popup_candidate_window (hcontext);
-      return TRUE;
-    }
-
-  /* char table */
-  if (key->keyval == GDK_F3)
-    {
-      if (im_hangul_commit (hcontext))
-	im_hangul_emit_preedit_changed (hcontext);
-      popup_char_table_window (hcontext);
       return TRUE;
     }
 
@@ -1980,24 +1968,24 @@ status_window_set_label (GtkIMContextHangul *hcontext)
 
 
 /*
- * Hanja selection window
+ * candidate selection window
  */
 static gint
-get_index_of_hanja_table (gunichar ch)
+get_index_of_candidate_table (gunichar ch)
 {
   guint first, last, mid;
 
   /* binary search */
   first = 0;
-  last = G_N_ELEMENTS (hanja_table) - 1;
+  last = G_N_ELEMENTS (candidate_table) - 1;
   while (first <= last)
     {
       mid = (first + last) / 2;
 
-      if (ch == hanja_table[mid][0])
+      if (ch == candidate_table[mid][0])
 	return mid;
 
-      if (ch < hanja_table[mid][0])
+      if (ch < candidate_table[mid][0])
 	last = mid - 1;
       else
 	first = mid + 1;
@@ -2005,198 +1993,72 @@ get_index_of_hanja_table (gunichar ch)
   return -1;
 }
 
-static void
-popup_candidate_window (GtkIMContextHangul *hcontext)
+static gboolean
+get_candidate_table (GtkIMContextHangul *hcontext,
+		     gchar *label_buf, gsize buf_size, const gunichar **table)
 {
-  gunichar ch;
+  gunichar ch = 0;
 
-  if (hcontext->candidate != NULL)
-    candidate_delete(hcontext->candidate);
-
-  if ((hcontext->choseong[0] != 0 &&
-       hcontext->jungseong[0] == 0 &&
-       hcontext->jongseong[0] == 0) ||
-      (hcontext->choseong[0] == 0 &&
-       hcontext->jungseong[0] != 0 &&
-       hcontext->jongseong[0] == 0))
+  if (im_hangul_is_empty (hcontext))
     {
-      int index;
-      int key = hcontext->choseong[0] + hcontext->jungseong[0];
-
-      switch (key)
-	{
-	  case 0x1100:
-	    index = 0;
-	    break;
-	  case 0x1102:
-	    index = 1;
-	    break;
-	  case 0x1103:
-	    index = 2;
-	    break;
-	  case 0x1105:
-	    index = 3;
-	    break;
-	  case 0x1106:
-	    index = 4;
-	    break;
-	  case 0x1107:
-	    index = 5;
-	    break;
-	  case 0x1109:
-	    index = 6;
-	    break;
-	  case 0x110b:
-	    index = 7;
-	    break;
-	  case 0x110c:
-	    index = 8;
-	    break;
-	  case 0x110e:
-	    index = 9;
-	    break;
-	  case 0x110f:
-	    index = 10;
-	    break;
-	  case 0x1110:
-	    index = 11;
-	    break;
-	  case 0x1111:
-	    index = 12;
-	    break;
-	  default:
-	    index = -1;
-	    break;
-	}
-      if (index >= 0)
-	hcontext->candidate = candidate_new (char_table[index].name,
-					     10,
-					     char_table[index].list,
-					     hcontext->client_window,
-					     &hcontext->cursor);
+      gchar *text = NULL;
+      gint cursor_index;
+      gtk_im_context_get_surrounding (GTK_IM_CONTEXT(hcontext),
+				      &text, &cursor_index);
+      ch = g_utf8_get_char_validated (text + cursor_index, 3);
+      g_free(text);
+      hcontext->surrounding_delete_length = 1;
     }
-  else if (hcontext->choseong[0] != 0 && hcontext->jungseong[0] != 0)
+  else if (hcontext->choseong[0] != 0 &&
+	   hcontext->jungseong[0] == 0 &&
+	   hcontext->jongseong[0] == 0)
+    {
+      ch = hcontext->choseong[0];
+    }
+  else
     {
       ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
 				       hcontext->jungseong[0],
 				       hcontext->jongseong[0]);
-      if (ch)
-	{
-	  int index;
-	  index = get_index_of_hanja_table (ch);
-	  if (index != -1)
-	    {
-	      int n;
-	      gchar buf[12];
+    }
 
-	      n = g_unichar_to_utf8(ch, buf);
-	      buf[n] = '\0';
-	      hcontext->candidate = candidate_new (buf,
-						   10,
-						   hanja_table[index] + 1,
-						   hcontext->client_window,
-						   &hcontext->cursor);
-	    }
+  if (ch > 0)
+    {
+      int index = get_index_of_candidate_table (ch);
+      if (index != -1)
+	{
+	  int n;
+	  n = g_unichar_to_utf8(ch, label_buf);
+	  label_buf[n] = '\0';
+	  *table = candidate_table[index] + 1;
+	  return TRUE;
 	}
     }
-}
 
-static gboolean
-on_char_table_keypress (GtkWidget *widget, GdkEventKey *event, gpointer data)
-{
-  if (event->keyval == GDK_Escape)
-    {
-      gtk_widget_hide (widget);
-      return TRUE;
-    }
   return FALSE;
 }
 
 static void
-on_char_table_clicked (GtkWidget *widget, gpointer data)
+popup_candidate_window (GtkIMContextHangul *hcontext)
 {
-  gchar *str = (gchar *)gtk_button_get_label (GTK_BUTTON(widget));
+  gchar buf[12];
+  const gunichar *table;
+  gboolean ret;
 
-  if (current_context != NULL && str != NULL)
-    im_hangul_commit_utf8(current_context, str);
-}
-
-
-static GtkWidget*
-create_char_window (GtkIMContextHangul *hcontext)
-{
-  GtkWidget *window;
-  GtkWidget* notebook;
-  GtkWidget* table;
-  GtkWidget* label;
-  GtkWidget* button;
-  GtkWidget* parent;
-  gchar buf[8];
-  gint i, j, x, y, n;
-
-  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-
-  notebook = gtk_notebook_new ();
-  gtk_container_add (GTK_CONTAINER(window), notebook);
-  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_LEFT);
-  gtk_widget_show (notebook);
-
-  i = 0;
-  while (char_table[i].name != NULL)
+  if (hcontext->candidate != NULL)
     {
-      label = gtk_label_new (char_table[i].name);
-      gtk_widget_show (label);
-
-      x = 0;
-      y = 0;
-      table = gtk_table_new (1, 16, TRUE);
-      gtk_widget_show (table);
-      for (j = 0; char_table[i].list[j] != 0; j++) {
-	n = g_unichar_to_utf8 (char_table[i].list[j], buf);
-	buf[n] = 0;
-	button = gtk_button_new_with_label (buf);
-	gtk_widget_show (button);
-	gtk_table_attach (GTK_TABLE(table), button, x, x + 1, y, y + 1,
-			  (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-			  (GtkAttachOptions) (GTK_FILL),
-			  0, 0);
-	g_signal_connect (G_OBJECT(button), "clicked",
-			  G_CALLBACK (on_char_table_clicked), NULL);
-	x++;
-	if (x >= 16)
-	  {
-	    x = 0;
-	    y++;
-	  }
-      }
-
-      gtk_notebook_append_page (GTK_NOTEBOOK(notebook), table, label);
-      i++;
+      candidate_delete(hcontext->candidate);
+      hcontext->candidate = NULL;
     }
 
-  g_signal_connect (G_OBJECT(window), "key-press-event",
-		    G_CALLBACK (on_char_table_keypress), NULL);
-  g_signal_connect (G_OBJECT(window), "delete_event",
-		    G_CALLBACK (gtk_widget_hide_on_delete), NULL);
-
-  parent = hcontext->toplevel;
-  if (parent)
-    gtk_window_set_transient_for (GTK_WINDOW(window), GTK_WINDOW(parent));
-
-  return window;
-}
-
-static void
-popup_char_table_window (GtkIMContextHangul *hcontext)
-{
-  if (char_table_window != NULL)
+  ret = get_candidate_table (hcontext, buf, sizeof(buf), &table);
+  if (ret)
     {
-      gtk_widget_show (char_table_window);
-    }
-  else
-    {
-      char_table_window = create_char_window (hcontext);
-      gtk_widget_show (char_table_window);
+      hcontext->candidate = candidate_new (buf,
+					   10,
+					   table,
+					   hcontext->client_window,
+					   &hcontext->cursor);
     }
 }
 
@@ -2213,20 +2075,6 @@ gtk_im_context_hangul_shutdown (void)
   /* remove status window */
   while (status_windows)
     status_window_free (status_windows->data);
-
-  /* remove hanja selection dialog */
-  if (hanja_window)
-    {
-      gtk_widget_destroy (hanja_window);
-      hanja_window = NULL;
-    }
-
-  /* remove character selection dialog */
-  if (char_table_window != NULL)
-    {
-      gtk_widget_destroy (char_table_window);
-      char_table_window = NULL;
-    }
 
   /* remove desktop info */
   for (item = desktops; item != NULL; item = item->next)
