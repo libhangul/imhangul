@@ -56,7 +56,7 @@ static const gunichar keyboard_table_390[] = {
   0x0024,	/* GDK_dollar:		dollar sign			*/
   0x0025,	/* GDK_percent:		percent sign			*/
   0x0026,	/* GDK_ampersand:	ampersand		 	*/
-  0x0027,	/* GDK_apostrophe:	apostrophe			*/
+  0x1110,	/* GDK_apostrophe:	choseong thieuth		*/
   0x0028,	/* GDK_parenleft:	left parenthesis		*/
   0x0029,	/* GDK_parenright:	right parenthesis		*/
   0x002a,	/* GDK_asterisk:	asterisk			*/
@@ -131,7 +131,7 @@ static const gunichar keyboard_table_390[] = {
   0x110e,	/* GDK_o:		choseong  chieuch		*/
   0x1111,	/* GDK_p:		choseong  phieuph		*/
   0x11ba,	/* GDK_q:		jongseong sios			*/
-  0x116b,	/* GDK_r:		jungseong ae			*/
+  0x1162,	/* GDK_r:		jungseong ae			*/
   0x11ab,	/* GDK_s:		jongseong nieun			*/
   0x1165, 	/* GDK_t:		jungseong eo			*/
   0x1103,	/* GDK_u:		choseong  tikeut		*/
@@ -190,5 +190,4 @@ im_module_create (const gchar *context_id)
   return NULL;
 }
 
-/* vim: nocindent
- */
+/* vim: set nocindent : */
