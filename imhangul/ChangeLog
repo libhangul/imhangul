@@ -1,3 +1,7 @@
+2003-12-18  Choe Hwanjin <krisna@kldp.org>
+	* gtkimcontexthangul.c: set_client_window 함수를 반복해서 호출할 경우에
+	  대한 처리
+
 2003-12-10  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: get_toplevel_window 함수를 다시 구현
 
