@@ -60,13 +60,26 @@ static GType gtk_type_im_context_hangul = 0;
 
 typedef struct _GtkIMContextHangul	GtkIMContextHangul;
 typedef struct _GtkIMContextHangulClass	GtkIMContextHangulClass;
-typedef gboolean (*GtkIMContextHangulAutomata) (GtkIMContextHangul *,
-					        GdkEventKey *);
+
+typedef gboolean (*IMHangulComposer)   (GtkIMContextHangul *, GdkEventKey *);
+typedef struct _IMHangulCombination	IMHangulCombination;
+
+typedef enum {
+  IM_HANGUL_COMPOSER_2,
+  IM_HANGUL_COMPOSER_3,
+} IMHangulComposerType,
 
 struct _GtkIMContextHangul
 {
   GtkIMContext object;
 
+  /* hangul keyboard information */
+  IMHangulComposer composer;
+  const gunichar *keyboard_table;
+  int compose_table_size;
+  const IMHangulCombination *compose_table;
+
+  /* hangul buffer */
   int state;
   int index;			/* stack index */
   gunichar stack[12];
@@ -78,7 +91,6 @@ struct _GtkIMContextHangul
   gunichar jungseong[4];
   gunichar jongseong[4];
 
-  GtkIMContextHangulAutomata automata;
   GtkWidget *toplevel;
 };
 
@@ -86,6 +98,25 @@ struct _GtkIMContextHangulClass
 {
   GtkIMContextClass parent_class;
 };
+
+struct _IMHangulCombination {
+  guint32 key;
+  gunichar code;
+};
+
+void          im_hangul_register_type (GTypeModule *type_module);
+
+GtkIMContext *im_hangul_new      (void);
+void          im_hangul_shutdown (void);
+
+/* configuration */
+void im_hangul_set_composer       (GtkIMContextHangul        *hcontext,
+		                   IMHangulComposerType       type)
+void im_hangul_set_keyboard_table (GtkIMContextHangul        *hcontext,
+		                   const gunichar            *keyboard_table)
+void im_hangul_set_compose_table  (GtkIMContextHangul        *hcontext,
+		                   const IMHangulCombination *compose_table,
+		                   int                       *compose_table_size);
 
 /* Status window: mostly copied from gtkimcontextxim.c */
 struct _StatusWindow
