@@ -81,7 +81,7 @@ static const gunichar keyboard_table_32[] = {
   0x003d,	/* GDK_equal:		equals sign			*/
   0x003e,	/* GDK_greater:		greater-than sign		*/
   0x003f,	/* GDK_question:	question mark	 		*/
-  0x0040,	/* GDK_at:		jongseong rieul-kiyeok		*/
+  0x0040,	/* GDK_at:		commercial at			*/
   0x11b7,	/* GDK_A:		jongseong mieum			*/
   0x1172,	/* GDK_B:		jungseong yu			*/
   0x11be,	/* GDK_C:		jongseong chieuch		*/
