@@ -97,6 +97,8 @@ static void	im_hangul_focus_in	     (GtkIMContext *context);
 static void	im_hangul_focus_out	     (GtkIMContext *context);
 static void	im_hangul_set_client_window  (GtkIMContext *context,
 					      GdkWindow    *client_window);
+static void	im_hangul_set_use_preedit    (GtkIMContext *context,
+    					      gboolean     use_preedit);
 
 /* asistant function for hangul composer */
 #define im_hangul_is_modifier(state)	((state & GDK_CONTROL_MASK) || \
@@ -109,8 +111,9 @@ static void	im_hangul_set_client_window  (GtkIMContext *context,
 					 (ctx)->jungseong[0] == 0 &&	\
 					 (ctx)->jongseong[0] == 0 )
 
-static gboolean	im_hangul_is_trigger	     (GdkEventKey *key);
-static gboolean	im_hangul_is_backspace	     (GdkEventKey *key);
+static inline gboolean	im_hangul_is_trigger	     (GdkEventKey *key);
+static inline gboolean	im_hangul_is_backspace	     (GdkEventKey *key);
+static inline void      im_hangul_emit_preedit_changed (GtkIMContextHangul *hcontext);
 
 static gboolean im_hangul_composer_2         (GtkIMContextHangul *hcontext,
 					      GdkEventKey *key);
@@ -119,6 +122,7 @@ static gboolean im_hangul_composer_3         (GtkIMContextHangul *hcontext,
 
 static void	im_hangul_mode_hangul	     (GtkIMContextHangul *hcontext);
 static void	im_hangul_mode_direct	     (GtkIMContextHangul *hcontext);
+
 
 /* stack functions */
 static gunichar	im_hangul_pop		     (GtkIMContextHangul *hcontext);
@@ -271,6 +275,8 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
   im_context_class->focus_in = im_hangul_focus_in;
   im_context_class->focus_out = im_hangul_focus_out;
   im_context_class->get_preedit_string = im_hangul_get_preedit_string;
+  im_context_class->set_use_preedit = im_hangul_set_use_preedit;
+
   gobject_class->finalize = im_hangul_finalize;
 }
 
@@ -325,6 +331,7 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 
   /* options */
   hcontext->always_use_jamo = FALSE;
+  hcontext->use_preedit = TRUE;
 }
 
 static void
@@ -1082,6 +1089,13 @@ im_hangul_focus_in (GtkIMContext *context)
   status_window_show (hcontext);
 }
 
+static inline void
+im_hangul_emit_preedit_changed (GtkIMContextHangul *hcontext)
+{
+  if (hcontext->use_preedit)
+    g_signal_emit_by_name (hcontext, "preedit_changed");
+}
+
 static void
 im_hangul_focus_out (GtkIMContext *context)
 {
@@ -1091,13 +1105,21 @@ im_hangul_focus_out (GtkIMContext *context)
     {
       if (im_hangul_commit (hcontext))
 	{
-	  g_signal_emit_by_name (hcontext, "preedit_changed");
+	  im_hangul_emit_preedit_changed (hcontext);
 	  hcontext->input_mode = INPUT_MODE_HANGUL;
 	}
     }
 
   status_window_hide (hcontext);
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
+}
+
+static void
+im_hangul_set_use_preedit (GtkIMContext *context, gboolean use_preedit)
+{
+  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+
+  hcontext->use_preedit = use_preedit;
 }
 
 static gboolean
@@ -1113,14 +1135,14 @@ im_hangul_is_ignore_key (guint16 key)
   return FALSE;
 }
 
-static gboolean
+static inline gboolean
 im_hangul_is_trigger (GdkEventKey *key)
 {
   return ( key->keyval == GDK_Hangul || 
 	  (key->keyval == GDK_space && (key->state & GDK_SHIFT_MASK)));
 }
 
-static gboolean
+static inline gboolean
 im_hangul_is_backspace (GdkEventKey *key)
 {
   return (key->keyval == GDK_BackSpace);
@@ -1132,7 +1154,7 @@ im_hangul_reset (GtkIMContext *context)
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
 
   if (im_hangul_commit (hcontext))
-    g_signal_emit_by_name (hcontext, "preedit_changed");
+    im_hangul_emit_preedit_changed (hcontext);
 }
 
 static gboolean
@@ -1163,7 +1185,7 @@ im_hangul_handle_direct_mode (GtkIMContextHangul *hcontext,
   if (im_hangul_is_trigger (key))
     {
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       im_hangul_mode_hangul (hcontext);
       return TRUE;
     }
@@ -1493,7 +1515,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (im_hangul_is_ignore_key (key->keyval))
     {
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       return FALSE;
     }
 
@@ -1505,7 +1527,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (key->keyval == GDK_Escape)
     {
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       im_hangul_mode_direct (hcontext);
       return FALSE;
     }
@@ -1514,7 +1536,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (im_hangul_is_modifier (key->state))
     {
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       return FALSE;
     }
 
@@ -1529,7 +1551,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (key->keyval == GDK_F3)
     {
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       popup_char_table_window (hcontext);
       return TRUE;
     }
@@ -1538,7 +1560,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (im_hangul_is_trigger (key))
     {
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       im_hangul_mode_direct (hcontext);
       return TRUE;
     }
@@ -1629,7 +1651,7 @@ on_click_hangul (GtkWidget *widget,
     {
       /* hangul mode change to english mode */
       if (im_hangul_commit (hcontext))
-	g_signal_emit_by_name (hcontext, "preedit_changed");
+	im_hangul_emit_preedit_changed (hcontext);
       im_hangul_mode_direct (hcontext);
     }
   return TRUE;
@@ -1869,7 +1891,7 @@ on_hanja_button_clicked (GtkButton *button, gpointer data)
       im_hangul_commit_utf8 (hcontext, str);
       hcontext->input_mode = INPUT_MODE_HANGUL;
       hcontext->index = -1;
-      g_signal_emit_by_name (hcontext, "preedit_changed");
+      im_hangul_emit_preedit_changed (hcontext);
     }
   gtk_widget_destroy (hanja_window);
 }
@@ -2406,12 +2428,12 @@ im_hangul_composer_2 (GtkIMContextHangul *hcontext,
     }
 
   if (im_hangul_commit (hcontext))
-    g_signal_emit_by_name (hcontext, "preedit_changed");
+    im_hangul_emit_preedit_changed (hcontext);
 
   return im_hangul_process_nonhangul (hcontext, key); /* english */
 
 done:
-  g_signal_emit_by_name (hcontext, "preedit_changed");
+  im_hangul_emit_preedit_changed (hcontext);
   return TRUE;
 }
 
@@ -2743,12 +2765,12 @@ im_hangul_composer_3 (GtkIMContextHangul *hcontext,
     }
 
   if (im_hangul_commit (hcontext))
-      g_signal_emit_by_name (hcontext, "preedit_changed");
+      im_hangul_emit_preedit_changed (hcontext);
 
   return im_hangul_process_nonhangul (hcontext, key);
 
 done:
-  g_signal_emit_by_name (hcontext, "preedit_changed");
+  im_hangul_emit_preedit_changed (hcontext);
   return TRUE;
 }
 
