@@ -727,7 +727,7 @@ im_hangul_process_nonhangul(GtkIMContextHangul *context_hangul,
 
 static gboolean
 im_hangul_handle_direct_mode(GtkIMContextHangul *context_hangul,
-				         GdkEventKey *key)
+		             GdkEventKey *key)
 {
   if (im_hangul_is_trigger(key)) {
     im_hangul_commit(context_hangul);
@@ -946,6 +946,18 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return im_hangul_handle_direct_mode(context_hangul, key);
   }
 
+  /* handle Escape key: automaticaly change to direct mode */
+  if (key->keyval == GDK_Escape) {
+    if (context_hangul->choseong != 0 ||
+	context_hangul->jungseong != 0 ||
+	context_hangul->jongseong != 0) {
+      im_hangul_commit(context_hangul);
+      g_signal_emit_by_name (context_hangul, "preedit_changed");
+    }
+    im_hangul_mode_direct(context_hangul);
+    return FALSE;
+  }
+
   /* modifiler key */
   if (im_hangul_is_modifier(key->state)) {
     if (context_hangul->choseong != 0 ||
@@ -962,9 +974,6 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     popup_hanja_window(context_hangul);
     return TRUE;
   }
-
-  if (context_hangul->state == STATE_DIRECT)
-    context_hangul->state = STATE_HANGUL;
 
   if (context_hangul->automata)
     return context_hangul->automata(context_hangul, key);
