@@ -1,3 +1,9 @@
+2003-12-26  Choe Hwanjin <krisna@kldp.org>
+	* gtkimcontexthangul.c,hangulcandidate.h,hanjatable.h,chartable.h:
+	  hanja_table과 char_table을 통합해서 candidata_table 하나로 만듦.
+	  surrounding을 이용하는 루틴을 추가. hanjatable.h,chartable.h 파일은
+	  삭제
+
 2003-12-20  Choe Hwanjin <krisna@kldp.org>
 	* release 0.9.9
 

@@ -59,6 +59,7 @@ struct _GtkIMContextHangul
   GtkWidget *toplevel;
   Candidate *candidate;
   GdkRectangle cursor;
+  gint surrounding_delete_length;
 
   /* hangul buffer */
   int input_mode;
