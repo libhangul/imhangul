@@ -1,0 +1,9 @@
+style "imhangul-style"
+{
+	fg[NORMAL]	= "#FFFFFF"
+	bg[NORMAL]	= "#EEEEE0"
+	text[NORMAL]	= "#FF0000"
+	font_name = "Sans 8"
+}
+
+widget "*imhangul*" style "imhangul-style"
