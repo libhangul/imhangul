@@ -61,7 +61,6 @@ struct _GtkIMContextHangul
   gint surrounding_delete_length;
 
   /* hangul buffer */
-  int input_mode;
   int index;			/* stack index */
   gunichar stack[12];
 
