@@ -17,7 +17,7 @@ style "imhangul-status-style"
 }
 
 # 한자 선택창 에서 나타나는 글자의 색과 크기모양
-style "imhangul-hanja-style"
+style "imhangul-candidate-style"
 {
 	font_name	= "Sans 20"
 #	font_name	= "Andale Sans UI 20"
@@ -25,7 +25,7 @@ style "imhangul-hanja-style"
 
 #class "GtkWidget" style "mydefault"
 widget "*imhangul_status*" style "imhangul-status-style"
-widget "*imhangul_hanja*" style "imhangul-hanja-style"
+widget "*imhangul_candidate*" style "imhangul-candidate-style"
 
 # 상태창을 보이게/안보이게 설정
 # 0 : 안보임
