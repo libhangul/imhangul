@@ -1,4 +1,3 @@
-# status 윈도우에서 나타나는 글자의 색과 크기모양
 style "mydefault"
 {
 	fg[NORMAL]	= "#00FF00"	# 글자, 테두리색
@@ -6,6 +5,7 @@ style "mydefault"
 	text[NORMAL]	= "#0000FF"	# 글자
 }
 
+# 상태창에서 나타나는 글자의 색과 크기모양
 style "imhangul-status-style"
 {
 	fg[NORMAL]	= "#990000"	# 글자, 테두리색
@@ -13,6 +13,7 @@ style "imhangul-status-style"
 	font_name	= "Sans 16"
 }
 
+# 한자 선택창 에서 나타나는 글자의 색과 크기모양
 style "imhangul-hanja-style"
 {
 	font_name	= "Sans 20"

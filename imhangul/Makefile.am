@@ -18,17 +18,17 @@ im_hangul3f_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 im_hangul3f_la_SOURCES = imhangul3f.c imhangul.h hanjatable.h imhangul3.h
 im_hangul3f_la_LIBADD = $(LDADDS)
 
-im_hangul3s_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul3s_la_SOURCES = imhangul3s.c imhangul.h hanjatable.h imhangul3.h
-im_hangul3s_la_LIBADD = $(LDADDS)
+#im_hangul3s_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
+#im_hangul3s_la_SOURCES = imhangul3s.c imhangul.h hanjatable.h imhangul3.h
+#im_hangul3s_la_LIBADD = $(LDADDS)
 
-im_hangul39_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul39_la_SOURCES = imhangul39.c imhangul.h hanjatable.h imhangul3.h
-im_hangul39_la_LIBADD = $(LDADDS)
+#im_hangul39_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
+#im_hangul39_la_SOURCES = imhangul39.c imhangul.h hanjatable.h imhangul3.h
+#im_hangul39_la_LIBADD = $(LDADDS)
 
-im_hangul3y_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
-im_hangul3y_la_SOURCES = imhangul3y.c imhangul.h imhangul3.h hanjatable.h
-im_hangul3y_la_LIBADD = $(LDADDS)
+#im_hangul3y_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
+#im_hangul3y_la_SOURCES = imhangul3y.c imhangul.h imhangul3.h hanjatable.h
+#im_hangul3y_la_LIBADD = $(LDADDS)
 
 #im_hangul3x_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 #im_hangul3x_la_SOURCES = imhangul3x.c imhangul.h hanjatable.h
@@ -38,10 +38,10 @@ CFLAGS = @GTK_CFLAGS@ -g -Wall
 
 module_LTLIBRARIES = \
 	im-hangul2.la \
-	im-hangul3f.la \
-	im-hangul3s.la \
-	im-hangul39.la \
-	im-hangul3y.la
+	im-hangul3f.la
+#	im-hangul3s.la \
+#	im-hangul39.la \
+#	im-hangul3y.la
 
 noinst_PROGRAMS = entry
 entry_SOURCES = entry.c
