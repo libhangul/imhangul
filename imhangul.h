@@ -138,6 +138,7 @@ static gboolean	im_hangul_filter_keypress(GtkIMContext *context,
 static void im_hangul_preedit_underline (PangoAttrList **attrs, gint start, gint end);
 static void im_hangul_preedit_foreground (PangoAttrList **attrs, gint start, gint end);
 static void im_hangul_preedit_background (PangoAttrList **attrs, gint start, gint end);
+static void im_hangul_preedit_nothing (PangoAttrList **attrs, gint start, gint end);
 static void im_hangul_get_preedit_string(GtkIMContext *ic,
 					 gchar **str,
 					 PangoAttrList **attrs,
@@ -174,10 +175,9 @@ static gint		input_mode = MODE_DIRECT;
 static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
-static gboolean		pref_enable_inverse_sequence = TRUE;
 static gchar* 		pref_hanja_font = NULL;
 static gint		pref_preedit_style = 1;
-static void (*im_hangul_preedit_attr)(PangoAttrList **attrs, gint start, gint end);
+static void (*im_hangul_preedit_attr)(PangoAttrList **attrs, gint start, gint end) = NULL;
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
 
@@ -250,7 +250,7 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
   						   "Preedit Style",
 						   "Preedit string style",
 						   0,
-						   3,
+						   4,
 						   1,
 						   G_PARAM_READWRITE));
 }
@@ -293,6 +293,9 @@ im_hangul_init (GtkIMContextHangul *context_hangul)
     case 2:
     case 3:
       im_hangul_preedit_attr = im_hangul_preedit_background;
+      break;
+    case 4:
+      im_hangul_preedit_attr = im_hangul_preedit_nothing;
       break;
     default:
       im_hangul_preedit_attr = im_hangul_preedit_foreground;
@@ -700,6 +703,13 @@ im_hangul_preedit_background (PangoAttrList **attrs, gint start, gint end)
   attr->start_index = start;
   attr->end_index = end;
   pango_attr_list_insert (*attrs, attr);
+}
+
+static void
+im_hangul_preedit_nothing (PangoAttrList **attrs, gint start, gint end)
+{
+  /* we do nothing */
+  *attrs = pango_attr_list_new();
 }
 
 static void
