@@ -173,6 +173,7 @@ static gint		input_mode = MODE_DIRECT;
 static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
+static gboolean		pref_enable_inverse_sequence = TRUE;
 static gchar* 		pref_hanja_font = NULL;
 
 static guint16 gtk_compose_ignore[] = {
