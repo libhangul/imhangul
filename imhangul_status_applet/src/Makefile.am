@@ -1,12 +1,12 @@
 SUBDIRS = themes
 
-INCLUDES = \
-	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"		\
-	-DIMHANGUL_STATUS_THEMES_DIR=\"@IMHANGUL_STATUS_THEMES_DIR@\"
-
-AM_CFLAGS = -Wall -g @IMHANGUL_STATUS_CFLAGS@
-
 libexec_PROGRAMS = imhangul-status-applet
+
+imhangul_status_applet_CFLAGS = \
+	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"		\
+	-DIMHANGUL_STATUS_THEMES_DIR=\"@IMHANGUL_STATUS_THEMES_DIR@\" \
+	@IMHANGUL_STATUS_CFLAGS@ \
+	-Wall
 
 imhangul_status_applet_SOURCES = \
 	none.xpm 		\
@@ -14,7 +14,7 @@ imhangul_status_applet_SOURCES = \
 	hangul.xpm 		\
 	imhangul_status.c
 
-imhangul_status_applet_LDADD = $(IMHANGUL_STATUS_LIBS)
+imhangul_status_applet_LDADD = @IMHANGUL_STATUS_LIBS@
 
 schemadir = @GCONF_SCHEMA_FILE_DIR@
 schema_in_files = imhangul_status.schemas.in
@@ -23,7 +23,7 @@ schema_DATA = $(schema_in_files:.schemas.in=.schemas)
 
 install-data-local:
 	if test -z "$(DESTDIR)" ; then \
-		GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) $(GCONFTOOL) --makefile-install-rule $(srcdir)/$(schema_DATA) ; \
+		GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) $(GCONFTOOL) --makefile-install-rule $(schema_DATA) ; \
 	fi
 
 

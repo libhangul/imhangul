@@ -26,14 +26,22 @@ ALL_LINGUAS="ko"
 AM_GLIB_GNU_GETTEXT
 GETTEXT_PACKAGE=imhangul_status_applet
 AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+		   [gettext package name])
 
 ## some const variables
-AC_DEFINE_UNQUOTED(GNOME_ICONDIR, "${prefix}/share/pixmaps")
+AC_DEFINE_UNQUOTED(GNOME_ICONDIR, "${prefix}/share/pixmaps",
+		   [gnome icon directory])
 
 AC_OUTPUT([
 Makefile
 po/Makefile.in
 src/Makefile
 src/themes/Makefile
+src/themes/SimplyRed/Makefile
+src/themes/MSWindows/Makefile
+src/themes/Mac/Makefile
+src/themes/Onion/Makefile
+src/themes/KingSejong/Makefile
+src/themes/keyboard/Makefile
 ])
