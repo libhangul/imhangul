@@ -1,3 +1,15 @@
+2003-12-10  Choe Hwanjin <krisna@kldp.org>
+	* gtkimcontexthangul.c: get_toplevel_window 함수를 다시 구현
+
+2003-11-27  Choe Hwanjin  <krisna@people.kldp.org>
+        * gtkimcontexthangul.c, gtkimcontexthangul.h:
+          set_cursor_location method 구현,
+	  candidate window를 커서 위치 근처에 표 현
+        * gtkimcontexthangul.c: remove period in hanja candidate window
+ 
+2003-11-23  Choe Hwanjin  <krisna@people.kldp.org>
+        * NEWS, TODO: 문서 업데이트
+
 2003-11-20  Choe Hwanjin  <krisna@people.kldp.org>
 	* relase 0.9.8
 	* configure.in: version up to 0.9.8
