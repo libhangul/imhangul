@@ -11,7 +11,7 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(THEMES_DIR); \
 	for dir in $(THEMES) ; do \
 		$(mkinstalldirs) $(DESTDIR)$(THEMES_DIR)/$$dir; \
-		for i in `find $(srcdir)/$$dir` ; do \
+		for i in `find $(srcdir)/$$dir -type f` ; do \
 			$(INSTALL_DATA) $$i $(DESTDIR)$(THEMES_DIR)/$$dir; \
 		done \
 	done
