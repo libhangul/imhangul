@@ -14,7 +14,7 @@ GTK_IMMODULES = $(sysconfdir)/gtk-2.0/gtk.immodules
 im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
 	gtkimcontexthangul.h 	\
-	hangulcandidate.h	\
+	candidatetable.h	\
 	gettext.h		\
 	imhangul.c
 
