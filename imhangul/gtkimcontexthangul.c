@@ -1162,6 +1162,7 @@ im_hangul_handle_direct_mode (GtkIMContextHangul *hcontext,
     {
       if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
+      g_signal_emit_by_name (hcontext, "preedit_start");
       im_hangul_mode_hangul (hcontext);
       return TRUE;
     }
@@ -1504,6 +1505,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     {
       if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
+      g_signal_emit_by_name (hcontext, "preedit_end");
       im_hangul_mode_direct (hcontext);
       return FALSE;
     }
@@ -1537,6 +1539,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     {
       if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
+      g_signal_emit_by_name (hcontext, "preedit_end");
       im_hangul_mode_direct (hcontext);
       return TRUE;
     }

@@ -1,3 +1,7 @@
+2003-06-24  Choe Hwanjin <krisna@kldp.org>
+	* gtkimcontexthangul.c: preedit_start, preedit_end signal 발생시킴
+	  (from Nam SungHyun <namsh@kldp.org>)
+
 2003-06-01  Choe Hwanjin <krisna@kldp.org>
 	* imhangul.c: 두벌식 테이블 수정 GDK_D -> 110b
 	  thanks to likesylph
