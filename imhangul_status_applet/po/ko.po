@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-11-12 10:07+0900\n"
+"POT-Creation-Date: 2002-11-17 20:38+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,24 +14,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/imhangul_status.c:288
+#: src/imhangul_status.c:307
 msgid "imhangul status applet: Select Theme"
 msgstr "imhangul status applet: 테마를 선택하세요"
 
-#: src/imhangul_status.c:315
+#: src/imhangul_status.c:335
 #, fuzzy
 msgid "Theme Name"
 msgstr "테마 이름"
 
-#: src/imhangul_status.c:370
+#: src/imhangul_status.c:390
 msgid "IMHangul Status Applet"
 msgstr ""
 
-#: src/imhangul_status.c:371
+#: src/imhangul_status.c:391
 msgid "(C) 2002 Choe Hwanjin"
 msgstr ""
 
-#: src/imhangul_status.c:372
+#: src/imhangul_status.c:392
 msgid "Showing status of IMHangul input module"
 msgstr "imhangul의 한영 상태를 보여줍니다"
 
