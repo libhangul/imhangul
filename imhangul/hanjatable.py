@@ -2,6 +2,8 @@
 
 import sys, string
 
+char_type = 'gunichar'
+copyright = ''
 
 def print_help():
 	sys.stderr.write("Usage: hanjatable.py [Unihan database file]\n")
@@ -18,30 +20,7 @@ def print_description():
  	print desc
 
 def print_copyright():
-	copyright = """/* Name: Unihan database
- * Unicode version: 3.2.0
- * Table version: 1.1
- * Date: 15 March 2002
- *
- * Copyright (c) 1996-2002 Unicode, Inc. All Rights reserved.
- *
- * This file is provided as-is by Unicode, Inc. (The Unicode Consortium).
- * No claims are made as to fitness for any particular purpose. No
- * warranties of any kind are expressed or implied. The recipient
- * agrees to determine applicability of information provided. If this
- * file has been provided on magnetic media by Unicode, Inc., the sole
- * remedy for any claim will be exchange of defective media within 90
- * days of receipt.
- *
- * Recipient is granted the right to make copies in any form for
- * internal distribution and to freely use the information supplied
- * in the creation of products supporting Unicode. Unicode, Inc.
- * specifically excludes the right to re-distribute this file directly
- * to third parties or other organizations whether for profit or not.
- */
-
-"""
-	print copyright
+	print '/*\n' + copyright + ' */\n'
 
 def unicodetohexnum(str):
 	return string.atoi(str[2:], 16)
@@ -201,11 +180,19 @@ except:
 	help()
 	sys.exit(1)
 
+gather_copyright = 0
 table = { }
 for line in data_file.readlines():
 	# check for comment, jump over comments
 	if line[0] == '#':
-		continue
+		if gather_copyright == 0:
+			if string.find(line, "Format information:") != -1 :
+				gather_copyright = 1
+				continue
+			copyright += ' * ' + string.strip(line[1:]) + '\n'
+			continue
+		else:
+			continue
 		
 	# check for korean phonetic data
 	if string.find(line, "kKorean") < 0:
@@ -232,7 +219,7 @@ list = table.keys()
 list.sort()
 
 for key in list:
-	print "unicode_t hangul_%X[] = {" % key
+	print char_type + " hangul_%X[] = {" % key
 	print "\t0x%X," % key
 
 	i = 0
@@ -253,7 +240,7 @@ for key in list:
 	print "};"
 
 
-print "unicode_t *hanjatable[] = {"
+print char_type + " *hanjatable[] = {"
 i = 0
 for key in list[:-1]:
 	if i == 0:
