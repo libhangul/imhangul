@@ -51,7 +51,6 @@
 #include <gtk/gtkwindow.h>
 #include <gtk/gtkimcontext.h>
 
-typedef gunichar unicode_t;         /* this is for hanjatable */
 #include "hanjatable.h"
 
 static GType gtk_type_im_context_hangul = 0;
