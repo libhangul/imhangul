@@ -1,219 +1,222 @@
+2003-10-30  Choe Hwanjin <krisna@kldp.org>
+	* ì—¬ëŸ¬ í…ìŠ¤íŠ¸ íŒŒì¼ì„ ëª¨ë‘ UTF-8 ì¸ì½”ë”©ìœ¼ë¡œ ë³€í™˜
+
 2003-10-20  Choe Hwanjin <krisna@kldp.org>
-	* Makefile.am: CFLAGS Á¤¸®, GTK_BINARY_VERSION »ç¿ë
-	* imhangul.spec.in: GTK_BINARY_VERSION »ç¿ë
-	* gtkimcontexthangul.c: ÇÔ¼ö Á¤¸®
+	* Makefile.am: CFLAGS ì •ë¦¬, GTK_BINARY_VERSION ì‚¬ìš©
+	* imhangul.spec.in: GTK_BINARY_VERSION ì‚¬ìš©
+	* gtkimcontexthangul.c: í•¨ìˆ˜ ì •ë¦¬
 
 2003-09-05  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: xkb compatibility
 
 2003-06-24  Choe Hwanjin <krisna@kldp.org>
-	* gtkimcontexthangul.c: preedit_start, preedit_end signal ¹ß»ı½ÃÅ´
+	* gtkimcontexthangul.c: preedit_start, preedit_end signal ë°œìƒì‹œí‚´
 	  (from Nam SungHyun <namsh@kldp.org>)
 
 2003-06-01  Choe Hwanjin <krisna@kldp.org>
-	* imhangul.c: µÎ¹ú½Ä Å×ÀÌºí ¼öÁ¤ GDK_D -> 110b
+	* imhangul.c: ë‘ë²Œì‹ í…Œì´ë¸” ìˆ˜ì • GDK_D -> 110b
 	  thanks to likesylph
 
 2003-04-08  Choe Hwanjin <krisna@kldp.org>
-	* gtkimcontexthangul.c: gtk-im-hangul-use-manual-mode ¼³Á¤ º¯¼ö Ãß°¡
+	* gtkimcontexthangul.c: gtk-im-hangul-use-manual-mode ì„¤ì • ë³€ìˆ˜ ì¶”ê°€
 
 2003-03-30  Choe Hwanjin <krisna@kldp.org>
 	* release 0.9.6
-	* ¸ğµâ ÆÄÀÏÀ» ÀÎ½ºÅçÇÑ ÈÄ gtk-query-immodules-2.0¸¦ ½ÇÇàÇÔ
+	* ëª¨ë“ˆ íŒŒì¼ì„ ì¸ìŠ¤í†¨í•œ í›„ gtk-query-immodules-2.0ë¥¼ ì‹¤í–‰í•¨
 
 2003-02-23  Choe Hwanjin <krisna@kldp.org>
 	* update entry.c (add for GtkSettings)
-	* preedit styleÀ» Á¤ÇÏ´Âµ¥ gtk_widget_get_default_style()À» »ç¿ë
+	* preedit styleì„ ì •í•˜ëŠ”ë° gtk_widget_get_default_style()ì„ ì‚¬ìš©
 
 2003-02-22  Choe Hwanjin <krisna@kldp.org>
-	* preedit_style_change()¿¡¼­ widgetÀÌ NULLÀÎÁö Ã¼Å©ÇÔ
-	* DesktopInfo¸¦ Ãß°¡ÇÏ¿© ¸ğµâ Á¾·áÇÒ¶§ notify Äİ¹éÀ» Á¦°ÅÇÔ
+	* preedit_style_change()ì—ì„œ widgetì´ NULLì¸ì§€ ì²´í¬í•¨
+	* DesktopInfoë¥¼ ì¶”ê°€í•˜ì—¬ ëª¨ë“ˆ ì¢…ë£Œí• ë•Œ notify ì½œë°±ì„ ì œê±°í•¨
 
 2003-02-12  Choe Hwanjin <krisna@kldp.org>
-	* {G,GDK,GTK}_DISABLE_DEPRECATED ¿É¼Ç Ãß°¡
-	* GDK_ROOT_PARENT´ë½Å gdk_screen_get_root_window¸¦ »ç¿ëÇÔ
+	* {G,GDK,GTK}_DISABLE_DEPRECATED ì˜µì…˜ ì¶”ê°€
+	* GDK_ROOT_PARENTëŒ€ì‹  gdk_screen_get_root_windowë¥¼ ì‚¬ìš©í•¨
 
 2003-02-11  Choe Hwanjin <krisna@kldp.org>
-	* im_hangul_set_client_window()¿¡¼­ µÎ¹øÂ° ÀÎÀÚ¸¦ NULLÀÎÁö °Ë»çÇÏ´Â
-	  ºÎºĞ Ãß°¡
-	* Makefile.am: CFLAGS ºÎºĞ Á¦°Å
-	  (Nam SungHyun <namsh@kldp.org>´Ô¿¡°Ô °¨»çµå¸³´Ï´Ù.)
+	* im_hangul_set_client_window()ì—ì„œ ë‘ë²ˆì§¸ ì¸ìë¥¼ NULLì¸ì§€ ê²€ì‚¬í•˜ëŠ”
+	  ë¶€ë¶„ ì¶”ê°€
+	* Makefile.am: CFLAGS ë¶€ë¶„ ì œê±°
+	  (Nam SungHyun <namsh@kldp.org>ë‹˜ì—ê²Œ ê°ì‚¬ë“œë¦½ë‹ˆë‹¤.)
 
 2003-02-09  Choe Hwanjin <krisna@kldp.org>
-	* GtkSettings °ü·Ã ºÎºĞÀ» im_hangul_set_client_window ¾ÈÂÊÀ¸·Î ¿Å±è
-	* GtkSettings ¼³Á¤°ªÀÌ ¹Ù²ğ¶§ ½ÇÇàµÉ Äİ¹é ¿¬°á
+	* GtkSettings ê´€ë ¨ ë¶€ë¶„ì„ im_hangul_set_client_window ì•ˆìª½ìœ¼ë¡œ ì˜®ê¹€
+	* GtkSettings ì„¤ì •ê°’ì´ ë°”ë€”ë•Œ ì‹¤í–‰ë  ì½œë°± ì—°ê²°
 
 2003-02-05 (Wed) 22:43 Choe Hwanjin <krisna@kldp.org>
-	* pref_use_jamo¸¦ ¾ø¾Ö°í output_mode·Î ÅëÀÏ
-	* hcontext->state¸¦ hcontext->input_mode·Î º¯°æ
+	* pref_use_jamoë¥¼ ì—†ì• ê³  output_modeë¡œ í†µì¼
+	* hcontext->stateë¥¼ hcontext->input_modeë¡œ ë³€ê²½
 
 2003-02-04 (Tue) 23:46 Choe Hwanjin <krisna@kldp.org>
-	* imhangul2,32,39,3f,3s,3y.c¸¦ ¸ğµÎ ÇÕÃÄ imhangul.c ·Î ¸¸µé°í
-	  °øÅë ºÎºĞÀ» ¸ğµÎ gtkimcontexthangul.c,h ¿¡ ¸ğ¾Æ¼­ ¸ğµâ ÆÄÀÏÀ» ÇÏ³ªÀÇ
-	  object ÆÄÀÏ·Î ¸¸µé¾î ¹ö¸²
-	* °¢ºÎºĞ¿¡ const Å°¿öµå¸¦ »ç¿ëÇÒ °÷¿¡ »ç¿ëÇÔ
+	* imhangul2,32,39,3f,3s,3y.cë¥¼ ëª¨ë‘ í•©ì³ imhangul.c ë¡œ ë§Œë“¤ê³ 
+	  ê³µí†µ ë¶€ë¶„ì„ ëª¨ë‘ gtkimcontexthangul.c,h ì— ëª¨ì•„ì„œ ëª¨ë“ˆ íŒŒì¼ì„ í•˜ë‚˜ì˜
+	  object íŒŒì¼ë¡œ ë§Œë“¤ì–´ ë²„ë¦¼
+	* ê°ë¶€ë¶„ì— const í‚¤ì›Œë“œë¥¼ ì‚¬ìš©í•  ê³³ì— ì‚¬ìš©í•¨
 
 2003-01-15 (Wed) 20:57 Choe Hwanjin <krisna@kldp.org>
-	* gen.py ¸¦ hanjatable.py·Î ÀÌ¸§ ¹Ù²Ş
-	* imhangul.h,hanjatable.h,chartable.h: unicode_t¸¦ »ç¿ëÇÏÁö ¾Ê°í
-	  Á÷Á¢ gunichar¸¦ »ç¿ë
+	* gen.py ë¥¼ hanjatable.pyë¡œ ì´ë¦„ ë°”ê¿ˆ
+	* imhangul.h,hanjatable.h,chartable.h: unicode_të¥¼ ì‚¬ìš©í•˜ì§€ ì•Šê³ 
+	  ì§ì ‘ gunicharë¥¼ ì‚¬ìš©
 
 2003-01-12 (Sun) 16:00 Choe Hwanjin <krisna@kldp.org>
-	* ¼Ò½º¸¦ ±ú²ıÀÌ (ÅÇ, ºóÄ­ Á¤¸®)
-	* imhangul.h: trigger Å°¸¦ Ã³¸®ÇÏ´Â ºÎºĞÀ» automata¿¡¼­ filter
-	  ÇÔ¼ö·Î ¿Å±è, STATE »ó¼ö¸¦ enumÀ¸·Î ¼±¾ğ, ±ÛÀÚ¸¦ °ñ¶ó¼­ ³ÖÀ»¼ö ÀÖ´Â
-	  ´ëÈ­Ã¢ ±â´É Ãß°¡(char_table)
-	* imhangul2.c, imhangul3.h: dvorak º¯È¯ ·çÆ¾À» im_hangul_mapping ÇÔ¼ö
-	  ³»ºÎ·Î ¿Å±è
-	* chartable.h: ÆÄÀÏ Ãß°¡(°ñ¶óÀÔ·ÂÇÒ¼ö ÀÖ´Â ±ÛÀÚÇ¥)
+	* ì†ŒìŠ¤ë¥¼ ê¹¨ë—ì´ (íƒ­, ë¹ˆì¹¸ ì •ë¦¬)
+	* imhangul.h: trigger í‚¤ë¥¼ ì²˜ë¦¬í•˜ëŠ” ë¶€ë¶„ì„ automataì—ì„œ filter
+	  í•¨ìˆ˜ë¡œ ì˜®ê¹€, STATE ìƒìˆ˜ë¥¼ enumìœ¼ë¡œ ì„ ì–¸, ê¸€ìë¥¼ ê³¨ë¼ì„œ ë„£ì„ìˆ˜ ìˆëŠ”
+	  ëŒ€í™”ì°½ ê¸°ëŠ¥ ì¶”ê°€(char_table)
+	* imhangul2.c, imhangul3.h: dvorak ë³€í™˜ ë£¨í‹´ì„ im_hangul_mapping í•¨ìˆ˜
+	  ë‚´ë¶€ë¡œ ì˜®ê¹€
+	* chartable.h: íŒŒì¼ ì¶”ê°€(ê³¨ë¼ì…ë ¥í• ìˆ˜ ìˆëŠ” ê¸€ìí‘œ)
 
 2002-12-24 (Tue) 07:10 Choe Hwanjin <krisna@kldp.org>
-	* Makefile.am: ¸ğµâ ÆÄÀÏÀÇ ÀÎ½ºÅç À§Ä¡¿¡¼­ binary version ºÎºĞÀ» Á¦°ÅÇÔ
+	* Makefile.am: ëª¨ë“ˆ íŒŒì¼ì˜ ì¸ìŠ¤í†¨ ìœ„ì¹˜ì—ì„œ binary version ë¶€ë¶„ì„ ì œê±°í•¨
 
 2002-12-05 (Thu) 21:15 Choe Hwanjin <krisna@kldp.org>
-	* imhangul2.c: ±âÁ¸ÀÇ automata ·çÆ¾À» ¿ÏÀüÈ÷ ¹Ù²Ş (stack »ç¿ë)
-	* imhangul.h, imhangul3.h: ½ºÅÃ °ü·Ã ÇÔ¼ö¸¦ imhangul3.h¿¡¼­
-	  imhangul.h ·Î ¿Å±è
+	* imhangul2.c: ê¸°ì¡´ì˜ automata ë£¨í‹´ì„ ì™„ì „íˆ ë°”ê¿ˆ (stack ì‚¬ìš©)
+	* imhangul.h, imhangul3.h: ìŠ¤íƒ ê´€ë ¨ í•¨ìˆ˜ë¥¼ imhangul3.hì—ì„œ
+	  imhangul.h ë¡œ ì˜®ê¹€
 
 2002-12-04 (Wed) 16:20 Choe Hwanjin <krisna@kldp.org>
-	* imhangul2.c: im_hangul2_jongseong_dicompose() ÇÔ¼ö Ãß°¡
-	  state7, state9 ¿¡¼­ ÀÌ ÇÔ¼ö¸¦ ÀÌ¿ëÇØ¼­ º¹Á¾¼ºÀ» ºĞ¸®ÇÑ´Ù.
+	* imhangul2.c: im_hangul2_jongseong_dicompose() í•¨ìˆ˜ ì¶”ê°€
+	  state7, state9 ì—ì„œ ì´ í•¨ìˆ˜ë¥¼ ì´ìš©í•´ì„œ ë³µì¢…ì„±ì„ ë¶„ë¦¬í•œë‹¤.
 
 2002-11-29 (Fri) 20:53 Choe Hwanjin  <krisna@kldp.org>
-	* 0.9.5 ¹öÁ¯ ÁØºñ
-	* µÎ¹ú½Ä ÀÚÆÇÀÇ Å°°ªÀ» Å×ÀÌºí¿¡¼­ °¡Á®¿Àµµ·Ï ¼öÁ¤
-	  °ü·Ã ÇÔ¼ö¸¦ imhangul3.h¿¡¼­ imhangul.h ·Î ÀÌµ¿ 
+	* 0.9.5 ë²„ì ¼ ì¤€ë¹„
+	* ë‘ë²Œì‹ ìíŒì˜ í‚¤ê°’ì„ í…Œì´ë¸”ì—ì„œ ê°€ì ¸ì˜¤ë„ë¡ ìˆ˜ì •
+	  ê´€ë ¨ í•¨ìˆ˜ë¥¼ imhangul3.hì—ì„œ imhangul.h ë¡œ ì´ë™ 
 	  imhangul_mapping(), imhangul_compose()
 
-2002. 11. 08. (±İ) 23:48:44 KST
-	* imhangul.h: X ¼­¹ö¿¡°Ô ÇÑ¿µ »óÅÂ¸¦ ¾Ë·ÁÁÖ´Â
-	  im_hangul_set_input_mode_info() ÇÔ¼ö¸¦ Ãß°¡
+2002. 11. 08. (ê¸ˆ) 23:48:44 KST
+	* imhangul.h: X ì„œë²„ì—ê²Œ í•œì˜ ìƒíƒœë¥¼ ì•Œë ¤ì£¼ëŠ”
+	  im_hangul_set_input_mode_info() í•¨ìˆ˜ë¥¼ ì¶”ê°€
 
-2002. 11. 08. (±İ) 23:46:14 KST
-	* configure.in, imhangul.spec.in: GTK+ÀÇ Binary VersionÀ» pkg-config¸¦
-	  ÅëÇØ¼­ °¡Á®¿À°Ô ÇÔ
-	  (Nam SungHyun <namsh@kldp.org>´Ô¿¡°Ô °¨»çµå¸³´Ï´Ù.)
+2002. 11. 08. (ê¸ˆ) 23:46:14 KST
+	* configure.in, imhangul.spec.in: GTK+ì˜ Binary Versionì„ pkg-configë¥¼
+	  í†µí•´ì„œ ê°€ì ¸ì˜¤ê²Œ í•¨
+	  (Nam SungHyun <namsh@kldp.org>ë‹˜ì—ê²Œ ê°ì‚¬ë“œë¦½ë‹ˆë‹¤.)
 
-2002. 10. 25. (±İ) 23:38:34 KST
-	* imhangul32.c: º¯Çü µÎ¹ú½Ä ÀÚÆÇÀ¸·Î ¼¼¹ú½Ä ÀÔ·ÂÀ» Èä³»³»´Â ¸ğµâ Ãß°¡
-	* imhangul.h: Ctrl-HangulÅ°·Î manual mode¸¦ Åä±Û °¡´É
+2002. 10. 25. (ê¸ˆ) 23:38:34 KST
+	* imhangul32.c: ë³€í˜• ë‘ë²Œì‹ ìíŒìœ¼ë¡œ ì„¸ë²Œì‹ ì…ë ¥ì„ í‰ë‚´ë‚´ëŠ” ëª¨ë“ˆ ì¶”ê°€
+	* imhangul.h: Ctrl-Hangulí‚¤ë¡œ manual modeë¥¼ í† ê¸€ ê°€ëŠ¥
 
-2002. 10. 24. (¸ñ) 18:25:09 KST
-	* imhangul3f.c imhangul39.c imhangul3s.c imhangul3y.c: ÀÚÆÇ ¹è¿­À» ¸ğµÎ
-	  tableÀ» »ç¿ëÇÏµµ·Ï ¼öÁ¤ÇÔ. ÀÚÆÇ¿¡ Á¾¼ÓÀûÀÌÁö ¾ÊÀº compose Å×ÀÌºíÀ» 
-	  ¸¸µé¾î¼­ ¿¾±ÛÀÚÆÇÀ» Á¦¿ÜÇÑ ¸ğµç ÀÚÆÇ¿¡¼­ °øÅëÀûÀ¸·Î »ç¿ëÇÔ.
-	* imhangul3.h: manual_mode¸¦ Ãß°¡ÇÔ
+2002. 10. 24. (ëª©) 18:25:09 KST
+	* imhangul3f.c imhangul39.c imhangul3s.c imhangul3y.c: ìíŒ ë°°ì—´ì„ ëª¨ë‘
+	  tableì„ ì‚¬ìš©í•˜ë„ë¡ ìˆ˜ì •í•¨. ìíŒì— ì¢…ì†ì ì´ì§€ ì•Šì€ compose í…Œì´ë¸”ì„ 
+	  ë§Œë“¤ì–´ì„œ ì˜›ê¸€ìíŒì„ ì œì™¸í•œ ëª¨ë“  ìíŒì—ì„œ ê³µí†µì ìœ¼ë¡œ ì‚¬ìš©í•¨.
+	* imhangul3.h: manual_modeë¥¼ ì¶”ê°€í•¨
 	
-Åä 10¿ù 12 11:15:16 KST 2002
-	* imhangul.h: gtk_settings_installÀ» È£ÃâÇÏ±â Àü¿¡ property°¡ ÀÌ¹Ì
-	  ÀÎ½ºÅç µÇ¾î ÀÖ´ÂÁö Ã¼Å©ÇÔ
-	  im_hangul_compjungseong_to_single, im_hangul_compjongseong_signle¸¦
-	  imhangul2.c ·Î ¿Å±è
-	  "gtk-imhangul-use-capslock" ¼¼ÆÃ°ªÀ» Ãß°¡
-	  use_caps_lock À» pref_use_caps_lock·Î ÀÌ¸§ ¹Ù²Ş
-	* imhangul3y.c: ¿¾±Û ÀÚÆÇÀ» ¿Ï¼º. ´Ü ¸ğÀ½ÀÇ °æ¿ì ¿ì¼±Àº compatibility
-	  Jamo(U+3130)¿µ¿ª¿¡ ÀÖ´Â °Íµé¸¸ Á¶ÇÕµÇµµ·Ï ÇÔ (U+1100 ¿µ¿ª¿¡ ÀÖ´Â
-	  ¸ğÀ½À» ¸ğµÎ Á¶ÇÕ °¡´ÉÇÏ°Ô ÇÏ·Á¸é ³Ê¹« ÄÚµù·®µµ ¸¹°í ºÒÆíÇÒ°Í °°¾Æ¼­
-	  ±×³É ÀÌ Á¤µµ·Î ±¸ÇöÇØµÒ, »ç½Ç ¾²´Â »ç¶÷ÀÌ ÀÖÀ»Áöµµ ÀÇ¹®ÀÓ)
+í†  10ì›” 12 11:15:16 KST 2002
+	* imhangul.h: gtk_settings_installì„ í˜¸ì¶œí•˜ê¸° ì „ì— propertyê°€ ì´ë¯¸
+	  ì¸ìŠ¤í†¨ ë˜ì–´ ìˆëŠ”ì§€ ì²´í¬í•¨
+	  im_hangul_compjungseong_to_single, im_hangul_compjongseong_signleë¥¼
+	  imhangul2.c ë¡œ ì˜®ê¹€
+	  "gtk-imhangul-use-capslock" ì„¸íŒ…ê°’ì„ ì¶”ê°€
+	  use_caps_lock ì„ pref_use_caps_lockë¡œ ì´ë¦„ ë°”ê¿ˆ
+	* imhangul3y.c: ì˜›ê¸€ ìíŒì„ ì™„ì„±. ë‹¨ ëª¨ìŒì˜ ê²½ìš° ìš°ì„ ì€ compatibility
+	  Jamo(U+3130)ì˜ì—­ì— ìˆëŠ” ê²ƒë“¤ë§Œ ì¡°í•©ë˜ë„ë¡ í•¨ (U+1100 ì˜ì—­ì— ìˆëŠ”
+	  ëª¨ìŒì„ ëª¨ë‘ ì¡°í•© ê°€ëŠ¥í•˜ê²Œ í•˜ë ¤ë©´ ë„ˆë¬´ ì½”ë”©ëŸ‰ë„ ë§ê³  ë¶ˆí¸í• ê²ƒ ê°™ì•„ì„œ
+	  ê·¸ëƒ¥ ì´ ì •ë„ë¡œ êµ¬í˜„í•´ë‘ , ì‚¬ì‹¤ ì“°ëŠ” ì‚¬ëŒì´ ìˆì„ì§€ë„ ì˜ë¬¸ì„)
 
-¸ñ 10¿ù 10 21:25:44 KST 2002
-	* imhangul3.h: backspace¸¦ ´­·¶À»¶§ im_hangul_compchoseong_to_single,
-	  im_hangul_compjungseong_to_single,im_hangul_compjongseong_to_single¸¦
-	  ¾È¾²°í Áö¿ìµµ·Ï º¯°æ
-	* imhangul.h: "gtk-imhangul-style"ÀÇ ±âº»°ªÀ» 0(¹ØÁÙ)·Î º¯°æ
-	* imhangul.h: use_caps_lock º¯¼ö Ãß°¡
-	* imhangul3y.c: capslockÀ¸·Î jamo/syllable ¸ğµå°¡ ¹Ù²îÁö ¾Ê°Ô ÇÔ
+ëª© 10ì›” 10 21:25:44 KST 2002
+	* imhangul3.h: backspaceë¥¼ ëˆŒë €ì„ë•Œ im_hangul_compchoseong_to_single,
+	  im_hangul_compjungseong_to_single,im_hangul_compjongseong_to_singleë¥¼
+	  ì•ˆì“°ê³  ì§€ìš°ë„ë¡ ë³€ê²½
+	* imhangul.h: "gtk-imhangul-style"ì˜ ê¸°ë³¸ê°’ì„ 0(ë°‘ì¤„)ë¡œ ë³€ê²½
+	* imhangul.h: use_caps_lock ë³€ìˆ˜ ì¶”ê°€
+	* imhangul3y.c: capslockìœ¼ë¡œ jamo/syllable ëª¨ë“œê°€ ë°”ë€Œì§€ ì•Šê²Œ í•¨
 
-È­ 10¿ù  8 20:44:36 KST 2002
-	* imhangul.h: »óÅÂÃ¢¿¡¼­ [¿Ï¼º/Á¶ÇÕ] ¶óº§À» ¾ø¾Ú
+í™” 10ì›”  8 20:44:36 KST 2002
+	* imhangul.h: ìƒíƒœì°½ì—ì„œ [ì™„ì„±/ì¡°í•©] ë¼ë²¨ì„ ì—†ì•°
 	* imhangul.h, imhangul3.h: im_hangul_pop, im_hangul_peek,
-	  im_hangul_push, im_hangul_compchoseong_to_single¸¦ 
-	  imhangul.h ¿¡¼­ imhangul3.h·Î ¿Å±è
+	  im_hangul_push, im_hangul_compchoseong_to_singleë¥¼ 
+	  imhangul.h ì—ì„œ imhangul3.hë¡œ ì˜®ê¹€
 
-2002. 10. 08. (È­) 14:26:25 KST
-	* imhangul.h: È¯°æ¼³Á¤°ª "gtk-imhangul-style" Ãß°¡, pref_fg, pref_bg¸¦
-	  Ãß°¡ÇØ¼­ preedit styleÀ» °áÁ¤ (im_hangul_preedit_attr ÇÔ¼ö)
+2002. 10. 08. (í™”) 14:26:25 KST
+	* imhangul.h: í™˜ê²½ì„¤ì •ê°’ "gtk-imhangul-style" ì¶”ê°€, pref_fg, pref_bgë¥¼
+	  ì¶”ê°€í•´ì„œ preedit styleì„ ê²°ì • (im_hangul_preedit_attr í•¨ìˆ˜)
 
-¿ù 10¿ù  7 20:47:59 KST 2002
-	* imhangul.h: Ctrl, Alt, CapsLock, Meta, Super, Hyper Å°°¡ ¿À¸é
-	  ¹«Á¶°Ç commit ÇÏµµ·Ï Ãß°¡,
-	  im_hangul_commit ÇÔ¼öÀÇ ¸®ÅÏ°ªÀ» gbooleanÀ¸·Î
+ì›” 10ì›”  7 20:47:59 KST 2002
+	* imhangul.h: Ctrl, Alt, CapsLock, Meta, Super, Hyper í‚¤ê°€ ì˜¤ë©´
+	  ë¬´ì¡°ê±´ commit í•˜ë„ë¡ ì¶”ê°€,
+	  im_hangul_commit í•¨ìˆ˜ì˜ ë¦¬í„´ê°’ì„ gbooleanìœ¼ë¡œ
 
-ÀÏ  9¿ù 29 13:34:02 KST 2002
-	* imhangul.h: status window¸¦ toplevel¸¶´Ù ÇÏ³ª¾¿ °¡Áöµµ·Ï ¼öÁ¤
+ì¼  9ì›” 29 13:34:02 KST 2002
+	* imhangul.h: status windowë¥¼ toplevelë§ˆë‹¤ í•˜ë‚˜ì”© ê°€ì§€ë„ë¡ ìˆ˜ì •
 
-ÀÏ  9¿ù 29 11:28:15 KST 2002
+ì¼  9ì›” 29 11:28:15 KST 2002
 	* version up: 0.9.3
 	* imhangul2.c imhangul3.h imhangul3f.c imhangul3s.c imhangul39.c
 	  imhangul3y.c:
-	  ÇÑ±Û ¸ğµâÀ» ÀÚÆÇ º°·Î ¸ğµÎ ºĞ¸®ÇÔ
-	* Makefile.am: gtk-query-immodules-2.0À» $(DESTDIR)ÀÌ nul ½ºÆ®¸µÀÎ
-	  °æ¿ì¸¸ ½ÇÇàÇÏµµ·Ï ¼öÁ¤(ÆĞÅ°Â¡½ÃÀÇ ¹®Á¦Á¡À» ÇØ°áÇÏ±â À§ÇØ)
+	  í•œê¸€ ëª¨ë“ˆì„ ìíŒ ë³„ë¡œ ëª¨ë‘ ë¶„ë¦¬í•¨
+	* Makefile.am: gtk-query-immodules-2.0ì„ $(DESTDIR)ì´ nul ìŠ¤íŠ¸ë§ì¸
+	  ê²½ìš°ë§Œ ì‹¤í–‰í•˜ë„ë¡ ìˆ˜ì •(íŒ¨í‚¤ì§•ì‹œì˜ ë¬¸ì œì ì„ í•´ê²°í•˜ê¸° ìœ„í•´)
 
-¿ù  9¿ù  9 19:13:06 KST 2002
+ì›”  9ì›”  9 19:13:06 KST 2002
 	* version up: 0.9.2
 
-¿ù  8¿ù 19 20:35:37 KST 2002
-	* hanjatable.h: »õ·Î ÃßÃâÇØ³¿ gen.py Ãß°¡
-	* imhangul.h: Tab¸¦ Ã³¸®ÇÏÁö ¾ÊÀ½, ¹Ù·Î ¾îÇÃ¸®ÄÉÀÌ¼Ç¿¡ ³Ñ°Ü¹ö¸²
-	* imhangul.h, imhangul2.c: pref_enable_inverse_sequence¸¦ Ãß°¡
-	  ÃÊ¼º Áß¼ºÀÇ ¼ø¼­°¡ ¹Ù²î¾î ÀÔ·ÂµÇµµ ÇÑ±ÛÀÌ Á¶ÇÕµÊ
+ì›”  8ì›” 19 20:35:37 KST 2002
+	* hanjatable.h: ìƒˆë¡œ ì¶”ì¶œí•´ëƒ„ gen.py ì¶”ê°€
+	* imhangul.h: Tabë¥¼ ì²˜ë¦¬í•˜ì§€ ì•ŠìŒ, ë°”ë¡œ ì–´í”Œë¦¬ì¼€ì´ì…˜ì— ë„˜ê²¨ë²„ë¦¼
+	* imhangul.h, imhangul2.c: pref_enable_inverse_sequenceë¥¼ ì¶”ê°€
+	  ì´ˆì„± ì¤‘ì„±ì˜ ìˆœì„œê°€ ë°”ë€Œì–´ ì…ë ¥ë˜ë„ í•œê¸€ì´ ì¡°í•©ë¨
 
-ÀÏ  8¿ù 18 14:27:26 KST 2002
+ì¼  8ì›” 18 14:27:26 KST 2002
 	* version 0.9.1
-	* imhangul.h: »óÅÂÃ¢¿¡ Å¬¸¯°¡´ÉÇÑ [¿µ¾î/ÇÑ±Û], [¿Ï¼º/Á¶ÇÕ], [ÇÑÀÚ] 
-	  ÀÌ·¸°Ô ¼¼ °³ ¸Ş´º¸¦ Ãß°¡
+	* imhangul.h: ìƒíƒœì°½ì— í´ë¦­ê°€ëŠ¥í•œ [ì˜ì–´/í•œê¸€], [ì™„ì„±/ì¡°í•©], [í•œì] 
+	  ì´ë ‡ê²Œ ì„¸ ê°œ ë©”ë‰´ë¥¼ ì¶”ê°€
 
-Åä  8¿ù 17 14:59:26 KST 2002
-	* imhangul.h: pref_use_hangul_jamo º¯¼ö¸¦ Ãß°¡, Ã¹°¡³¡ ÄÚµå·Î Ãâ·ÂÇÏ´Â
-	  ¿É¼ÇÀ» µÒ
+í†   8ì›” 17 14:59:26 KST 2002
+	* imhangul.h: pref_use_hangul_jamo ë³€ìˆ˜ë¥¼ ì¶”ê°€, ì²«ê°€ë ì½”ë“œë¡œ ì¶œë ¥í•˜ëŠ”
+	  ì˜µì…˜ì„ ë‘ 
 
-ÀÏ  8¿ù 11 12:53:08 KST 2002
-	* version 0.9 ·Î ¿Ã¸²: Æ¯º°È÷ ¹Ù²ï°Ç ¾ø°í 1.0À» À§ÇÑ ÀüÃÊÀü
+ì¼  8ì›” 11 12:53:08 KST 2002
+	* version 0.9 ë¡œ ì˜¬ë¦¼: íŠ¹ë³„íˆ ë°”ë€ê±´ ì—†ê³  1.0ì„ ìœ„í•œ ì „ì´ˆì „
 
-ÀÏ  8¿ù 11 12:51:15 KST 2002
-	* imhangul.h: status_window¿¡ "imhangul" widget nameÀ» ÁÜ
-	  .gtkrc-2.0 ÆÄÀÏ¿¡¼­ widget "*imhangul*"À» ¼³Á¤ÇÏ¿© º¯È­¸¦ ÁÙ¼ö ÀÖÀ½
+ì¼  8ì›” 11 12:51:15 KST 2002
+	* imhangul.h: status_windowì— "imhangul" widget nameì„ ì¤Œ
+	  .gtkrc-2.0 íŒŒì¼ì—ì„œ widget "*imhangul*"ì„ ì„¤ì •í•˜ì—¬ ë³€í™”ë¥¼ ì¤„ìˆ˜ ìˆìŒ
 
-2002. 08. 08. (¸ñ) 10:40:02 KST
-	* imhangul.h: status_window_get()ÇÔ¼ö¿¡¼­ gtk_window_set_transient_for()
-	  ¸¦ È£ÃâÇÏ¿© »óÅÂÃ¢À» toplevelÀÇ transient·Î ¼³Á¤, ÀÌ°É·Î status
-	  window°¡ ³²´Â ¹®Á¦°¡ ÇØ°áµÉÁö´Â ¹ÌÁö¼ö
+2002. 08. 08. (ëª©) 10:40:02 KST
+	* imhangul.h: status_window_get()í•¨ìˆ˜ì—ì„œ gtk_window_set_transient_for()
+	  ë¥¼ í˜¸ì¶œí•˜ì—¬ ìƒíƒœì°½ì„ toplevelì˜ transientë¡œ ì„¤ì •, ì´ê±¸ë¡œ status
+	  windowê°€ ë‚¨ëŠ” ë¬¸ì œê°€ í•´ê²°ë ì§€ëŠ” ë¯¸ì§€ìˆ˜
 
-2002. 07. 26. (±İ) 16:40:58 KST
-	* imhangul.h: Esc Å°¸¦ ´­·¶À»¶§ ÀÚµ¿À¸·Î ¿µ¹® ¸ğµå·Î ¹Ù²î°Ô
+2002. 07. 26. (ê¸ˆ) 16:40:58 KST
+	* imhangul.h: Esc í‚¤ë¥¼ ëˆŒë €ì„ë•Œ ìë™ìœ¼ë¡œ ì˜ë¬¸ ëª¨ë“œë¡œ ë°”ë€Œê²Œ
 
-2002. 07. 22. (¿ù) 14:20:09 KST
-	* imhangul.spec.in: RPM SPEC file Ãß°¡
+2002. 07. 22. (ì›”) 14:20:09 KST
+	* imhangul.spec.in: RPM SPEC file ì¶”ê°€
 	  (Thanks to Lee, Kwan-hong <sorcerer@jerimo.org>)
 
-2002. 07. 19. (±İ) 09:41:00 KST
-	* imhangul2.c: µÎ¹ú½Ä¿¡¼­ "±«Â¥"°¡ ÀÔ·Â ¾ÈµÇ´ø ¹®Á¦ ÇØ°á
-	  state6 ¿¡¼­ ÃÊ¼º Ã¼Å©¸¦ ¾ÈÇØ¼­ÀÓ, ÃÊ¼ºÃ¼Å©¸¦ Ãß°¡ÇÏ°í state1·Î °¡´Â
-	  ºÎºĞ Ãß°¡
+2002. 07. 19. (ê¸ˆ) 09:41:00 KST
+	* imhangul2.c: ë‘ë²Œì‹ì—ì„œ "ê´´ì§œ"ê°€ ì…ë ¥ ì•ˆë˜ë˜ ë¬¸ì œ í•´ê²°
+	  state6 ì—ì„œ ì´ˆì„± ì²´í¬ë¥¼ ì•ˆí•´ì„œì„, ì´ˆì„±ì²´í¬ë¥¼ ì¶”ê°€í•˜ê³  state1ë¡œ ê°€ëŠ”
+	  ë¶€ë¶„ ì¶”ê°€
 
-2002. 07. 18. (¸ñ) 13:46:48 KST
+2002. 07. 18. (ëª©) 13:46:48 KST
 	* imhangul.h, imhangul2.c, imhangul3.c:
-	  GDK_SHIFT_MASK¸¦ Ã¼Å©ÇÏ´Â ºÎºĞÀ» ¸ğµÎ is_set() ¸ÅÅ©·Î·Î ´ëÃ¼
+	  GDK_SHIFT_MASKë¥¼ ì²´í¬í•˜ëŠ” ë¶€ë¶„ì„ ëª¨ë‘ is_set() ë§¤í¬ë¡œë¡œ ëŒ€ì²´
 
-2002. 07. 12. (±İ) 11:02:20 KST
-	* im_hangul_shutdown(): im moduleÀÌ shutdowÇÒ¶§ hanja_window°¡ ¿­·Á
-	  ÀÖÀ¸¸é ±×°É ´İµµ·Ï Ãß°¡
+2002. 07. 12. (ê¸ˆ) 11:02:20 KST
+	* im_hangul_shutdown(): im moduleì´ shutdowí• ë•Œ hanja_windowê°€ ì—´ë ¤
+	  ìˆìœ¼ë©´ ê·¸ê±¸ ë‹«ë„ë¡ ì¶”ê°€
 
-2002. 07. 11. (¸ñ) 19:47:34 KST
-	* hanja select dialog¿¡ gtk_window_set_transient_for() ÇÔ¼ö¸¦ Àû¿ë
+2002. 07. 11. (ëª©) 19:47:34 KST
+	* hanja select dialogì— gtk_window_set_transient_for() í•¨ìˆ˜ë¥¼ ì ìš©
 
-2002. 07. 09. (È­) 14:39:29 KST
-	* hanja select dialog¿¡¼­ ÇÑÀÚ ÆùÆ®¸¦ ¼³Á¤ÇÑ °ªÀ» ¾²µµ·Ï º¯°æ
-	  (ÇöÀç ¼³Á¤ °ªÀ» ¹Ù²Ü¼ö ÀÖ´Â ¹æ¹ıÀº ¾øÀ½)
+2002. 07. 09. (í™”) 14:39:29 KST
+	* hanja select dialogì—ì„œ í•œì í°íŠ¸ë¥¼ ì„¤ì •í•œ ê°’ì„ ì“°ë„ë¡ ë³€ê²½
+	  (í˜„ì¬ ì„¤ì • ê°’ì„ ë°”ê¿€ìˆ˜ ìˆëŠ” ë°©ë²•ì€ ì—†ìŒ)
 
-2002. 06. 06. (¸ñ) 12:28:56 KST
-	* im-hangul2.c, im-hangul2.c ¸¦
-	°¢°¢ imhangul2.c imhangul3.c ·Î ÀÌ¸§ º¯°æ
+2002. 06. 06. (ëª©) 12:28:56 KST
+	* im-hangul2.c, im-hangul2.c ë¥¼
+	ê°ê° imhangul2.c imhangul3.c ë¡œ ì´ë¦„ ë³€ê²½
 
-2002. 06. 05. (¼ö) 16:03:10 KST
-	* ChangeLog ÀÛ¼º
-	* ¼¼¹ú½Ä 390 Áö¿ø ÀÚÆÇ Ãß°¡ (Lee KwanHong <sorcerer@jerimo.org>)
-	* ¼¼¹ú½ÄÀÇ °æ¿ì È¯°æº¯¼ö HANGUL_KEYBOARD_TYPE¿¡ µû¶ó ÀÚÆÇÀ» ¼±ÅÃÇÏ
-	µµ·Ï º¯°æ
-	Âü°í(http://www.mizi.com/ko/prod/desktop/mizios/mos-pro3.htm)
+2002. 06. 05. (ìˆ˜) 16:03:10 KST
+	* ChangeLog ì‘ì„±
+	* ì„¸ë²Œì‹ 390 ì§€ì› ìíŒ ì¶”ê°€ (Lee KwanHong <sorcerer@jerimo.org>)
+	* ì„¸ë²Œì‹ì˜ ê²½ìš° í™˜ê²½ë³€ìˆ˜ HANGUL_KEYBOARD_TYPEì— ë”°ë¼ ìíŒì„ ì„ íƒí•˜
+	ë„ë¡ ë³€ê²½
+	ì°¸ê³ (http://www.mizi.com/ko/prod/desktop/mizios/mos-pro3.htm)
