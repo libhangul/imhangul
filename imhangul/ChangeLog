@@ -1,5 +1,7 @@
 2003-01-12 (Sun) 16:00 Choe Hwanjin <krisna@kldp.org>
 	* gen.py 를 hanjatable.py로 이름 바꿈
+	* imhangul.h,hanjatable.h,chartable.h: unicode_t를 사용하지 않고
+	  직접 gunichar를 사용
 
 2003-01-15 (Wed) 20:57 Choe Hwanjin <krisna@kldp.org>
 	* 소스를 깨끗이 (탭, 빈칸 정리)
