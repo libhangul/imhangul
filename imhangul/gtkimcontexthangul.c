@@ -206,7 +206,7 @@ static gint		pref_preedit_style = 0;
 static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
 						  gint start,
 						  gint end) =
-						im_hangul_preedit_underline;
+						im_hangul_preedit_foreground;
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
 
@@ -546,7 +546,7 @@ im_hangul_set_client_window (GtkIMContext *context,
 						       "Preedit string style",
 						       0,
 						       4,
-						       0,
+						       1,
 						       G_PARAM_READWRITE));
       gdk_window_get_user_data (client_window, (gpointer *)&widget);
       desktop_info->preedit_style_cb =
