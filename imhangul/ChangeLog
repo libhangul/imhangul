@@ -1,6 +1,8 @@
 월  8월 19 20:35:37 KST 2002
-	* hanjatable.h: 새로 추출해냄
+	* hanjatable.h: 새로 추출해냄 gen.py 추가
 	* imhangul.h: Tab를 처리하지 않음, 바로 어플리케이션에 넘겨버림
+	* imhangul.h, imhangul2.c: pref_enable_inverse_sequence를 추가
+	  초성 중성의 순서가 바뀌어 입력되도 한글이 조합됨
 
 일  8월 18 14:27:26 KST 2002
 	* version 0.9.1
@@ -56,9 +58,7 @@
 
 2002. 06. 05. (수) 16:03:10 KST
 	* ChangeLog 작성
-
 	* 세벌식 390 지원 자판 추가 (Lee KwanHong <sorcerer@jerimo.org>)
-
 	* 세벌식의 경우 환경변수 HANGUL_KEYBOARD_TYPE에 따라 자판을 선택하
 	도록 변경
 	참고(http://www.mizi.com/ko/prod/desktop/mizios/mos-pro3.htm)
