@@ -217,8 +217,6 @@ GType gtk_type_im_context_hangul = 0;
 /* static variables for hangul immodule */
 static GObjectClass *parent_class;
 
-static GtkIMContextHangul *current_context = NULL;
-static GdkWindow       *current_root_window = NULL;
 static GSList	       *desktops = NULL;
 static GSList          *toplevels = NULL;
 
@@ -236,23 +234,6 @@ static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
 						im_hangul_preedit_foreground;
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
-
-static guint16 im_hangul_ignore_table[] = {
-  GDK_Control_L,
-  GDK_Control_R,
-  GDK_Caps_Lock,
-  GDK_Shift_Lock,
-  GDK_Meta_L,
-  GDK_Meta_R,
-  GDK_Alt_L,
-  GDK_Alt_R,
-  GDK_Super_L,
-  GDK_Super_R,
-  GDK_Hyper_L,
-  GDK_Hyper_R,
-  GDK_Mode_switch,
-  0
-};
 
 void
 gtk_im_context_hangul_register_type (GTypeModule *type_module)
@@ -352,7 +333,6 @@ im_hangul_init (GtkIMContextHangul *hcontext)
   hcontext->cursor.height = -1;
   hcontext->surrounding_delete_length = 0;
 
-  hcontext->input_mode = INPUT_MODE_DIRECT;	/* english mode */
   hcontext->composer = NULL;		/* initial value: composer == null */
   hcontext->keyboard_table = NULL;
   hcontext->compose_table_size = G_N_ELEMENTS(compose_table_default);
@@ -366,10 +346,6 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 static void
 im_hangul_finalize (GObject *obj)
 {
-  GtkIMContextHangul* hcontext = GTK_IM_CONTEXT_HANGUL(obj);
-
-  if (hcontext == current_context)
-    current_context = NULL;
   parent_class->finalize (obj);
 }
 
@@ -625,8 +601,6 @@ im_hangul_set_client_window (GtkIMContext *context,
 			  NULL);
       use_manual_mode_change (settings, NULL);
     }
-
-  current_root_window = gdk_screen_get_root_window(screen);
 }
 
 GtkIMContext *
@@ -639,6 +613,8 @@ void
 gtk_im_context_hangul_set_composer (GtkIMContextHangul   *hcontext,
 				    IMHangulComposerType  type)
 {
+  g_return_if_fail (hcontext);
+
   switch (type)
     {
     case IM_HANGUL_COMPOSER_2:
@@ -678,6 +654,8 @@ void
 gtk_im_context_hangul_set_use_jamo (GtkIMContextHangul *hcontext,
     				    gboolean		use_jamo)
 {
+  g_return_if_fail (hcontext);
+
   if (use_jamo)
     {
       hcontext->always_use_jamo = TRUE;
@@ -691,33 +669,45 @@ gtk_im_context_hangul_set_use_jamo (GtkIMContextHangul *hcontext,
 }
 
 static void
-im_hangul_set_input_mode_info (int state)
+im_hangul_set_input_mode_info_for_screen (GdkScreen *screen, int state)
 {
-  long data = state;
+  if (screen != NULL) {
+    GdkWindow *root_window = gdk_screen_get_root_window(screen);
+    long data = state;
+    gdk_property_change (root_window,
+			 gdk_atom_intern ("_HANGUL_INPUT_MODE", FALSE),
+			 gdk_atom_intern ("INTEGER", FALSE),
+			 32, GDK_PROP_MODE_REPLACE,
+			 (const guchar *)&data, 1);
+  }
+}
 
-  if (current_root_window == NULL)
-    return;
-
-  gdk_property_change (current_root_window,
-		       gdk_atom_intern ("_HANGUL_INPUT_MODE", FALSE),
-		       gdk_atom_intern ("INTEGER", FALSE),
-		       32, GDK_PROP_MODE_REPLACE,
-		       (const guchar *)&data, 1);
+static void
+im_hangul_set_input_mode_info (GdkWindow *window, int state)
+{
+  if (window != NULL) {
+    GdkScreen *screen = gdk_drawable_get_screen(window);
+    im_hangul_set_input_mode_info_for_screen (screen, state);
+  }
 }
 
 static void
 im_hangul_set_input_mode(GtkIMContextHangul *hcontext, int mode)
 {
+  GdkScreen *screen = NULL;
+  if (hcontext->client_window != NULL)
+    screen = gdk_drawable_get_screen(hcontext->client_window);
+
   switch (mode) {
     case INPUT_MODE_DIRECT:
-      hcontext->input_mode = INPUT_MODE_DIRECT;
-      im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
+      im_hangul_set_input_mode_info (hcontext->client_window,
+				     INPUT_MODE_INFO_ENGLISH);
       im_hangul_hide_status_window(hcontext);
       g_signal_emit_by_name (hcontext, "preedit_end");
       break;
     case INPUT_MODE_HANGUL:
-      hcontext->input_mode = INPUT_MODE_HANGUL;
-      im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
+      im_hangul_set_input_mode_info (hcontext->client_window,
+				     INPUT_MODE_INFO_HANGUL);
       im_hangul_show_status_window(hcontext);
       g_signal_emit_by_name (hcontext, "preedit_start");
       break;
@@ -1079,7 +1069,11 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
 {
   gchar buf[40];
   int len = 0;
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  GtkIMContextHangul *hcontext;
+  
+  g_return_if_fail (context != NULL);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
   buf[0] = '\0';
   len = im_hangul_make_preedit_string (hcontext, buf);
@@ -1103,11 +1097,14 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
 static void
 im_hangul_focus_in (GtkIMContext *context)
 {
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
-  int input_mode = im_hangul_get_toplevel_input_mode(hcontext);
+  int input_mode;
+  GtkIMContextHangul *hcontext;
 
+  g_return_if_fail (context != NULL);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  input_mode = im_hangul_get_toplevel_input_mode(hcontext);
   im_hangul_set_input_mode(hcontext, input_mode);
-  current_context = hcontext;
 }
 
 static inline void
@@ -1120,8 +1117,11 @@ im_hangul_emit_preedit_changed (GtkIMContextHangul *hcontext)
 static void
 im_hangul_focus_out (GtkIMContext *context)
 {
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  GtkIMContextHangul *hcontext;
 
+  g_return_if_fail (context != NULL);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
   if (hcontext->candidate == NULL)
     {
       if (im_hangul_commit (hcontext))
@@ -1129,22 +1129,28 @@ im_hangul_focus_out (GtkIMContext *context)
     }
 
   im_hangul_hide_status_window (hcontext);
-  im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
+  im_hangul_set_input_mode_info (hcontext->client_window, INPUT_MODE_INFO_NONE);
 }
 
 static void
 im_hangul_set_use_preedit (GtkIMContext *context, gboolean use_preedit)
 {
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  GtkIMContextHangul *hcontext;
 
+  g_return_if_fail (context != NULL);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
   hcontext->use_preedit = use_preedit;
 }
 
 static void
 im_hangul_set_cursor_location (GtkIMContext *context, GdkRectangle *area)
 {
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  GtkIMContextHangul *hcontext;
 
+  g_return_if_fail (context != NULL);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
   hcontext->cursor = *area;
 }
 
@@ -1178,19 +1184,6 @@ im_hangul_is_empty (GtkIMContextHangul *hcontext)
   return (hcontext->choseong[0]  == 0 &&
 	  hcontext->jungseong[0] == 0 &&
 	  hcontext->jongseong[0] == 0 );
-}
-
-static inline gboolean
-im_hangul_is_ignore_key (guint16 key)
-{
-  int i;
-
-  for (i = 0; im_hangul_ignore_table[i]; i++)
-    {
-      if (key == im_hangul_ignore_table[i])
-	return TRUE;
-    }
-  return FALSE;
 }
 
 static inline gboolean
@@ -1618,7 +1611,12 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
 static gboolean
 im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 {
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  GtkIMContextHangul *hcontext;
+
+  g_return_val_if_fail (context != NULL, FALSE);
+  g_return_val_if_fail (key != NULL, FALSE);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
   /* ignore key release */
   if (key->type == GDK_KEY_RELEASE)
@@ -1645,17 +1643,6 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
       else
 	output_mode &= ~OUTPUT_MODE_JAMO;
     }
-
-  /* some keys are ignored: Ctrl, Alt, Meta */
-  /* we flush out all preedit text */
-#if 0
-  if (im_hangul_is_ignore_key (key->keyval))
-    {
-      if (im_hangul_commit (hcontext))
-	im_hangul_emit_preedit_changed (hcontext);
-      return FALSE;
-    }
-#endif
 
   /* handle direct mode */
   if (im_hangul_get_toplevel_input_mode(hcontext) == INPUT_MODE_DIRECT)
@@ -2004,24 +1991,23 @@ gtk_im_context_hangul_shutdown (void)
   g_slist_free(toplevels);
 
   /* remove desktop info */
-  for (item = desktops; item != NULL; item = item->next)
-    {
-      DesktopInfo *info = (DesktopInfo*)(item->data);
-      if (info->status_window_cb > 0)
-	g_signal_handler_disconnect (info->settings, info->status_window_cb);
-      if (info->use_capslock_cb > 0)
-	g_signal_handler_disconnect (info->settings, info->use_capslock_cb);
-      if (info->use_dvorak_cb > 0)
-	g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
-      if (info->preedit_style_cb > 0)
-	g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
-      if (info->use_manual_mode_cb > 0)
-	g_signal_handler_disconnect (info->settings, info->use_manual_mode_cb);
-      g_free(info);
-    }
+  for (item = desktops; item != NULL; item = item->next) {
+    DesktopInfo *info = (DesktopInfo*)(item->data);
+    im_hangul_set_input_mode_info_for_screen (info->screen,
+					      INPUT_MODE_INFO_NONE);
+    if (info->status_window_cb > 0)
+      g_signal_handler_disconnect (info->settings, info->status_window_cb);
+    if (info->use_capslock_cb > 0)
+      g_signal_handler_disconnect (info->settings, info->use_capslock_cb);
+    if (info->use_dvorak_cb > 0)
+      g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
+    if (info->preedit_style_cb > 0)
+      g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
+    if (info->use_manual_mode_cb > 0)
+      g_signal_handler_disconnect (info->settings, info->use_manual_mode_cb);
+    g_free(info);
+  }
   g_slist_free(desktops);
-
-  im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
 }
 
 /* composer functions (automata) */
