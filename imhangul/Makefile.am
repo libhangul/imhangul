@@ -1,7 +1,7 @@
 ## Makefile.am for gtk+ hangul modules
 #AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = test.sh gtkrc
+EXTRA_DIST = test.sh gtkrc gen.py
 
 INCLUDES = -DGTK_LOCALEDIR=\"$(prefix)/share/locale\"
 LDADDS = @GTK_DEP_LIBS@
@@ -31,3 +31,4 @@ install-data-local:
 
 uninstall:
 	gtk-query-immodules-2.0 > $(GTK_IMMODULES)
+

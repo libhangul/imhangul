@@ -10,7 +10,7 @@ export GTK_RC_FILES=`pwd`/gtkrc
 export GTK2_RC_FILES=`pwd`/gtkrc
 export GTK_IM_MODULE_PATH=.libs/
 export GTK_IM_MODULE_FILE=$immodules_file
-# exec ./entry
+exec ./entry
 # gtk-demo
 # exec ./xchat
- exec gedit
+# exec gedit
