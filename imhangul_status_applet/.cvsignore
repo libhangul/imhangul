@@ -1,5 +1,6 @@
 .libs
 .deps
+CVS
 Makefile
 Makefile.in
 aclocal.m4
@@ -17,3 +18,4 @@ libtool
 intltool-*
 imhangul_status_applet-*.tar.gz
 imhangul_status_applet-*.tar.bz2
+ltmain.sh
