@@ -4,7 +4,7 @@
 EXTRA_DIST = test.sh gtkrc gen.py
 
 INCLUDES = -DGTK_LOCALEDIR=\"$(prefix)/share/locale\"
-LDADDS = @GTK_DEP_LIBS@
+LDADDS = @GTK_LIBS@
 
 moduledir = $(libdir)/gtk-2.0/$(GTK_BINARY_VERSION)/immodules
 
@@ -36,7 +36,8 @@ im_hangul3y_la_LIBADD = $(LDADDS)
 
 CFLAGS = @GTK_CFLAGS@ -g -Wall
 
-module_LTLIBRARIES = im-hangul2.la \
+module_LTLIBRARIES = \
+	im-hangul2.la \
 	im-hangul3f.la \
 	im-hangul3s.la \
 	im-hangul39.la \
