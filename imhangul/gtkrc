@@ -42,7 +42,7 @@ gtk-imhangul-dvorak = 0
 # 2 : 역상
 # 3 : 회색 배경
 # 4 : 없음
-gtk-imhangul-style = 1
+gtk-imhangul-style = 3
 
 # Caps Lock키를 씀/안씀
 # 이 옵션이 켜져 있으면 Caps Lock이 켜져 있을때  첫가끝 코드로 결과를 출력함 
