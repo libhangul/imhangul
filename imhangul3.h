@@ -25,36 +25,8 @@
 static gunichar	im_hangul_compchoseong_to_single	(gunichar ch);
 */
 
-static gunichar	im_hangul_pop	(GtkIMContextHangul *hcontext);
-static gunichar	im_hangul_peek	(GtkIMContextHangul *hcontext);
-static void	im_hangul_push	(GtkIMContextHangul *hcontext, gunichar ch);
-
 static void	im_hangul_commit_unicode(GtkIMContextHangul *hcontext,
 					 gunichar ch);
-
-static const gunichar *keyboard_table;
-
-static void
-im_hangul_push(GtkIMContextHangul *hcontext, gunichar ch)
-{
-  hcontext->stack[++hcontext->index] = ch;
-}
-
-static gunichar
-im_hangul_peek(GtkIMContextHangul *hcontext)
-{
-  if (hcontext->index < 0)
-    return 0;
-  return hcontext->stack[hcontext->index];
-}
-
-static gunichar
-im_hangul_pop(GtkIMContextHangul *hcontext)
-{
-  if (hcontext->index < 0)
-    return 0;
-  return hcontext->stack[hcontext->index--];
-}
 
 static gboolean
 im_hangul_add_choseong(GtkIMContextHangul *hcontext, gunichar ch)
