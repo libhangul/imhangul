@@ -101,19 +101,15 @@ static void	im_hangul_set_use_preedit    (GtkIMContext *context,
     					      gboolean     use_preedit);
 
 /* asistant function for hangul composer */
-#define im_hangul_is_modifier(state)	((state & GDK_CONTROL_MASK) || \
-					 (state & GDK_MOD1_MASK))
-#define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1159)
-#define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x11A2)
-#define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11F9)
+static inline gboolean im_hangul_is_modifier  (guint state);
+static inline gboolean im_hangul_is_choseong  (gunichar ch);
+static inline gboolean im_hangul_is_jungseong (gunichar ch);
+static inline gboolean im_hangul_is_jongseong (gunichar ch);
+static inline gboolean im_hangul_is_empty     (GtkIMContextHangul *hcontext);
 
-#define im_hangul_is_empty(ctx)	        ((ctx)->choseong[0]  == 0 &&	\
-					 (ctx)->jungseong[0] == 0 &&	\
-					 (ctx)->jongseong[0] == 0 )
-
-static inline gboolean	im_hangul_is_trigger	     (GdkEventKey *key);
-static inline gboolean	im_hangul_is_backspace	     (GdkEventKey *key);
-static inline void      im_hangul_emit_preedit_changed (GtkIMContextHangul *hcontext);
+static inline gboolean im_hangul_is_trigger	     (GdkEventKey *key);
+static inline gboolean im_hangul_is_backspace	     (GdkEventKey *key);
+static inline void     im_hangul_emit_preedit_changed (GtkIMContextHangul *hcontext);
 
 static gboolean im_hangul_composer_2         (GtkIMContextHangul *hcontext,
 					      GdkEventKey *key);
@@ -1122,7 +1118,39 @@ im_hangul_set_use_preedit (GtkIMContext *context, gboolean use_preedit)
   hcontext->use_preedit = use_preedit;
 }
 
-static gboolean
+static inline gboolean
+im_hangul_is_modifier (guint state)
+{
+  return ((state & GDK_CONTROL_MASK) || (state & GDK_MOD1_MASK));
+}
+
+static inline gboolean
+im_hangul_is_choseong (gunichar ch)
+{
+  return (ch >= 0x1100 && ch <= 0x1159);
+}
+
+static inline gboolean
+im_hangul_is_jungseong (gunichar ch)
+{
+  return (ch >= 0x1161 && ch <= 0x11A2);
+}
+
+static inline gboolean
+im_hangul_is_jongseong (gunichar ch)
+{
+  return (ch >= 0x11A7 && ch <= 0x11F9);
+}
+
+static inline gboolean
+im_hangul_is_empty (GtkIMContextHangul *hcontext)
+{
+  return (hcontext->choseong[0]  == 0 &&
+	  hcontext->jungseong[0] == 0 &&
+	  hcontext->jongseong[0] == 0 );
+}
+
+static inline gboolean
 im_hangul_is_ignore_key (guint16 key)
 {
   int i;
