@@ -1,0 +1,33 @@
+AC_INIT(imhangul.h)
+
+AM_INIT_AUTOMAKE(im-hangul, 0.7)
+AM_MAINTAINER_MODE
+
+dnl Checks for programs
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+
+dnl Checks for libraries.
+dnl AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+AM_PATH_GTK_2_0(2.0.0,,AC_MSG_ERROR(im-hangul needs GTK+ 2.0.0 or higher))
+
+dnl Checks for header files.
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+
+dnl add -Wall to CFLAGS if GCC=yes
+if test x$CC == xgcc; then
+	CFLAGS="$CFLAGS -Wall"
+fi
+
+GTK_BINARY_VERSION="2.0.0"
+AC_SUBST(GTK_BINARY_VERSION)
+
+GTK_DEP_LIBS="`$PKG_CONFIG --libs gtk+-2.0`"
+AC_SUBST(GTK_DEP_LIBS)
+
+AC_OUTPUT(Makefile)
