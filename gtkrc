@@ -1,4 +1,10 @@
 # status 윈도우에서 나타나는 글자의 색과 크기모양
+style "mydefault"
+{
+	fg[NORMAL]	= "#00FF00"	# 글자, 테두리색
+	bg[NORMAL]	= "#DDDDDD"	# 바탕색
+	text[NORMAL]	= "#0000FF"	# 글자
+}
 
 style "imhangul-status-style"
 {
@@ -13,7 +19,7 @@ style "imhangul-hanja-style"
 #	font_name	= "Andale Sans UI 20"
 }
 
-
+# class "GtkWidget" style "mydefault"
 widget "*imhangul_status*" style "imhangul-status-style"
 widget "*imhangul_hanja*" style "imhangul-hanja-style"
 
@@ -26,3 +32,5 @@ gtk-imhangul-status = 0
 # 0 : 안씀
 # 1 : 씀
 gtk-imhangul-dvorak = 0
+
+gtk-imhangul-style = 3

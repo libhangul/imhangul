@@ -766,16 +766,16 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
 
   if (im_hangul_is_trigger(key)) {
     /* hangul mode change to englishmode */
-    im_hangul_commit(context_hangul);
-    g_signal_emit_by_name (context_hangul, "preedit_changed");
+    if (im_hangul_commit(context_hangul))
+      g_signal_emit_by_name (context_hangul, "preedit_changed");
     im_hangul_mode_direct(context_hangul);
     return TRUE;
   }
 
   if (context_hangul->state != 0) {
-    im_hangul_commit(context_hangul);
+    if (im_hangul_commit(context_hangul))
+      g_signal_emit_by_name (context_hangul, "preedit_changed");
     context_hangul->state = 0;
-    g_signal_emit_by_name (context_hangul, "preedit_changed");
   }
   return im_hangul_process_nonhangul(context_hangul, key); /* english */
 
@@ -818,5 +818,4 @@ im_module_create (const gchar *context_id)
   return NULL;
 }
 
-/* vim: nocindent
- */
+/* vim: set nocindent : */

@@ -1,3 +1,7 @@
+2002. 10. 08. (화) 14:26:25 KST
+	* imhangul.h: 환경설정값 "gtk-imhangul-style" 추가, pref_fg, pref_bg를
+	  추가해서 preedit style을 결정 (im_hangul_preedit_attr 함수)
+
 월 10월  7 20:47:59 KST 2002
 	* imhangul.h: Ctrl, Alt, CapsLock, Meta, Super, Hyper 키가 오면
 	  무조건 commit 하도록 추가,
