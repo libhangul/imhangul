@@ -758,7 +758,6 @@ im_hangul2_automata(GtkIMContextHangul *context_hangul,
 
   if (im_hangul_is_trigger(key)) {
     /* hangul mode change to englishmode */
-    g_print("Input mode changed: Direct mode\n");
     im_hangul_commit(context_hangul);
     g_signal_emit_by_name (context_hangul, "preedit_changed");
     im_hangul_mode_direct(context_hangul);

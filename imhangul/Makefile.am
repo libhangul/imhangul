@@ -1,7 +1,7 @@
 ## Makefile.am for gtk+ hangul modules
 #AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = test.sh
+EXTRA_DIST = test.sh gtkrc
 
 INCLUDES = -DGTK_LOCALEDIR=\"$(prefix)/share/locale\"
 LDADDS = @GTK_DEP_LIBS@
