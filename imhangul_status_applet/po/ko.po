@@ -2,7 +2,7 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # Choe Hwanjin <krisna@kldp.org>, 2002, 2003.
 #
-msgid ""
+msgid "imhangul-status-applet"
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2003-07-24 14:09+0900\n"
@@ -65,7 +65,7 @@ msgstr "imhangul의 한영 상태를 보여줍니다"
 
 #: src/GNOME_IMHangulStatusApplet.server.in.in.h:2
 msgid "Utility"
-msgstr ""
+msgstr "유틸리티"
 
 #: src/GNOME_IMHangulStatusApplet.server.in.in.h:3
 msgid "imhangul Status Applet"
