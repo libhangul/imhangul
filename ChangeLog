@@ -1,3 +1,6 @@
+2003-02-22  Choe Hwanjin <krisna@kldp.org>
+	* preedit_style_change()에서 widget이 NULL인지 체크함
+
 2003-02-12  Choe Hwanjin <krisna@kldp.org>
 	* {G,GDK,GTK}_DISABLE_DEPRECATED 옵션 추가
 	* GDK_ROOT_PARENT대신 gdk_screen_get_root_window를 사용함

@@ -10,6 +10,7 @@ export GTK_IM_MODULE_PATH=.libs/
 export GTK_IM_MODULE_FILE=$immodules_file
 # export GDK_USE_XFT=1
 exec ./entry
+# exec settings/settings
 # exec gtk-demo
 # exec ./xchat
 # exec /usr/local/bin/gedit
