@@ -114,12 +114,9 @@ static void im_hangul_set_automata(GtkIMContextHangul *context_hangul,
 
 static gboolean	im_hangul_is_trigger			(GdkEventKey *key);
 static gboolean	im_hangul_is_backspace			(GdkEventKey *key);
-static gunichar	im_hangul_compchoseong_to_single	(gunichar ch);
 static gunichar	im_hangul_compjungseong_to_single	(gunichar ch);
 static gunichar	im_hangul_compjongseong_to_single	(gunichar ch);
-static gunichar	im_hangul_pop	(GtkIMContextHangul *context_hangul);
-static gunichar	im_hangul_peek	(GtkIMContextHangul *context_hangul);
-static void	im_hangul_push	(GtkIMContextHangul *context_hangul, gunichar ch);
+
 static void	im_hangul_mode_hangul(GtkIMContextHangul *context_hangul);
 static void	im_hangul_mode_direct(GtkIMContextHangul *context_hangul);
 
@@ -361,28 +358,6 @@ im_hangul_new(void)
 }
 
 static void
-im_hangul_push(GtkIMContextHangul *context_hangul, gunichar ch)
-{
-  context_hangul->stack[++context_hangul->index] = ch;
-}
-
-static gunichar
-im_hangul_peek(GtkIMContextHangul *context_hangul)
-{
-  if (context_hangul->index < 0)
-    return 0;
-  return context_hangul->stack[context_hangul->index];
-}
-
-static gunichar
-im_hangul_pop(GtkIMContextHangul *context_hangul)
-{
-  if (context_hangul->index < 0)
-    return 0;
-  return context_hangul->stack[context_hangul->index--];
-}
-
-static void
 im_hangul_set_automata(GtkIMContextHangul *context_hangul,
 		       GtkIMContextHangulAutomata automata)
 {
@@ -403,25 +378,6 @@ im_hangul_mode_direct(GtkIMContextHangul *context_hangul)
   input_mode = MODE_DIRECT;
   context_hangul->state = STATE_DIRECT;
   status_window_set_label(context_hangul);
-}
-
-/* this funcs used for backspace */
-static gunichar
-im_hangul_compchoseong_to_single(gunichar ch)
-{
-  switch (ch) {
-    case 0x1101:	/* hangul choseong ssangkiyeok */
-      return 0x1100;	/* hangul choseong kiyeok */
-    case 0x1104:	/* hangul choseong ssangtikeut */
-      return 0x1103;	/* hangul choseong tikeut */
-    case 0x1108:	/* hangul choseong ssangpieup */
-      return 0x1107;	/* hangul choseong pieup */
-    case 0x110a:	/* hangul choseong ssangsios */
-      return 0x1109;	/* hangul choseong sios */
-    case 0x110d:	/* hangul choseong ssangcieuc */
-      return 0x110c;	/* hangul choseong cieuc */
-  }
-  return 0;
 }
 
 static gunichar
