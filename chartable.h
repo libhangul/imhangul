@@ -1,4 +1,3 @@
-
 unicode_t symbols[] = {
     0x2600,  /* black sun with rays                    */
     0x2601,  /* cloud                                  */
@@ -188,6 +187,118 @@ unicode_t parenthesized[] = {
     0x3219,  /* parenthesized hangul thieuth a */
     0x321a,  /* parenthesized hangul phieuph a */
     0x321b,  /* parenthesized hangul hieuh   a */
+
+    0x2474,  /* parenthesized digit one                                      */
+    0x2475,  /* parenthesized digit two                                      */
+    0x2476,  /* parenthesized digit three                                    */
+    0x2477,  /* parenthesized digit four                                     */
+    0x2478,  /* parenthesized digit five                                     */
+    0x2479,  /* parenthesized digit six                                      */
+    0x247a,  /* parenthesized digit seven                                    */
+    0x247b,  /* parenthesized digit eight                                    */
+    0x247c,  /* parenthesized digit nine                                     */
+    0x247d,  /* parenthesized number ten                                     */
+    0x247e,  /* parenthesized number eleven                                  */
+    0x247f,  /* parenthesized number twelve                                  */
+    0x2480,  /* parenthesized number thirteen                                */
+    0x2481,  /* parenthesized number fourteen                                */
+    0x2482,  /* parenthesized number fifteen                                 */
+    0x2483,  /* parenthesized number sixteen                                 */
+    0x2484,  /* parenthesized number seventeen                               */
+    0x2485,  /* parenthesized number eighteen                                */
+    0x2486,  /* parenthesized number nineteen                                */
+    0x2487,  /* parenthesized number twenty                                  */
+    0x249c,  /* parenthesized latin small letter a                           */
+    0x249d,  /* parenthesized latin small letter b                           */
+    0x249e,  /* parenthesized latin small letter c                           */
+    0x249f,  /* parenthesized latin small letter d                           */
+    0x24a0,  /* parenthesized latin small letter e                           */
+    0x24a1,  /* parenthesized latin small letter f                           */
+    0x24a2,  /* parenthesized latin small letter g                           */
+    0x24a3,  /* parenthesized latin small letter h                           */
+    0x24a4,  /* parenthesized latin small letter i                           */
+    0x24a5,  /* parenthesized latin small letter j                           */
+    0x24a6,  /* parenthesized latin small letter k                           */
+    0x24a7,  /* parenthesized latin small letter l                           */
+    0x24a8,  /* parenthesized latin small letter m                           */
+    0x24a9,  /* parenthesized latin small letter n                           */
+    0x24aa,  /* parenthesized latin small letter o                           */
+    0x24ab,  /* parenthesized latin small letter p                           */
+    0x24ac,  /* parenthesized latin small letter q                           */
+    0x24ad,  /* parenthesized latin small letter r                           */
+    0x24ae,  /* parenthesized latin small letter s                           */
+    0x24af,  /* parenthesized latin small letter t                           */
+    0x24b0,  /* parenthesized latin small letter u                           */
+    0x24b1,  /* parenthesized latin small letter v                           */
+    0x24b2,  /* parenthesized latin small letter w                           */
+    0x24b3,  /* parenthesized latin small letter x                           */
+    0x24b4,  /* parenthesized latin small letter y                           */
+    0x24b5,  /* parenthesized latin small letter z                           */
+    0x3200,  /* parenthesized hangul kiyeok                                  */
+    0x3201,  /* parenthesized hangul nieun                                   */
+    0x3202,  /* parenthesized hangul tikeut                                  */
+    0x3203,  /* parenthesized hangul rieul                                   */
+    0x3204,  /* parenthesized hangul mieum                                   */
+    0x3205,  /* parenthesized hangul pieup                                   */
+    0x3206,  /* parenthesized hangul sios                                    */
+    0x3207,  /* parenthesized hangul ieung                                   */
+    0x3208,  /* parenthesized hangul cieuc                                   */
+    0x3209,  /* parenthesized hangul chieuch                                 */
+    0x320a,  /* parenthesized hangul khieukh                                 */
+    0x320b,  /* parenthesized hangul thieuth                                 */
+    0x320c,  /* parenthesized hangul phieuph                                 */
+    0x320d,  /* parenthesized hangul hieuh                                   */
+    0x320e,  /* parenthesized hangul kiyeok a                                */
+    0x320f,  /* parenthesized hangul nieun a                                 */
+    0x3210,  /* parenthesized hangul tikeut a                                */
+    0x3211,  /* parenthesized hangul rieul a                                 */
+    0x3212,  /* parenthesized hangul mieum a                                 */
+    0x3213,  /* parenthesized hangul pieup a                                 */
+    0x3214,  /* parenthesized hangul sios a                                  */
+    0x3215,  /* parenthesized hangul ieung a                                 */
+    0x3216,  /* parenthesized hangul cieuc a                                 */
+    0x3217,  /* parenthesized hangul chieuch a                               */
+    0x3218,  /* parenthesized hangul khieukh a                               */
+    0x3219,  /* parenthesized hangul thieuth a                               */
+    0x321a,  /* parenthesized hangul phieuph a                               */
+    0x321b,  /* parenthesized hangul hieuh a                                 */
+    0x321c,  /* parenthesized hangul cieuc u                                 */
+    0x3220,  /* parenthesized ideograph one                                  */
+    0x3221,  /* parenthesized ideograph two                                  */
+    0x3222,  /* parenthesized ideograph three                                */
+    0x3223,  /* parenthesized ideograph four                                 */
+    0x3224,  /* parenthesized ideograph five                                 */
+    0x3225,  /* parenthesized ideograph six                                  */
+    0x3226,  /* parenthesized ideograph seven                                */
+    0x3227,  /* parenthesized ideograph eight                                */
+    0x3228,  /* parenthesized ideograph nine                                 */
+    0x3229,  /* parenthesized ideograph ten                                  */
+    0x322a,  /* parenthesized ideograph moon                                 */
+    0x322b,  /* parenthesized ideograph fire                                 */
+    0x322c,  /* parenthesized ideograph water                                */
+    0x322d,  /* parenthesized ideograph wood                                 */
+    0x322e,  /* parenthesized ideograph metal                                */
+    0x322f,  /* parenthesized ideograph earth                                */
+    0x3230,  /* parenthesized ideograph sun                                  */
+    0x3231,  /* parenthesized ideograph stock                                */
+    0x3232,  /* parenthesized ideograph have                                 */
+    0x3233,  /* parenthesized ideograph society                              */
+    0x3234,  /* parenthesized ideograph name                                 */
+    0x3235,  /* parenthesized ideograph special                              */
+    0x3236,  /* parenthesized ideograph financial                            */
+    0x3237,  /* parenthesized ideograph congratulation                       */
+    0x3238,  /* parenthesized ideograph labor                                */
+    0x3239,  /* parenthesized ideograph represent                            */
+    0x323a,  /* parenthesized ideograph call                                 */
+    0x323b,  /* parenthesized ideograph study                                */
+    0x323c,  /* parenthesized ideograph supervise                            */
+    0x323d,  /* parenthesized ideograph enterprise                           */
+    0x323e,  /* parenthesized ideograph resource                             */
+    0x323f,  /* parenthesized ideograph alliance                             */
+    0x3240,  /* parenthesized ideograph festival                             */
+    0x3241,  /* parenthesized ideograph rest                                 */
+    0x3242,  /* parenthesized ideograph self                                 */
+    0x3243,  /* parenthesized ideograph reach                                */
     0
 };
 
@@ -274,9 +385,263 @@ unicode_t circled[] = {
     0x32bd,  /* circled number 48 */
     0x32be,  /* circled number 49 */
     0x32bf,  /* circled number 50 */
+
+    0x2295,  /* circled plus                                                 */
+    0x2296,  /* circled minus                                                */
+    0x2297,  /* circled times                                                */
+    0x2298,  /* circled division slash                                       */
+    0x2299,  /* circled dot operator                                         */
+    0x229a,  /* circled ring operator                                        */
+    0x229b,  /* circled asterisk operator                                    */
+    0x229c,  /* circled equals                                               */
+    0x229d,  /* circled dash                                                 */
+    0x2389,  /* circled horizontal bar with notch                            */
+    0x238a,  /* circled triangle down                                        */
+    0x2460,  /* circled digit one                                            */
+    0x2461,  /* circled digit two                                            */
+    0x2462,  /* circled digit three                                          */
+    0x2463,  /* circled digit four                                           */
+    0x2464,  /* circled digit five                                           */
+    0x2465,  /* circled digit six                                            */
+    0x2466,  /* circled digit seven                                          */
+    0x2467,  /* circled digit eight                                          */
+    0x2468,  /* circled digit nine                                           */
+    0x2469,  /* circled number ten                                           */
+    0x246a,  /* circled number eleven                                        */
+    0x246b,  /* circled number twelve                                        */
+    0x246c,  /* circled number thirteen                                      */
+    0x246d,  /* circled number fourteen                                      */
+    0x246e,  /* circled number fifteen                                       */
+    0x246f,  /* circled number sixteen                                       */
+    0x2470,  /* circled number seventeen                                     */
+    0x2471,  /* circled number eighteen                                      */
+    0x2472,  /* circled number nineteen                                      */
+    0x2473,  /* circled number twenty                                        */
+    0x24b6,  /* circled latin capital letter a                               */
+    0x24b7,  /* circled latin capital letter b                               */
+    0x24b8,  /* circled latin capital letter c                               */
+    0x24b9,  /* circled latin capital letter d                               */
+    0x24ba,  /* circled latin capital letter e                               */
+    0x24bb,  /* circled latin capital letter f                               */
+    0x24bc,  /* circled latin capital letter g                               */
+    0x24bd,  /* circled latin capital letter h                               */
+    0x24be,  /* circled latin capital letter i                               */
+    0x24bf,  /* circled latin capital letter j                               */
+    0x24c0,  /* circled latin capital letter k                               */
+    0x24c1,  /* circled latin capital letter l                               */
+    0x24c2,  /* circled latin capital letter m                               */
+    0x24c3,  /* circled latin capital letter n                               */
+    0x24c4,  /* circled latin capital letter o                               */
+    0x24c5,  /* circled latin capital letter p                               */
+    0x24c6,  /* circled latin capital letter q                               */
+    0x24c7,  /* circled latin capital letter r                               */
+    0x24c8,  /* circled latin capital letter s                               */
+    0x24c9,  /* circled latin capital letter t                               */
+    0x24ca,  /* circled latin capital letter u                               */
+    0x24cb,  /* circled latin capital letter v                               */
+    0x24cc,  /* circled latin capital letter w                               */
+    0x24cd,  /* circled latin capital letter x                               */
+    0x24ce,  /* circled latin capital letter y                               */
+    0x24cf,  /* circled latin capital letter z                               */
+    0x24d0,  /* circled latin small letter a                                 */
+    0x24d1,  /* circled latin small letter b                                 */
+    0x24d2,  /* circled latin small letter c                                 */
+    0x24d3,  /* circled latin small letter d                                 */
+    0x24d4,  /* circled latin small letter e                                 */
+    0x24d5,  /* circled latin small letter f                                 */
+    0x24d6,  /* circled latin small letter g                                 */
+    0x24d7,  /* circled latin small letter h                                 */
+    0x24d8,  /* circled latin small letter i                                 */
+    0x24d9,  /* circled latin small letter j                                 */
+    0x24da,  /* circled latin small letter k                                 */
+    0x24db,  /* circled latin small letter l                                 */
+    0x24dc,  /* circled latin small letter m                                 */
+    0x24dd,  /* circled latin small letter n                                 */
+    0x24de,  /* circled latin small letter o                                 */
+    0x24df,  /* circled latin small letter p                                 */
+    0x24e0,  /* circled latin small letter q                                 */
+    0x24e1,  /* circled latin small letter r                                 */
+    0x24e2,  /* circled latin small letter s                                 */
+    0x24e3,  /* circled latin small letter t                                 */
+    0x24e4,  /* circled latin small letter u                                 */
+    0x24e5,  /* circled latin small letter v                                 */
+    0x24e6,  /* circled latin small letter w                                 */
+    0x24e7,  /* circled latin small letter x                                 */
+    0x24e8,  /* circled latin small letter y                                 */
+    0x24e9,  /* circled latin small letter z                                 */
+    0x24ea,  /* circled digit zero                                           */
+    0x272a,  /* circled white star                                           */
+    0x2742,  /* circled open centre eight pointed star                       */
+    0x27b2,  /* circled heavy white rightwards arrow                         */
+    0x29b6,  /* circled vertical bar                                         */
+    0x29b7,  /* circled parallel                                             */
+    0x29b8,  /* circled reverse solidus                                      */
+    0x29b9,  /* circled perpendicular                                        */
+    0x29bc,  /* circled anticlockwise-rotated division sign                  */
+    0x29be,  /* circled white bullet                                         */
+    0x29bf,  /* circled bullet                                               */
+    0x29c0,  /* circled less-than                                            */
+    0x29c1,  /* circled greater-than                                         */
+    0x2a36,  /* circled multiplication sign with circumflex accent           */
+    0x2a38,  /* circled division sign                                        */
+    0x3036,  /* circled postal mark                                          */
+    0x3251,  /* circled number twenty one                                    */
+    0x3252,  /* circled number twenty two                                    */
+    0x3253,  /* circled number twenty three                                  */
+    0x3254,  /* circled number twenty four                                   */
+    0x3255,  /* circled number twenty five                                   */
+    0x3256,  /* circled number twenty six                                    */
+    0x3257,  /* circled number twenty seven                                  */
+    0x3258,  /* circled number twenty eight                                  */
+    0x3259,  /* circled number twenty nine                                   */
+    0x325a,  /* circled number thirty                                        */
+    0x325b,  /* circled number thirty one                                    */
+    0x325c,  /* circled number thirty two                                    */
+    0x325d,  /* circled number thirty three                                  */
+    0x325e,  /* circled number thirty four                                   */
+    0x325f,  /* circled number thirty five                                   */
+    0x3260,  /* circled hangul kiyeok                                        */
+    0x3261,  /* circled hangul nieun                                         */
+    0x3262,  /* circled hangul tikeut                                        */
+    0x3263,  /* circled hangul rieul                                         */
+    0x3264,  /* circled hangul mieum                                         */
+    0x3265,  /* circled hangul pieup                                         */
+    0x3266,  /* circled hangul sios                                          */
+    0x3267,  /* circled hangul ieung                                         */
+    0x3268,  /* circled hangul cieuc                                         */
+    0x3269,  /* circled hangul chieuch                                       */
+    0x326a,  /* circled hangul khieukh                                       */
+    0x326b,  /* circled hangul thieuth                                       */
+    0x326c,  /* circled hangul phieuph                                       */
+    0x326d,  /* circled hangul hieuh                                         */
+    0x326e,  /* circled hangul kiyeok a                                      */
+    0x326f,  /* circled hangul nieun a                                       */
+    0x3270,  /* circled hangul tikeut a                                      */
+    0x3271,  /* circled hangul rieul a                                       */
+    0x3272,  /* circled hangul mieum a                                       */
+    0x3273,  /* circled hangul pieup a                                       */
+    0x3274,  /* circled hangul sios a                                        */
+    0x3275,  /* circled hangul ieung a                                       */
+    0x3276,  /* circled hangul cieuc a                                       */
+    0x3277,  /* circled hangul chieuch a                                     */
+    0x3278,  /* circled hangul khieukh a                                     */
+    0x3279,  /* circled hangul thieuth a                                     */
+    0x327a,  /* circled hangul phieuph a                                     */
+    0x327b,  /* circled hangul hieuh a                                       */
+    0x3280,  /* circled ideograph one                                        */
+    0x3281,  /* circled ideograph two                                        */
+    0x3282,  /* circled ideograph three                                      */
+    0x3283,  /* circled ideograph four                                       */
+    0x3284,  /* circled ideograph five                                       */
+    0x3285,  /* circled ideograph six                                        */
+    0x3286,  /* circled ideograph seven                                      */
+    0x3287,  /* circled ideograph eight                                      */
+    0x3288,  /* circled ideograph nine                                       */
+    0x3289,  /* circled ideograph ten                                        */
+    0x328a,  /* circled ideograph moon                                       */
+    0x328b,  /* circled ideograph fire                                       */
+    0x328c,  /* circled ideograph water                                      */
+    0x328d,  /* circled ideograph wood                                       */
+    0x328e,  /* circled ideograph metal                                      */
+    0x328f,  /* circled ideograph earth                                      */
+    0x3290,  /* circled ideograph sun                                        */
+    0x3291,  /* circled ideograph stock                                      */
+    0x3292,  /* circled ideograph have                                       */
+    0x3293,  /* circled ideograph society                                    */
+    0x3294,  /* circled ideograph name                                       */
+    0x3295,  /* circled ideograph special                                    */
+    0x3296,  /* circled ideograph financial                                  */
+    0x3297,  /* circled ideograph congratulation                             */
+    0x3298,  /* circled ideograph labor                                      */
+    0x3299,  /* circled ideograph secret                                     */
+    0x329a,  /* circled ideograph male                                       */
+    0x329b,  /* circled ideograph female                                     */
+    0x329c,  /* circled ideograph suitable                                   */
+    0x329d,  /* circled ideograph excellent                                  */
+    0x329e,  /* circled ideograph print                                      */
+    0x329f,  /* circled ideograph attention                                  */
+    0x32a0,  /* circled ideograph item                                       */
+    0x32a1,  /* circled ideograph rest                                       */
+    0x32a2,  /* circled ideograph copy                                       */
+    0x32a3,  /* circled ideograph correct                                    */
+    0x32a4,  /* circled ideograph high                                       */
+    0x32a5,  /* circled ideograph centre                                     */
+    0x32a6,  /* circled ideograph low                                        */
+    0x32a7,  /* circled ideograph left                                       */
+    0x32a8,  /* circled ideograph right                                      */
+    0x32a9,  /* circled ideograph medicine                                   */
+    0x32aa,  /* circled ideograph religion                                   */
+    0x32ab,  /* circled ideograph study                                      */
+    0x32ac,  /* circled ideograph supervise                                  */
+    0x32ad,  /* circled ideograph enterprise                                 */
+    0x32ae,  /* circled ideograph resource                                   */
+    0x32af,  /* circled ideograph alliance                                   */
+    0x32b0,  /* circled ideograph night                                      */
+    0x32b1,  /* circled number thirty six                                    */
+    0x32b2,  /* circled number thirty seven                                  */
+    0x32b3,  /* circled number thirty eight                                  */
+    0x32b4,  /* circled number thirty nine                                   */
+    0x32b5,  /* circled number forty                                         */
+    0x32b6,  /* circled number forty one                                     */
+    0x32b7,  /* circled number forty two                                     */
+    0x32b8,  /* circled number forty three                                   */
+    0x32b9,  /* circled number forty four                                    */
+    0x32ba,  /* circled number forty five                                    */
+    0x32bb,  /* circled number forty six                                     */
+    0x32bc,  /* circled number forty seven                                   */
+    0x32bd,  /* circled number forty eight                                   */
+    0x32be,  /* circled number forty nine                                    */
+    0x32bf,  /* circled number fifty                                         */
+    0x32d0,  /* circled katakana a                                           */
+    0x32d1,  /* circled katakana i                                           */
+    0x32d2,  /* circled katakana u                                           */
+    0x32d3,  /* circled katakana e                                           */
+    0x32d4,  /* circled katakana o                                           */
+    0x32d5,  /* circled katakana ka                                          */
+    0x32d6,  /* circled katakana ki                                          */
+    0x32d7,  /* circled katakana ku                                          */
+    0x32d8,  /* circled katakana ke                                          */
+    0x32d9,  /* circled katakana ko                                          */
+    0x32da,  /* circled katakana sa                                          */
+    0x32db,  /* circled katakana si                                          */
+    0x32dc,  /* circled katakana su                                          */
+    0x32dd,  /* circled katakana se                                          */
+    0x32de,  /* circled katakana so                                          */
+    0x32df,  /* circled katakana ta                                          */
+    0x32e0,  /* circled katakana ti                                          */
+    0x32e1,  /* circled katakana tu                                          */
+    0x32e2,  /* circled katakana te                                          */
+    0x32e3,  /* circled katakana to                                          */
+    0x32e4,  /* circled katakana na                                          */
+    0x32e5,  /* circled katakana ni                                          */
+    0x32e6,  /* circled katakana nu                                          */
+    0x32e7,  /* circled katakana ne                                          */
+    0x32e8,  /* circled katakana no                                          */
+    0x32e9,  /* circled katakana ha                                          */
+    0x32ea,  /* circled katakana hi                                          */
+    0x32eb,  /* circled katakana hu                                          */
+    0x32ec,  /* circled katakana he                                          */
+    0x32ed,  /* circled katakana ho                                          */
+    0x32ee,  /* circled katakana ma                                          */
+    0x32ef,  /* circled katakana mi                                          */
+    0x32f0,  /* circled katakana mu                                          */
+    0x32f1,  /* circled katakana me                                          */
+    0x32f2,  /* circled katakana mo                                          */
+    0x32f3,  /* circled katakana ya                                          */
+    0x32f4,  /* circled katakana yu                                          */
+    0x32f5,  /* circled katakana yo                                          */
+    0x32f6,  /* circled katakana ra                                          */
+    0x32f7,  /* circled katakana ri                                          */
+    0x32f8,  /* circled katakana ru                                          */
+    0x32f9,  /* circled katakana re                                          */
+    0x32fa,  /* circled katakana ro                                          */
+    0x32fb,  /* circled katakana wa                                          */
+    0x32fc,  /* circled katakana wi                                          */
+    0x32fd,  /* circled katakana we                                          */
+    0x32fe,  /* circled katakana wo                                          */
     0
 };                                            
-                                              
+
 unicode_t hangul_cjamo[] = {                      
     0x3131,  /* hangul letter kiyeok              */
     0x3132,  /* hangul letter ssangkiyeok         */
