@@ -32,6 +32,7 @@ extern GType gtk_type_im_context_hangul;
 typedef struct _GtkIMContextHangul	GtkIMContextHangul;
 typedef struct _GtkIMContextHangulClass	GtkIMContextHangulClass;
 typedef struct _Candidate               Candidate;
+typedef struct _Toplevel                Toplevel;
 
 typedef struct _IMHangulCombination	IMHangulCombination;
 typedef gboolean (*IMHangulComposer)   (GtkIMContextHangul *, GdkEventKey *);
@@ -54,7 +55,7 @@ struct _GtkIMContextHangul
 
   /* window */
   GdkWindow *client_window;
-  GtkWidget *toplevel;
+  Toplevel *toplevel;
   Candidate *candidate;
   GdkRectangle cursor;
   gint surrounding_delete_length;
