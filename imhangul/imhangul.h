@@ -93,8 +93,9 @@ static void im_hangul_set_automata(GtkIMContextHangul *context_hangul,
 				   GtkIMContextHangulAutomata automata);
 
 /* asistant function for hangul automata */
-#define im_hangul_is_modifier(key)	(   (key)->state & GDK_CONTROL_MASK \
-					 || (key)->state & GDK_MOD1_MASK )
+#define is_set(state, mask)		((state & mask) == mask)
+#define im_hangul_is_modifier(state)	(is_set(state, GDK_CONTROL_MASK) || \
+					 is_set(state, GDK_MOD1_MASK))
 #define im_hangul_is_choseong(c)	((c) >=0x1100 && (c) <=0x1112)
 #define im_hangul_is_jungseong(c)	((c) >=0x1161 && (c) <=0x1175)
 #define im_hangul_is_jongseong(c)	((c) >=0x11a7 && (c) <=0x11c2)
@@ -677,7 +678,7 @@ static gboolean
 im_hangul_is_trigger(GdkEventKey *key)
 {
   return ( key->keyval == GDK_Hangul || 
-	  (key->keyval == GDK_space && (key->state & GDK_SHIFT_MASK)));
+	  (key->keyval == GDK_space && is_set(key->state, GDK_SHIFT_MASK)));
 }
 
 static gboolean
@@ -710,7 +711,7 @@ static gboolean
 im_hangul_process_nonhangul(GtkIMContextHangul *context_hangul,
 		            GdkEventKey *key)
 {
-  if (!im_hangul_is_modifier(key)) {
+  if (!im_hangul_is_modifier(key->state)) {
     gunichar ch = gdk_keyval_to_unicode(key->keyval);
     if (ch != 0) {
       gchar buf[10];
@@ -946,7 +947,7 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   }
 
   /* modifiler key */
-  if (im_hangul_is_modifier(key)) {
+  if (im_hangul_is_modifier(key->state)) {
     if (context_hangul->choseong != 0 ||
 	context_hangul->jungseong != 0 ||
 	context_hangul->jongseong != 0) {

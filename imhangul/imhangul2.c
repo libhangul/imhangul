@@ -48,7 +48,7 @@ static const GtkIMContextInfo *info_list[] = {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul2_choseong(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_R:
       case GDK_r:
@@ -146,7 +146,7 @@ im_hangul2_choseong(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul2_jungseong(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_K:
       case GDK_k:
@@ -232,7 +232,7 @@ im_hangul2_jungseong(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul2_comp_jungseong(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1169:
@@ -276,7 +276,7 @@ im_hangul2_comp_jungseong(gunichar ch, guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul2_jongseong(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_R:
       case GDK_r:
@@ -365,7 +365,7 @@ im_hangul2_jongseong(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul2_comp_jongseong(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (ch) {
       case 0x11ab:		/* jongseong nieun */
         switch (keyval) {

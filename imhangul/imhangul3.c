@@ -60,7 +60,7 @@ gunichar (*im_hangul3_comp_jongseong)	(gunichar, guint, guint);
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_choseong_90(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (keyval) {
     case GDK_K:
@@ -110,7 +110,7 @@ im_hangul3_choseong_90(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_comp_choseong_90(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1100:		/* choseong kiyeok */
@@ -156,7 +156,7 @@ im_hangul3_comp_choseong_90(gunichar ch, guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_jungseong_90(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_R:
       case GDK_r:
@@ -212,7 +212,7 @@ im_hangul3_jungseong_90(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_comp_jungseong_90(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1169:		/* jungseong o */
@@ -256,7 +256,7 @@ im_hangul3_comp_jungseong_90(gunichar ch, guint keyval, guint state) {
 static gunichar
 im_hangul3_jongseong_90(guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) { 
     switch (keyval) {
       case GDK_X:
       case GDK_x:
@@ -330,7 +330,7 @@ im_hangul3_jongseong_90(guint keyval, guint state)
 static gunichar
 im_hangul3_comp_jongseong_90(gunichar ch, guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (ch) {
       case 0x11ab:		/* jongseong nieun */
         switch (keyval) {
@@ -406,7 +406,7 @@ im_hangul3_comp_jongseong_90(gunichar ch, guint keyval, guint state)
 static gunichar
 im_hangul3_punct_90(guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_N:
       case GDK_n:
@@ -464,7 +464,7 @@ im_hangul3_punct_90(guint keyval, guint state)
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_choseong_sun(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (keyval) {
     case GDK_K:
@@ -514,7 +514,7 @@ im_hangul3_choseong_sun(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_comp_choseong_sun(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1100:		/* choseong kiyeok */
@@ -560,7 +560,7 @@ im_hangul3_comp_choseong_sun(gunichar ch, guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_jungseong_sun(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (keyval) {
     case GDK_F:
@@ -608,7 +608,7 @@ im_hangul3_jungseong_sun(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_comp_jungseong_sun(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1169:		/* jungseong o */
@@ -652,7 +652,7 @@ im_hangul3_comp_jungseong_sun(gunichar ch, guint keyval, guint state) {
 static gunichar
 im_hangul3_jongseong_sun(guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (keyval) {
     case GDK_X:
@@ -700,7 +700,7 @@ im_hangul3_jongseong_sun(guint keyval, guint state)
 static gunichar
 im_hangul3_comp_jongseong_sun(gunichar ch, guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x11a8:		/* jongseong kiyeok */
@@ -764,7 +764,7 @@ im_hangul3_comp_jongseong_sun(gunichar ch, guint keyval, guint state)
 static gunichar
 im_hangul3_punct_sun(guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_N:
       case GDK_n:
@@ -824,7 +824,7 @@ im_hangul3_punct_sun(guint keyval, guint state)
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_choseong_final(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (keyval) {
     case GDK_K:
@@ -874,7 +874,7 @@ im_hangul3_choseong_final(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_comp_choseong_final(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1100:		/* choseong kiyeok */
@@ -920,7 +920,7 @@ im_hangul3_comp_choseong_final(gunichar ch, guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_jungseong_final(guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     if (keyval == GDK_G || keyval == GDK_g)
       return 0x1164;
   } else {
@@ -973,7 +973,7 @@ im_hangul3_jungseong_final(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3_comp_jungseong_final(gunichar ch, guint keyval, guint state) {
-  if (state & GDK_SHIFT_MASK)
+  if (is_set(state, GDK_SHIFT_MASK))
     return 0;
   switch (ch) {
     case 0x1169:		/* jungseong o */
@@ -1017,7 +1017,7 @@ im_hangul3_comp_jungseong_final(gunichar ch, guint keyval, guint state) {
 static gunichar
 im_hangul3_jongseong_final(guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_X:
       case GDK_x:
@@ -1105,7 +1105,7 @@ im_hangul3_jongseong_final(guint keyval, guint state)
 static gunichar
 im_hangul3_comp_jongseong_final(gunichar ch, guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (ch) {
       case 0x11ab:		/* jongseong nieun */
         switch (keyval) {
@@ -1181,7 +1181,7 @@ im_hangul3_comp_jongseong_final(gunichar ch, guint keyval, guint state)
 static gunichar
 im_hangul3_punct_final(guint keyval, guint state)
 {
-  if (state & GDK_SHIFT_MASK) {
+  if (is_set(state, GDK_SHIFT_MASK)) {
     switch (keyval) {
       case GDK_H:
       case GDK_h:
