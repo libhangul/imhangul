@@ -17,15 +17,14 @@ imhangul_status_applet_SOURCES = \
 
 imhangul_status_applet_LDADD = $(IMHANGUL_STATUS_LIBS)
 
-schemasdir = @GCONF_SCHEMA_FILE_DIR@
-schemasdir = $(sysconfdir)/gconf/schemas
-schemas_in_files = imhangul_status.schemas.in
-schemas_DATA = $(schemas_in_files:.schemas.in=.schemas)
+schemadir = @GCONF_SCHEMA_FILE_DIR@
+schema_in_files = imhangul_status.schemas.in
+schema_DATA = $(schema_in_files:.schemas.in=.schemas)
 @INTLTOOL_SCHEMAS_RULE@
 
 install-data-local:
 	if test -z "$(DESTDIR)" ; then \
-		GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) $(GCONFTOOL) --makefile-install-rule $(srcdir)/$(schemas_DATA) ; \
+		GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) $(GCONFTOOL) --makefile-install-rule $(srcdir)/$(schema_DATA) ; \
 	fi
 
 
