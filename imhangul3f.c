@@ -131,7 +131,7 @@ static const gunichar keyboard_table_3final[] = {
   0x110e,	/* GDK_o:		choseong  chieuch		*/
   0x1111,	/* GDK_p:		choseong  phieuph		*/
   0x11ba,	/* GDK_q:		jongseong sios			*/
-  0x116b,	/* GDK_r:		jungseong ae			*/
+  0x1162,	/* GDK_r:		jungseong ae			*/
   0x11ab,	/* GDK_s:		jongseong nieun			*/
   0x1165, 	/* GDK_t:		jungseong eo			*/
   0x1103,	/* GDK_u:		choseong  tikeut		*/
