@@ -1,3 +1,7 @@
+2002. 07. 18. (목) 13:46:48 KST
+	* imhangul.h, imhangul2.c, imhangul3.c:
+	  GDK_SHIFT_MASK를 체크하는 부분을 모두 is_set() 매크로로 대체
+
 2002. 07. 12. (금) 11:02:20 KST
 	* im_hangul_shutdown(): im module이 shutdow할때 hanja_window가 열려
 	  있으면 그걸 닫도록 추가
