@@ -1,170 +1,145 @@
 unicode_t symbols[] = {
-    0x2600,  /* black sun with rays                    */
-    0x2601,  /* cloud                                  */
-    0x2602,  /* umbrella                               */
-    0x2603,  /* snowman                                */
-    0x2604,  /* comet                                  */
-    0x2605,  /* black star                             */
-    0x2606,  /* white star                             */
-    0x2607,  /* lightning                              */
-    0x2608,  /* thunderstorm                           */
-    0x2609,  /* sun                                    */
-    0x260a,  /* ascending node                         */
-    0x260b,  /* descending node                        */
-    0x260c,  /* conjunction                            */
-    0x260d,  /* opposition                             */
-    0x260e,  /* black telephone                        */
-    0x260f,  /* white telephone                        */
-    0x2610,  /* ballot box                             */
-    0x2611,  /* ballot box with check                  */
-    0x2612,  /* ballot box with x                      */
-    0x2613,  /* saltire                                */
-    0x2616,  /* white shogi piece                      */
-    0x2617,  /* black shogi piece                      */
-    0x2619,  /* reversed rotated floral heart bullet   */
-    0x261a,  /* black left pointing index              */
-    0x261b,  /* black right pointing index             */
-    0x261c,  /* white left pointing index              */
-    0x261d,  /* white up pointing index                */
-    0x261e,  /* white right pointing index             */
-    0x261f,  /* white down pointing index              */
-    0x2620,  /* skull and crossbones                   */
-    0x2621,  /* caution sign                           */
-    0x2622,  /* radioactive sign                       */
-    0x2623,  /* biohazard sign                         */
-    0x2624,  /* caduceus                               */
-    0x2625,  /* ankh                                   */
-    0x2626,  /* orthodox cross                         */
-    0x2627,  /* chi rho                                */
-    0x2628,  /* cross of lorraine                      */
-    0x2629,  /* cross of jerusalem                     */
-    0x262a,  /* star and crescent                      */
-    0x262b,  /* farsi symbol                           */
-    0x262c,  /* adi shakti                             */
-    0x262d,  /* hammer and sickle                      */
-    0x262e,  /* peace symbol                           */
-    0x262f,  /* yin yang                               */
-    0x2630,  /* trigram for heaven                     */
-    0x2631,  /* trigram for lake                       */
-    0x2632,  /* trigram for fire                       */
-    0x2633,  /* trigram for thunder                    */
-    0x2634,  /* trigram for wind                       */
-    0x2635,  /* trigram for water                      */
-    0x2636,  /* trigram for mountain                   */
-    0x2637,  /* trigram for earth                      */
-    0x2638,  /* wheel of dharma                        */
-    0x2639,  /* white frowning face                    */
-    0x263a,  /* white smiling face                     */
-    0x263b,  /* black smiling face                     */
-    0x263c,  /* white sun with rays                    */
-    0x263d,  /* first quarter moon                     */
-    0x263e,  /* last quarter moon                      */
-    0x263f,  /* mercury                                */
-    0x2640,  /* female sign                            */
-    0x2641,  /* earth                                  */
-    0x2642,  /* male sign                              */
-    0x2643,  /* jupiter                                */
-    0x2644,  /* saturn                                 */
-    0x2645,  /* uranus                                 */
-    0x2646,  /* neptune                                */
-    0x2647,  /* pluto                                  */
-    0x2648,  /* aries                                  */
-    0x2649,  /* taurus                                 */
-    0x264a,  /* gemini                                 */
-    0x264b,  /* cancer                                 */
-    0x264c,  /* leo                                    */
-    0x264d,  /* virgo                                  */
-    0x264e,  /* libra                                  */
-    0x264f,  /* scorpius                               */
-    0x2650,  /* sagittarius                            */
-    0x2651,  /* capricorn                              */
-    0x2652,  /* aquarius                               */
-    0x2653,  /* pisces                                 */
-    0x2654,  /* white chess king                       */
-    0x2655,  /* white chess queen                      */
-    0x2656,  /* white chess rook                       */
-    0x2657,  /* white chess bishop                     */
-    0x2658,  /* white chess knight                     */
-    0x2659,  /* white chess pawn                       */
-    0x265a,  /* black chess king                       */
-    0x265b,  /* black chess queen                      */
-    0x265c,  /* black chess rook                       */
-    0x265d,  /* black chess bishop                     */
-    0x265e,  /* black chess knight                     */
-    0x265f,  /* black chess pawn                       */
-    0x2660,  /* black spade suit                       */
-    0x2661,  /* white heart suit                       */
-    0x2662,  /* white diamond suit                     */
-    0x2663,  /* black club suit                        */
-    0x2664,  /* white spade suit                       */
-    0x2665,  /* black heart suit                       */
-    0x2666,  /* black diamond suit                     */
-    0x2667,  /* white club suit                        */
-    0x2668,  /* hot springs                            */
-    0x2669,  /* quarter note                           */
-    0x266a,  /* eighth note                            */
-    0x266b,  /* beamed eighth notes                    */
-    0x266c,  /* beamed sixteenth notes                 */
-    0x266d,  /* music flat sign                        */
-    0x266e,  /* music natural sign                     */
-    0x266f,  /* music sharp sign                       */
-    0x2670,  /* west syriac cross                      */
-    0x2671,  /* east syriac cross                      */
-    0x2672,  /* universal recycling symbol             */
-    0x2673,  /* recycling symbol for type-1 plastics   */
-    0x2674,  /* recycling symbol for type-2 plastics   */
-    0x2675,  /* recycling symbol for type-3 plastics   */
-    0x2676,  /* recycling symbol for type-4 plastics   */
-    0x2677,  /* recycling symbol for type-5 plastics   */
-    0x2678,  /* recycling symbol for type-6 plastics   */
-    0x2679,  /* recycling symbol for type-7 plastics   */
-    0x267a,  /* recycling symbol for generic materials */
-    0x267b,  /* black universal recycling symbol       */
-    0x267c,  /* recycled paper symbol                  */
-    0x267d,  /* partially-recycled paper symbol        */
-    0x2680,  /* die face-1                             */
-    0x2681,  /* die face-2                             */
-    0x2682,  /* die face-3                             */
-    0x2683,  /* die face-4                             */
-    0x2684,  /* die face-5                             */
-    0x2685,  /* die face-6                             */
-    0x2686,  /* white circle with dot right            */
-    0x2687,  /* white circle with two dots             */
-    0x2688,  /* black circle with white dot right      */
-    0x2689,  /* black circle with two white dots       */
+    0x2600,  /* black sun with rays                                          */
+    0x2601,  /* cloud                                                        */
+    0x2602,  /* umbrella                                                     */
+    0x2603,  /* snowman                                                      */
+    0x2604,  /* comet                                                        */
+    0x2605,  /* black star                                                   */
+    0x2606,  /* white star                                                   */
+    0x2607,  /* lightning                                                    */
+    0x2608,  /* thunderstorm                                                 */
+    0x2609,  /* sun                                                          */
+    0x260a,  /* ascending node                                               */
+    0x260b,  /* descending node                                              */
+    0x260c,  /* conjunction                                                  */
+    0x260d,  /* opposition                                                   */
+    0x260e,  /* black telephone                                              */
+    0x260f,  /* white telephone                                              */
+    0x2610,  /* ballot box                                                   */
+    0x2611,  /* ballot box with check                                        */
+    0x2612,  /* ballot box with x                                            */
+    0x2613,  /* saltire                                                      */
+    0x2616,  /* white shogi piece                                            */
+    0x2617,  /* black shogi piece                                            */
+    0x2619,  /* reversed rotated floral heart bullet                         */
+    0x261a,  /* black left pointing index                                    */
+    0x261b,  /* black right pointing index                                   */
+    0x261c,  /* white left pointing index                                    */
+    0x261d,  /* white up pointing index                                      */
+    0x261e,  /* white right pointing index                                   */
+    0x261f,  /* white down pointing index                                    */
+    0x2620,  /* skull and crossbones                                         */
+    0x2621,  /* caution sign                                                 */
+    0x2622,  /* radioactive sign                                             */
+    0x2623,  /* biohazard sign                                               */
+    0x2624,  /* caduceus                                                     */
+    0x2625,  /* ankh                                                         */
+    0x2626,  /* orthodox cross                                               */
+    0x2627,  /* chi rho                                                      */
+    0x2628,  /* cross of lorraine                                            */
+    0x2629,  /* cross of jerusalem                                           */
+    0x262a,  /* star and crescent                                            */
+    0x262b,  /* farsi symbol                                                 */
+    0x262c,  /* adi shakti                                                   */
+    0x262d,  /* hammer and sickle                                            */
+    0x262e,  /* peace symbol                                                 */
+    0x262f,  /* yin yang                                                     */
+    0x2630,  /* trigram for heaven                                           */
+    0x2631,  /* trigram for lake                                             */
+    0x2632,  /* trigram for fire                                             */
+    0x2633,  /* trigram for thunder                                          */
+    0x2634,  /* trigram for wind                                             */
+    0x2635,  /* trigram for water                                            */
+    0x2636,  /* trigram for mountain                                         */
+    0x2637,  /* trigram for earth                                            */
+    0x2638,  /* wheel of dharma                                              */
+    0x2639,  /* white frowning face                                          */
+    0x263a,  /* white smiling face                                           */
+    0x263b,  /* black smiling face                                           */
+    0x263c,  /* white sun with rays                                          */
+    0x263d,  /* first quarter moon                                           */
+    0x263e,  /* last quarter moon                                            */
+    0x263f,  /* mercury                                                      */
+    0x2640,  /* female sign                                                  */
+    0x2641,  /* earth                                                        */
+    0x2642,  /* male sign                                                    */
+    0x2643,  /* jupiter                                                      */
+    0x2644,  /* saturn                                                       */
+    0x2645,  /* uranus                                                       */
+    0x2646,  /* neptune                                                      */
+    0x2647,  /* pluto                                                        */
+    0x2648,  /* aries                                                        */
+    0x2649,  /* taurus                                                       */
+    0x264a,  /* gemini                                                       */
+    0x264b,  /* cancer                                                       */
+    0x264c,  /* leo                                                          */
+    0x264d,  /* virgo                                                        */
+    0x264e,  /* libra                                                        */
+    0x264f,  /* scorpius                                                     */
+    0x2650,  /* sagittarius                                                  */
+    0x2651,  /* capricorn                                                    */
+    0x2652,  /* aquarius                                                     */
+    0x2653,  /* pisces                                                       */
+    0x2654,  /* white chess king                                             */
+    0x2655,  /* white chess queen                                            */
+    0x2656,  /* white chess rook                                             */
+    0x2657,  /* white chess bishop                                           */
+    0x2658,  /* white chess knight                                           */
+    0x2659,  /* white chess pawn                                             */
+    0x265a,  /* black chess king                                             */
+    0x265b,  /* black chess queen                                            */
+    0x265c,  /* black chess rook                                             */
+    0x265d,  /* black chess bishop                                           */
+    0x265e,  /* black chess knight                                           */
+    0x265f,  /* black chess pawn                                             */
+    0x2660,  /* black spade suit                                             */
+    0x2661,  /* white heart suit                                             */
+    0x2662,  /* white diamond suit                                           */
+    0x2663,  /* black club suit                                              */
+    0x2664,  /* white spade suit                                             */
+    0x2665,  /* black heart suit                                             */
+    0x2666,  /* black diamond suit                                           */
+    0x2667,  /* white club suit                                              */
+    0x2668,  /* hot springs                                                  */
+    0x2669,  /* quarter note                                                 */
+    0x266a,  /* eighth note                                                  */
+    0x266b,  /* beamed eighth notes                                          */
+    0x266c,  /* beamed sixteenth notes                                       */
+    0x266d,  /* music flat sign                                              */
+    0x266e,  /* music natural sign                                           */
+    0x266f,  /* music sharp sign                                             */
+    0x2670,  /* west syriac cross                                            */
+    0x2671,  /* east syriac cross                                            */
+    0x2672,  /* universal recycling symbol                                   */
+    0x2673,  /* recycling symbol for type-1 plastics                         */
+    0x2674,  /* recycling symbol for type-2 plastics                         */
+    0x2675,  /* recycling symbol for type-3 plastics                         */
+    0x2676,  /* recycling symbol for type-4 plastics                         */
+    0x2677,  /* recycling symbol for type-5 plastics                         */
+    0x2678,  /* recycling symbol for type-6 plastics                         */
+    0x2679,  /* recycling symbol for type-7 plastics                         */
+    0x267a,  /* recycling symbol for generic materials                       */
+    0x267b,  /* black universal recycling symbol                             */
+    0x267c,  /* recycled paper symbol                                        */
+    0x267d,  /* partially-recycled paper symbol                              */
+    0x2680,  /* die face-1                                                   */
+    0x2681,  /* die face-2                                                   */
+    0x2682,  /* die face-3                                                   */
+    0x2683,  /* die face-4                                                   */
+    0x2684,  /* die face-5                                                   */
+    0x2685,  /* die face-6                                                   */
+    0x2686,  /* white circle with dot right                                  */
+    0x2687,  /* white circle with two dots                                   */
+    0x2688,  /* black circle with white dot right                            */
+    0x2689,  /* black circle with two white dots                             */
     0
 };
 
 unicode_t char_symbol[] = {
-    0x2070,  /* superscript zero                                             */
-    0x2071,  /* superscript latin small letter i                             */
-    0x2074,  /* superscript four                                             */
-    0x2075,  /* superscript five                                             */
-    0x2076,  /* superscript six                                              */
-    0x2077,  /* superscript seven                                            */
-    0x2078,  /* superscript eight                                            */
-    0x2079,  /* superscript nine                                             */
-    0x207a,  /* superscript plus sign                                        */
-    0x207b,  /* superscript minus                                            */
-    0x207c,  /* superscript equals sign                                      */
-    0x207d,  /* superscript left parenthesis                                 */
-    0x207e,  /* superscript right parenthesis                                */
-    0x207f,  /* superscript latin small letter n                             */
-    0x2080,  /* subscript zero                                               */
-    0x2081,  /* subscript one                                                */
-    0x2082,  /* subscript two                                                */
-    0x2083,  /* subscript three                                              */
-    0x2084,  /* subscript four                                               */
-    0x2085,  /* subscript five                                               */
-    0x2086,  /* subscript six                                                */
-    0x2087,  /* subscript seven                                              */
-    0x2088,  /* subscript eight                                              */
-    0x2089,  /* subscript nine                                               */
-    0x208a,  /* subscript plus sign                                          */
-    0x208b,  /* subscript minus                                              */
-    0x208c,  /* subscript equals sign                                        */
-    0x208d,  /* subscript left parenthesis                                   */
-    0x208e,  /* subscript right parenthesis                                  */
+    0x00a2,  /* cent sign                                                    */
+    0x00a3,  /* pound sign                                                   */
+    0x00a4,  /* currency sign                                                */
+    0x00a5,  /* yen sign                                                     */
     0x20a0,  /* euro-currency sign                                           */
     0x20a1,  /* colon sign                                                   */
     0x20a2,  /* cruzeiro sign                                                */
@@ -258,28 +233,148 @@ unicode_t char_symbol[] = {
     0x2149,  /* double-struck italic small j                                 */
     0x214a,  /* property line                                                */
     0x214b,  /* turned ampersand                                             */
+
+    0x327f,  /* korean standard symbol                                       */
+    0x3004,  /* japanese industrial standard symbol                          */
     0
 };
 
 unicode_t punctuation[] = {
-    0x2018,  /* left single quotation mark            */
-    0x2019,  /* right single quotation mark           */
-    0x201a,  /* single low-9 quotation mark           */
-    0x201b,  /* single high-reversed-9 quotation mark */
-    0x201c,  /* left double quotation mark            */
-    0x201d,  /* right double quotation mark           */
-    0x201e,  /* double low-9 quotation mark           */
-    0x201f,  /* double high-reversed-9 quotation mark */
-    0x2020,  /* dagger                                */
-    0x2021,  /* double dagger                         */
-    0x2022,  /* bullet                                */
-    0x2023,  /* triangular bullet                     */
-    0x2024,  /* one dot leader                        */
-    0x2025,  /* two dot leader                        */
-    0x2026,  /* horizontal ellipsis                   */
-    0x2027,  /* hyphenation point                     */
+    0x2018,  /* left single quotation mark                                   */
+    0x2019,  /* right single quotation mark                                  */
+    0x201a,  /* single low-9 quotation mark                                  */
+    0x201b,  /* single high-reversed-9 quotation mark                        */
+    0x201c,  /* left double quotation mark                                   */
+    0x201d,  /* right double quotation mark                                  */
+    0x201e,  /* double low-9 quotation mark                                  */
+    0x201f,  /* double high-reversed-9 quotation mark                        */
+    0x2020,  /* dagger                                                       */
+    0x2021,  /* double dagger                                                */
+    0x2022,  /* bullet                                                       */
+    0x2023,  /* triangular bullet                                            */
+    0x2024,  /* one dot leader                                               */
+    0x2025,  /* two dot leader                                               */
+    0x2026,  /* horizontal ellipsis                                          */
+    0x2027,  /* hyphenation point                                            */
 
-    0x203b,  /* reference mark                        */
+    0x203b,  /* reference mark                                               */
+    0x00a7,  /* section sign                                                 */
+
+    0x3001,  /* ideographic comma                                            */
+    0x3002,  /* ideographic full stop                                        */
+    0x3003,  /* ditto mark                                                   */
+    0x3005,  /* ideographic iteration mark                                   */
+    0x3006,  /* ideographic closing mark                                     */
+    0x3007,  /* ideographic number zero                                      */
+    0x3008,  /* left angle bracket                                           */
+    0x3009,  /* right angle bracket                                          */
+    0x300a,  /* left double angle bracket                                    */
+    0x300b,  /* right double angle bracket                                   */
+    0x300c,  /* left corner bracket                                          */
+    0x300d,  /* right corner bracket                                         */
+    0x300e,  /* left white corner bracket                                    */
+    0x300f,  /* right white corner bracket                                   */
+    0x3010,  /* left black lenticular bracket                                */
+    0x3011,  /* right black lenticular bracket                               */
+    0x3014,  /* left tortoise shell bracket                                  */
+    0x3015,  /* right tortoise shell bracket                                 */
+    0x3016,  /* left white lenticular bracket                                */
+    0x3017,  /* right white lenticular bracket                               */
+    0x3018,  /* left white tortoise shell bracket                            */
+    0x3019,  /* right white tortoise shell bracket                           */
+    0x301a,  /* left white square bracket                                    */
+    0x301b,  /* right white square bracket                                   */
+    0x301c,  /* wave dash                                                    */
+    0x301d,  /* reversed double prime quotation mark                         */
+    0x301e,  /* double prime quotation mark                                  */
+    0x301f,  /* low double prime quotation mark                              */
+    0
+};
+
+unicode_t number_form[] = {
+    0x2070,  /* superscript zero                                             */
+    0x00b9,  /* superscript one                                              */
+    0x00b2,  /* superscript two                                              */
+    0x00b3,  /* superscript three                                            */
+    0x2074,  /* superscript four                                             */
+    0x2075,  /* superscript five                                             */
+    0x2076,  /* superscript six                                              */
+    0x2077,  /* superscript seven                                            */
+    0x2078,  /* superscript eight                                            */
+    0x2079,  /* superscript nine                                             */
+    0x207a,  /* superscript plus sign                                        */
+    0x207b,  /* superscript minus                                            */
+    0x207c,  /* superscript equals sign                                      */
+    0x207d,  /* superscript left parenthesis                                 */
+    0x207e,  /* superscript right parenthesis                                */
+    0x207f,  /* superscript latin small letter n                             */
+    0x2080,  /* subscript zero                                               */
+    0x2081,  /* subscript one                                                */
+    0x2082,  /* subscript two                                                */
+    0x2083,  /* subscript three                                              */
+    0x2084,  /* subscript four                                               */
+    0x2085,  /* subscript five                                               */
+    0x2086,  /* subscript six                                                */
+    0x2087,  /* subscript seven                                              */
+    0x2088,  /* subscript eight                                              */
+    0x2089,  /* subscript nine                                               */
+    0x208a,  /* subscript plus sign                                          */
+    0x208b,  /* subscript minus                                              */
+    0x208c,  /* subscript equals sign                                        */
+    0x208d,  /* subscript left parenthesis                                   */
+    0x208e,  /* subscript right parenthesis                                  */
+    0x00bd,  /* vulgar fraction one half                                     */
+    0x2153,  /* vulgar fraction one third                                    */
+    0x2154,  /* vulgar fraction two thirds                                   */
+    0x00bc,  /* vulgar fraction one quarter                                  */
+    0x00be,  /* vulgar fraction three quarters                               */
+    0x2155,  /* vulgar fraction one fifth                                    */
+    0x2156,  /* vulgar fraction two fifths                                   */
+    0x2157,  /* vulgar fraction three fifths                                 */
+    0x2158,  /* vulgar fraction four fifths                                  */
+    0x2159,  /* vulgar fraction one sixth                                    */
+    0x215a,  /* vulgar fraction five sixths                                  */
+    0x215b,  /* vulgar fraction one eighth                                   */
+    0x215c,  /* vulgar fraction three eighths                                */
+    0x215d,  /* vulgar fraction five eighths                                 */
+    0x215e,  /* vulgar fraction seven eighths                                */
+    0x215f,  /* fraction numerator one                                       */
+    0x2160,  /* roman numeral one                                            */
+    0x2161,  /* roman numeral two                                            */
+    0x2162,  /* roman numeral three                                          */
+    0x2163,  /* roman numeral four                                           */
+    0x2164,  /* roman numeral five                                           */
+    0x2165,  /* roman numeral six                                            */
+    0x2166,  /* roman numeral seven                                          */
+    0x2167,  /* roman numeral eight                                          */
+    0x2168,  /* roman numeral nine                                           */
+    0x2169,  /* roman numeral ten                                            */
+    0x216a,  /* roman numeral eleven                                         */
+    0x216b,  /* roman numeral twelve                                         */
+    0x216c,  /* roman numeral fifty                                          */
+    0x216d,  /* roman numeral one hundred                                    */
+    0x216e,  /* roman numeral five hundred                                   */
+    0x216f,  /* roman numeral one thousand                                   */
+    0x2170,  /* small roman numeral one                                      */
+    0x2171,  /* small roman numeral two                                      */
+    0x2172,  /* small roman numeral three                                    */
+    0x2173,  /* small roman numeral four                                     */
+    0x2174,  /* small roman numeral five                                     */
+    0x2175,  /* small roman numeral six                                      */
+    0x2176,  /* small roman numeral seven                                    */
+    0x2177,  /* small roman numeral eight                                    */
+    0x2178,  /* small roman numeral nine                                     */
+    0x2179,  /* small roman numeral ten                                      */
+    0x217a,  /* small roman numeral eleven                                   */
+    0x217b,  /* small roman numeral twelve                                   */
+    0x217c,  /* small roman numeral fifty                                    */
+    0x217d,  /* small roman numeral one hundred                              */
+    0x217e,  /* small roman numeral five hundred                             */
+    0x217f,  /* small roman numeral one thousand                             */
+    0x2180,  /* roman numeral one thousand c d                               */
+    0x2181,  /* roman numeral five thousand                                  */
+    0x2182,  /* roman numeral ten thousand                                   */
+    0x2183,  /* roman numeral reversed one hundred                           */
     0
 };
  
@@ -399,70 +494,7 @@ unicode_t parenthesized[] = {
 };
 
 unicode_t circled[] = {
-    0x2460,  /* circled number 1  */
-    0x2461,  /* circled number 2  */
-    0x2462,  /* circled number 3  */
-    0x2463,  /* circled number 4  */
-    0x2464,  /* circled number 5  */
-    0x2465,  /* circled number 6  */
-    0x2466,  /* circled number 7  */
-    0x2467,  /* circled number 8  */
-    0x2468,  /* circled number 9  */
-    0x2469,  /* circled number 10 */
-    0x246a,  /* circled number 11 */
-    0x246b,  /* circled number 12 */
-    0x246c,  /* circled number 13 */
-    0x246d,  /* circled number 14 */
-    0x246e,  /* circled number 15 */
-    0x246f,  /* circled number 16 */
-    0x2470,  /* circled number 17 */
-    0x2471,  /* circled number 18 */
-    0x2472,  /* circled number 19 */
-    0x2473,  /* circled number 20 */
-
-    0x3251,  /* circled number 21 */
-    0x3252,  /* circled number 22 */
-    0x3253,  /* circled number 23 */
-    0x3254,  /* circled number 24 */
-    0x3255,  /* circled number 25 */
-    0x3256,  /* circled number 26 */
-    0x3257,  /* circled number 27 */
-    0x3258,  /* circled number 28 */
-    0x3259,  /* circled number 29 */
-    0x325a,  /* circled number 30 */
-    0x325b,  /* circled number 31 */
-    0x325c,  /* circled number 32 */
-    0x325d,  /* circled number 33 */
-    0x325e,  /* circled number 34 */
-    0x325f,  /* circled number 35 */
-
-    0x32b1,  /* circled number 36 */
-    0x32b2,  /* circled number 37 */
-    0x32b3,  /* circled number 38 */
-    0x32b4,  /* circled number 39 */
-    0x32b5,  /* circled number 40 */
-    0x32b6,  /* circled number 41 */
-    0x32b7,  /* circled number 42 */
-    0x32b8,  /* circled number 43 */
-    0x32b9,  /* circled number 44 */
-    0x32ba,  /* circled number 45 */
-    0x32bb,  /* circled number 46 */
-    0x32bc,  /* circled number 47 */
-    0x32bd,  /* circled number 48 */
-    0x32be,  /* circled number 49 */
-    0x32bf,  /* circled number 50 */
-
-    0x2295,  /* circled plus                                                 */
-    0x2296,  /* circled minus                                                */
-    0x2297,  /* circled times                                                */
-    0x2298,  /* circled division slash                                       */
-    0x2299,  /* circled dot operator                                         */
-    0x229a,  /* circled ring operator                                        */
-    0x229b,  /* circled asterisk operator                                    */
-    0x229c,  /* circled equals                                               */
-    0x229d,  /* circled dash                                                 */
-    0x2389,  /* circled horizontal bar with notch                            */
-    0x238a,  /* circled triangle down                                        */
+    0x24ea,  /* circled digit zero                                           */
     0x2460,  /* circled digit one                                            */
     0x2461,  /* circled digit two                                            */
     0x2462,  /* circled digit three                                          */
@@ -483,6 +515,36 @@ unicode_t circled[] = {
     0x2471,  /* circled number eighteen                                      */
     0x2472,  /* circled number nineteen                                      */
     0x2473,  /* circled number twenty                                        */
+    0x3251,  /* circled number twenty one                                    */
+    0x3252,  /* circled number twenty two                                    */
+    0x3253,  /* circled number twenty three                                  */
+    0x3254,  /* circled number twenty four                                   */
+    0x3255,  /* circled number twenty five                                   */
+    0x3256,  /* circled number twenty six                                    */
+    0x3257,  /* circled number twenty seven                                  */
+    0x3258,  /* circled number twenty eight                                  */
+    0x3259,  /* circled number twenty nine                                   */
+    0x325a,  /* circled number thirty                                        */
+    0x325b,  /* circled number thirty one                                    */
+    0x325c,  /* circled number thirty two                                    */
+    0x325d,  /* circled number thirty three                                  */
+    0x325e,  /* circled number thirty four                                   */
+    0x325f,  /* circled number thirty five                                   */
+    0x32b1,  /* circled number thirty six                                    */
+    0x32b2,  /* circled number thirty seven                                  */
+    0x32b3,  /* circled number thirty eight                                  */
+    0x32b4,  /* circled number thirty nine                                   */
+    0x32b5,  /* circled number forty                                         */
+    0x32b6,  /* circled number forty one                                     */
+    0x32b7,  /* circled number forty two                                     */
+    0x32b8,  /* circled number forty three                                   */
+    0x32b9,  /* circled number forty four                                    */
+    0x32ba,  /* circled number forty five                                    */
+    0x32bb,  /* circled number forty six                                     */
+    0x32bc,  /* circled number forty seven                                   */
+    0x32bd,  /* circled number forty eight                                   */
+    0x32be,  /* circled number forty nine                                    */
+    0x32bf,  /* circled number fifty                                         */
     0x24b6,  /* circled latin capital letter a                               */
     0x24b7,  /* circled latin capital letter b                               */
     0x24b8,  /* circled latin capital letter c                               */
@@ -535,37 +597,6 @@ unicode_t circled[] = {
     0x24e7,  /* circled latin small letter x                                 */
     0x24e8,  /* circled latin small letter y                                 */
     0x24e9,  /* circled latin small letter z                                 */
-    0x24ea,  /* circled digit zero                                           */
-    0x272a,  /* circled white star                                           */
-    0x2742,  /* circled open centre eight pointed star                       */
-    0x27b2,  /* circled heavy white rightwards arrow                         */
-    0x29b6,  /* circled vertical bar                                         */
-    0x29b7,  /* circled parallel                                             */
-    0x29b8,  /* circled reverse solidus                                      */
-    0x29b9,  /* circled perpendicular                                        */
-    0x29bc,  /* circled anticlockwise-rotated division sign                  */
-    0x29be,  /* circled white bullet                                         */
-    0x29bf,  /* circled bullet                                               */
-    0x29c0,  /* circled less-than                                            */
-    0x29c1,  /* circled greater-than                                         */
-    0x2a36,  /* circled multiplication sign with circumflex accent           */
-    0x2a38,  /* circled division sign                                        */
-    0x3036,  /* circled postal mark                                          */
-    0x3251,  /* circled number twenty one                                    */
-    0x3252,  /* circled number twenty two                                    */
-    0x3253,  /* circled number twenty three                                  */
-    0x3254,  /* circled number twenty four                                   */
-    0x3255,  /* circled number twenty five                                   */
-    0x3256,  /* circled number twenty six                                    */
-    0x3257,  /* circled number twenty seven                                  */
-    0x3258,  /* circled number twenty eight                                  */
-    0x3259,  /* circled number twenty nine                                   */
-    0x325a,  /* circled number thirty                                        */
-    0x325b,  /* circled number thirty one                                    */
-    0x325c,  /* circled number thirty two                                    */
-    0x325d,  /* circled number thirty three                                  */
-    0x325e,  /* circled number thirty four                                   */
-    0x325f,  /* circled number thirty five                                   */
     0x3260,  /* circled hangul kiyeok                                        */
     0x3261,  /* circled hangul nieun                                         */
     0x3262,  /* circled hangul tikeut                                        */
@@ -643,23 +674,328 @@ unicode_t circled[] = {
     0x32ae,  /* circled ideograph resource                                   */
     0x32af,  /* circled ideograph alliance                                   */
     0x32b0,  /* circled ideograph night                                      */
-    0x32b1,  /* circled number thirty six                                    */
-    0x32b2,  /* circled number thirty seven                                  */
-    0x32b3,  /* circled number thirty eight                                  */
-    0x32b4,  /* circled number thirty nine                                   */
-    0x32b5,  /* circled number forty                                         */
-    0x32b6,  /* circled number forty one                                     */
-    0x32b7,  /* circled number forty two                                     */
-    0x32b8,  /* circled number forty three                                   */
-    0x32b9,  /* circled number forty four                                    */
-    0x32ba,  /* circled number forty five                                    */
-    0x32bb,  /* circled number forty six                                     */
-    0x32bc,  /* circled number forty seven                                   */
-    0x32bd,  /* circled number forty eight                                   */
-    0x32be,  /* circled number forty nine                                    */
-    0x32bf,  /* circled number fifty                                         */
     0
 };                                            
+
+unicode_t math1[] = {                      
+    0x00b1,  /* plus-minus sign                                              */
+    0x00d7,  /* multiplication sign                                          */
+    0x00f7,  /* division sign                                                */
+    0x2200,  /* for all                                                      */
+    0x2201,  /* complement                                                   */
+    0x2202,  /* partial differential                                         */
+    0x2203,  /* there exists                                                 */
+    0x2204,  /* there does not exist                                         */
+    0x2205,  /* empty set                                                    */
+    0x2206,  /* increment                                                    */
+    0x2207,  /* nabla                                                        */
+    0x2208,  /* element of                                                   */
+    0x2209,  /* not an element of                                            */
+    0x220a,  /* small element of                                             */
+    0x220b,  /* contains as member                                           */
+    0x220c,  /* does not contain as member                                   */
+    0x220d,  /* small contains as member                                     */
+    0x220e,  /* end of proof                                                 */
+    0x220f,  /* n-ary product                                                */
+    0x2210,  /* n-ary coproduct                                              */
+    0x2211,  /* n-ary summation                                              */
+    0x2212,  /* minus sign                                                   */
+    0x2213,  /* minus-or-plus sign                                           */
+    0x2214,  /* dot plus                                                     */
+    0x2215,  /* division slash                                               */
+    0x2216,  /* set minus                                                    */
+    0x2217,  /* asterisk operator                                            */
+    0x2218,  /* ring operator                                                */
+    0x2219,  /* bullet operator                                              */
+    0x221a,  /* square root                                                  */
+    0x221b,  /* cube root                                                    */
+    0x221c,  /* fourth root                                                  */
+    0x221d,  /* proportional to                                              */
+    0x221e,  /* infinity                                                     */
+    0x221f,  /* right angle                                                  */
+    0x2220,  /* angle                                                        */
+    0x2221,  /* measured angle                                               */
+    0x2222,  /* spherical angle                                              */
+    0x2223,  /* divides                                                      */
+    0x2224,  /* does not divide                                              */
+    0x2225,  /* parallel to                                                  */
+    0x2226,  /* not parallel to                                              */
+    0x2227,  /* logical and                                                  */
+    0x2228,  /* logical or                                                   */
+    0x2229,  /* intersection                                                 */
+    0x222a,  /* union                                                        */
+    0x222b,  /* integral                                                     */
+    0x222c,  /* double integral                                              */
+    0x222d,  /* triple integral                                              */
+    0x222e,  /* contour integral                                             */
+    0x222f,  /* surface integral                                             */
+    0x2230,  /* volume integral                                              */
+    0x2231,  /* clockwise integral                                           */
+    0x2232,  /* clockwise contour integral                                   */
+    0x2233,  /* anticlockwise contour integral                               */
+    0x2234,  /* therefore                                                    */
+    0x2235,  /* because                                                      */
+    0x2236,  /* ratio                                                        */
+    0x2237,  /* proportion                                                   */
+    0x2238,  /* dot minus                                                    */
+    0x2239,  /* excess                                                       */
+    0x223a,  /* geometric proportion                                         */
+    0x223b,  /* homothetic                                                   */
+    0x223c,  /* tilde operator                                               */
+    0x223d,  /* reversed tilde                                               */
+    0x223e,  /* inverted lazy s                                              */
+    0x223f,  /* sine wave                                                    */
+    0x2240,  /* wreath product                                               */
+    0x2241,  /* not tilde                                                    */
+    0x2242,  /* minus tilde                                                  */
+    0x2243,  /* asymptotically equal to                                      */
+    0x2244,  /* not asymptotically equal to                                  */
+    0x2245,  /* approximately equal to                                       */
+    0x2246,  /* approximately but not actually equal to                      */
+    0x2247,  /* neither approximately nor actually equal to                  */
+    0x2248,  /* almost equal to                                              */
+    0x2249,  /* not almost equal to                                          */
+    0x224a,  /* almost equal or equal to                                     */
+    0x224b,  /* triple tilde                                                 */
+    0x224c,  /* all equal to                                                 */
+    0x224d,  /* equivalent to                                                */
+    0x224e,  /* geometrically equivalent to                                  */
+    0x224f,  /* difference between                                           */
+    0x2250,  /* approaches the limit                                         */
+    0x2251,  /* geometrically equal to                                       */
+    0x2252,  /* approximately equal to or the image of                       */
+    0x2253,  /* image of or approximately equal to                           */
+    0x2254,  /* colon equals                                                 */
+    0x2255,  /* equals colon                                                 */
+    0x2256,  /* ring in equal to                                             */
+    0x2257,  /* ring equal to                                                */
+    0x2258,  /* corresponds to                                               */
+    0x2259,  /* estimates                                                    */
+    0x225a,  /* equiangular to                                               */
+    0x225b,  /* star equals                                                  */
+    0x225c,  /* delta equal to                                               */
+    0x225d,  /* equal to by definition                                       */
+    0x225e,  /* measured by                                                  */
+    0x225f,  /* questioned equal to                                          */
+    0x2260,  /* not equal to                                                 */
+    0x2261,  /* identical to                                                 */
+    0x2262,  /* not identical to                                             */
+    0x2263,  /* strictly equivalent to                                       */
+    0x2264,  /* less-than or equal to                                        */
+    0x2265,  /* greater-than or equal to                                     */
+    0x2266,  /* less-than over equal to                                      */
+    0x2267,  /* greater-than over equal to                                   */
+    0x2268,  /* less-than but not equal to                                   */
+    0x2269,  /* greater-than but not equal to                                */
+    0x226a,  /* much less-than                                               */
+    0x226b,  /* much greater-than                                            */
+    0x226c,  /* between                                                      */
+    0x226d,  /* not equivalent to                                            */
+    0x226e,  /* not less-than                                                */
+    0x226f,  /* not greater-than                                             */
+    0x2270,  /* neither less-than nor equal to                               */
+    0x2271,  /* neither greater-than nor equal to                            */
+    0x2272,  /* less-than or equivalent to                                   */
+    0x2273,  /* greater-than or equivalent to                                */
+    0x2274,  /* neither less-than nor equivalent to                          */
+    0x2275,  /* neither greater-than nor equivalent to                       */
+    0x2276,  /* less-than or greater-than                                    */
+    0x2277,  /* greater-than or less-than                                    */
+    0x2278,  /* neither less-than nor greater-than                           */
+    0x2279,  /* neither greater-than nor less-than                           */
+    0x227a,  /* precedes                                                     */
+    0x227b,  /* succeeds                                                     */
+    0x227c,  /* precedes or equal to                                         */
+    0x227d,  /* succeeds or equal to                                         */
+    0x227e,  /* precedes or equivalent to                                    */
+    0x227f,  /* succeeds or equivalent to                                    */
+    0x2280,  /* does not precede                                             */
+    0x2281,  /* does not succeed                                             */
+    0
+};
+
+unicode_t math2[] = {                      
+    0x2282,  /* subset of                                                    */
+    0x2283,  /* superset of                                                  */
+    0x2284,  /* not a subset of                                              */
+    0x2285,  /* not a superset of                                            */
+    0x2286,  /* subset of or equal to                                        */
+    0x2287,  /* superset of or equal to                                      */
+    0x2288,  /* neither a subset of nor equal to                             */
+    0x2289,  /* neither a superset of nor equal to                           */
+    0x228a,  /* subset of with not equal to                                  */
+    0x228b,  /* superset of with not equal to                                */
+    0x228c,  /* multiset                                                     */
+    0x228d,  /* multiset multiplication                                      */
+    0x228e,  /* multiset union                                               */
+    0x228f,  /* square image of                                              */
+    0x2290,  /* square original of                                           */
+    0x2291,  /* square image of or equal to                                  */
+    0x2292,  /* square original of or equal to                               */
+    0x2293,  /* square cap                                                   */
+    0x2294,  /* square cup                                                   */
+    0x2295,  /* circled plus                                                 */
+    0x2296,  /* circled minus                                                */
+    0x2297,  /* circled times                                                */
+    0x2298,  /* circled division slash                                       */
+    0x2299,  /* circled dot operator                                         */
+    0x229a,  /* circled ring operator                                        */
+    0x229b,  /* circled asterisk operator                                    */
+    0x229c,  /* circled equals                                               */
+    0x229d,  /* circled dash                                                 */
+    0x229e,  /* squared plus                                                 */
+    0x229f,  /* squared minus                                                */
+    0x22a0,  /* squared times                                                */
+    0x22a1,  /* squared dot operator                                         */
+    0x22a2,  /* right tack                                                   */
+    0x22a3,  /* left tack                                                    */
+    0x22a4,  /* down tack                                                    */
+    0x22a5,  /* up tack                                                      */
+    0x22a6,  /* assertion                                                    */
+    0x22a7,  /* models                                                       */
+    0x22a8,  /* true                                                         */
+    0x22a9,  /* forces                                                       */
+    0x22aa,  /* triple vertical bar right turnstile                          */
+    0x22ab,  /* double vertical bar double right turnstile                   */
+    0x22ac,  /* does not prove                                               */
+    0x22ad,  /* not true                                                     */
+    0x22ae,  /* does not force                                               */
+    0x22af,  /* negated double vertical bar double right turnstile           */
+    0x22b0,  /* precedes under relation                                      */
+    0x22b1,  /* succeeds under relation                                      */
+    0x22b2,  /* normal subgroup of                                           */
+    0x22b3,  /* contains as normal subgroup                                  */
+    0x22b4,  /* normal subgroup of or equal to                               */
+    0x22b5,  /* contains as normal subgroup or equal to                      */
+    0x22b6,  /* original of                                                  */
+    0x22b7,  /* image of                                                     */
+    0x22b8,  /* multimap                                                     */
+    0x22b9,  /* hermitian conjugate matrix                                   */
+    0x22ba,  /* intercalate                                                  */
+    0x22bb,  /* xor                                                          */
+    0x22bc,  /* nand                                                         */
+    0x22bd,  /* nor                                                          */
+    0x22be,  /* right angle with arc                                         */
+    0x22bf,  /* right triangle                                               */
+    0x22c0,  /* n-ary logical and                                            */
+    0x22c1,  /* n-ary logical or                                             */
+    0x22c2,  /* n-ary intersection                                           */
+    0x22c3,  /* n-ary union                                                  */
+    0x22c4,  /* diamond operator                                             */
+    0x22c5,  /* dot operator                                                 */
+    0x22c6,  /* star operator                                                */
+    0x22c7,  /* division times                                               */
+    0x22c8,  /* bowtie                                                       */
+    0x22c9,  /* left normal factor semidirect product                        */
+    0x22ca,  /* right normal factor semidirect product                       */
+    0x22cb,  /* left semidirect product                                      */
+    0x22cc,  /* right semidirect product                                     */
+    0x22cd,  /* reversed tilde equals                                        */
+    0x22ce,  /* curly logical or                                             */
+    0x22cf,  /* curly logical and                                            */
+    0x22d0,  /* double subset                                                */
+    0x22d1,  /* double superset                                              */
+    0x22d2,  /* double intersection                                          */
+    0x22d3,  /* double union                                                 */
+    0x22d4,  /* pitchfork                                                    */
+    0x22d5,  /* equal and parallel to                                        */
+    0x22d6,  /* less-than with dot                                           */
+    0x22d7,  /* greater-than with dot                                        */
+    0x22d8,  /* very much less-than                                          */
+    0x22d9,  /* very much greater-than                                       */
+    0x22da,  /* less-than equal to or greater-than                           */
+    0x22db,  /* greater-than equal to or less-than                           */
+    0x22dc,  /* equal to or less-than                                        */
+    0x22dd,  /* equal to or greater-than                                     */
+    0x22de,  /* equal to or precedes                                         */
+    0x22df,  /* equal to or succeeds                                         */
+    0x22e0,  /* does not precede or equal                                    */
+    0x22e1,  /* does not succeed or equal                                    */
+    0x22e2,  /* not square image of or equal to                              */
+    0x22e3,  /* not square original of or equal to                           */
+    0x22e4,  /* square image of or not equal to                              */
+    0x22e5,  /* square original of or not equal to                           */
+    0x22e6,  /* less-than but not equivalent to                              */
+    0x22e7,  /* greater-than but not equivalent to                           */
+    0x22e8,  /* precedes but not equivalent to                               */
+    0x22e9,  /* succeeds but not equivalent to                               */
+    0x22ea,  /* not normal subgroup of                                       */
+    0x22eb,  /* does not contain as normal subgroup                          */
+    0x22ec,  /* not normal subgroup of or equal to                           */
+    0x22ed,  /* does not contain as normal subgroup or equal                 */
+    0x22ee,  /* vertical ellipsis                                            */
+    0x22ef,  /* midline horizontal ellipsis                                  */
+    0x22f0,  /* up right diagonal ellipsis                                   */
+    0x22f1,  /* down right diagonal ellipsis                                 */
+    0x22f2,  /* element of with long horizontal stroke                       */
+    0x22f3,  /* element of with vertical bar at end of horizontal stroke     */
+    0x22f4,  /* small element of with vertical bar at end of horizontal strok*/
+    0x22f5,  /* element of with dot above                                    */
+    0x22f6,  /* element of with overbar                                      */
+    0x22f7,  /* small element of with overbar                                */
+    0x22f8,  /* element of with underbar                                     */
+    0x22f9,  /* element of with two horizontal strokes                       */
+    0x22fa,  /* contains with long horizontal stroke                         */
+    0x22fb,  /* contains with vertical bar at end of horizontal stroke       */
+    0x22fc,  /* small contains with vertical bar at end of horizontal stroke */
+    0x22fd,  /* contains with overbar                                        */
+    0x22fe,  /* small contains with overbar                                  */
+    0x22ff,  /* z notation bag membership                                    */
+    0
+};
+
+unicode_t greek[] = {                      
+    0x0391,  /* greek capital letter alpha                                   */
+    0x0392,  /* greek capital letter beta                                    */
+    0x0393,  /* greek capital letter gamma                                   */
+    0x0394,  /* greek capital letter delta                                   */
+    0x0395,  /* greek capital letter epsilon                                 */
+    0x0396,  /* greek capital letter zeta                                    */
+    0x0397,  /* greek capital letter eta                                     */
+    0x0398,  /* greek capital letter theta                                   */
+    0x0399,  /* greek capital letter iota                                    */
+    0x039a,  /* greek capital letter kappa                                   */
+    0x039b,  /* greek capital letter lamda                                   */
+    0x039c,  /* greek capital letter mu                                      */
+    0x039d,  /* greek capital letter nu                                      */
+    0x039e,  /* greek capital letter xi                                      */
+    0x039f,  /* greek capital letter omicron                                 */
+    0x03a0,  /* greek capital letter pi                                      */
+    0x03a1,  /* greek capital letter rho                                     */
+    0x03a3,  /* greek capital letter sigma                                   */
+    0x03a4,  /* greek capital letter tau                                     */
+    0x03a5,  /* greek capital letter upsilon                                 */
+    0x03a6,  /* greek capital letter phi                                     */
+    0x03a7,  /* greek capital letter chi                                     */
+    0x03a8,  /* greek capital letter psi                                     */
+    0x03a9,  /* greek capital letter omega                                   */
+    0x03b1,  /* greek small letter alpha                                     */
+    0x03b2,  /* greek small letter beta                                      */
+    0x03b3,  /* greek small letter gamma                                     */
+    0x03b4,  /* greek small letter delta                                     */
+    0x03b5,  /* greek small letter epsilon                                   */
+    0x03b6,  /* greek small letter zeta                                      */
+    0x03b7,  /* greek small letter eta                                       */
+    0x03b8,  /* greek small letter theta                                     */
+    0x03b9,  /* greek small letter iota                                      */
+    0x03ba,  /* greek small letter kappa                                     */
+    0x03bb,  /* greek small letter lamda                                     */
+    0x03bc,  /* greek small letter mu                                        */
+    0x03bd,  /* greek small letter nu                                        */
+    0x03be,  /* greek small letter xi                                        */
+    0x03bf,  /* greek small letter omicron                                   */
+    0x03c0,  /* greek small letter pi                                        */
+    0x03c1,  /* greek small letter rho                                       */
+    0x03c2,  /* greek small letter final sigma                               */
+    0x03c3,  /* greek small letter sigma                                     */
+    0x03c4,  /* greek small letter tau                                       */
+    0x03c5,  /* greek small letter upsilon                                   */
+    0x03c6,  /* greek small letter phi                                       */
+    0x03c7,  /* greek small letter chi                                       */
+    0x03c8,  /* greek small letter psi                                       */
+    0x03c9,  /* greek small letter omega                                     */
+    0
+};
 
 unicode_t hangul_cjamo[] = {                      
     0x3131,  /* hangul letter kiyeok              */
@@ -977,20 +1313,125 @@ unicode_t hiragana[] = {
     0
 };
 
+unicode_t shapes[] = {
+    0x25a0,  /* black square                                                 */
+    0x25a1,  /* white square                                                 */
+    0x25a2,  /* white square with rounded corners                            */
+    0x25a3,  /* white square containing black small square                   */
+    0x25a4,  /* square with horizontal fill                                  */
+    0x25a5,  /* square with vertical fill                                    */
+    0x25a6,  /* square with orthogonal crosshatch fill                       */
+    0x25a7,  /* square with upper left to lower right fill                   */
+    0x25a8,  /* square with upper right to lower left fill                   */
+    0x25a9,  /* square with diagonal crosshatch fill                         */
+    0x25aa,  /* black small square                                           */
+    0x25ab,  /* white small square                                           */
+    0x25ac,  /* black rectangle                                              */
+    0x25ad,  /* white rectangle                                              */
+    0x25ae,  /* black vertical rectangle                                     */
+    0x25af,  /* white vertical rectangle                                     */
+    0x25b0,  /* black parallelogram                                          */
+    0x25b1,  /* white parallelogram                                          */
+    0x25b2,  /* black up-pointing triangle                                   */
+    0x25b3,  /* white up-pointing triangle                                   */
+    0x25b4,  /* black up-pointing small triangle                             */
+    0x25b5,  /* white up-pointing small triangle                             */
+    0x25b6,  /* black right-pointing triangle                                */
+    0x25b7,  /* white right-pointing triangle                                */
+    0x25b8,  /* black right-pointing small triangle                          */
+    0x25b9,  /* white right-pointing small triangle                          */
+    0x25ba,  /* black right-pointing pointer                                 */
+    0x25bb,  /* white right-pointing pointer                                 */
+    0x25bc,  /* black down-pointing triangle                                 */
+    0x25bd,  /* white down-pointing triangle                                 */
+    0x25be,  /* black down-pointing small triangle                           */
+    0x25bf,  /* white down-pointing small triangle                           */
+    0x25c0,  /* black left-pointing triangle                                 */
+    0x25c1,  /* white left-pointing triangle                                 */
+    0x25c2,  /* black left-pointing small triangle                           */
+    0x25c3,  /* white left-pointing small triangle                           */
+    0x25c4,  /* black left-pointing pointer                                  */
+    0x25c5,  /* white left-pointing pointer                                  */
+    0x25c6,  /* black diamond                                                */
+    0x25c7,  /* white diamond                                                */
+    0x25c8,  /* white diamond containing black small diamond                 */
+    0x25c9,  /* fisheye                                                      */
+    0x25ca,  /* lozenge                                                      */
+    0x25cb,  /* white circle                                                 */
+    0x25cc,  /* dotted circle                                                */
+    0x25cd,  /* circle with vertical fill                                    */
+    0x25ce,  /* bullseye                                                     */
+    0x25cf,  /* black circle                                                 */
+    0x25d0,  /* circle with left half black                                  */
+    0x25d1,  /* circle with right half black                                 */
+    0x25d2,  /* circle with lower half black                                 */
+    0x25d3,  /* circle with upper half black                                 */
+    0x25d4,  /* circle with upper right quadrant black                       */
+    0x25d5,  /* circle with all but upper left quadrant black                */
+    0x25d6,  /* left half black circle                                       */
+    0x25d7,  /* right half black circle                                      */
+    0x25d8,  /* inverse bullet                                               */
+    0x25d9,  /* inverse white circle                                         */
+    0x25da,  /* upper half inverse white circle                              */
+    0x25db,  /* lower half inverse white circle                              */
+    0x25dc,  /* upper left quadrant circular arc                             */
+    0x25dd,  /* upper right quadrant circular arc                            */
+    0x25de,  /* lower right quadrant circular arc                            */
+    0x25df,  /* lower left quadrant circular arc                             */
+    0x25e0,  /* upper half circle                                            */
+    0x25e1,  /* lower half circle                                            */
+    0x25e2,  /* black lower right triangle                                   */
+    0x25e3,  /* black lower left triangle                                    */
+    0x25e4,  /* black upper left triangle                                    */
+    0x25e5,  /* black upper right triangle                                   */
+    0x25e6,  /* white bullet                                                 */
+    0x25e7,  /* square with left half black                                  */
+    0x25e8,  /* square with right half black                                 */
+    0x25e9,  /* square with upper left diagonal half black                   */
+    0x25ea,  /* square with lower right diagonal half black                  */
+    0x25eb,  /* white square with vertical bisecting line                    */
+    0x25ec,  /* white up-pointing triangle with dot                          */
+    0x25ed,  /* up-pointing triangle with left half black                    */
+    0x25ee,  /* up-pointing triangle with right half black                   */
+    0x25ef,  /* large circle                                                 */
+    0x25f0,  /* white square with upper left quadrant                        */
+    0x25f1,  /* white square with lower left quadrant                        */
+    0x25f2,  /* white square with lower right quadrant                       */
+    0x25f3,  /* white square with upper right quadrant                       */
+    0x25f4,  /* white circle with upper left quadrant                        */
+    0x25f5,  /* white circle with lower left quadrant                        */
+    0x25f6,  /* white circle with lower right quadrant                       */
+    0x25f7,  /* white circle with upper right quadrant                       */
+    0x25f8,  /* upper left triangle                                          */
+    0x25f9,  /* upper right triangle                                         */
+    0x25fa,  /* lower left triangle                                          */
+    0x25fb,  /* white medium square                                          */
+    0x25fc,  /* black medium square                                          */
+    0x25fd,  /* white medium small square                                    */
+    0x25fe,  /* black medium small square                                    */
+    0x25ff,  /* lower right triangle                                         */
+    0
+};
+
 struct table_item {
     char* name;
     unicode_t* list;
 };
 
 struct table_item char_table[] = {
-    { "\354\235\274\353\260\230\352\270\260\355\230\270", symbols       },
     { "\353\254\270\354\236\245\353\266\200\355\230\270", punctuation   },
-    { "\353\254\270\354\236\245\353\266\200\355\230\270", char_symbol   },
+    { "\352\270\200\354\236\220\352\270\260\355\230\270", char_symbol   },
+    { "\354\210\253\354\236\220\352\270\260\355\230\270", number_form   },
     { "\352\264\204\355\230\270\352\270\200\354\236\220", parenthesized },
     { "\354\233\220\352\270\200\354\236\220",             circled       },
+    { "\354\210\230\355\225\231\352\270\260\355\230\270 1", math1       },
+    { "\354\210\230\355\225\231\352\270\260\355\230\270 2", math2       },
     { "\355\225\234\352\270\200\353\202\261\354\236\220", hangul_cjamo  },
+    { "\352\267\270\353\246\254\354\212\244\353\254\270\354\236\220", greek  },
     { "\352\260\200\355\203\200\352\260\200\353\202\230", katakana      },
     { "\355\236\210\353\235\274\352\260\200\353\202\230", hiragana      },
+    { "\354\235\274\353\260\230\352\270\260\355\230\270", symbols       },
+    { "\353\252\250\354\226\221\352\270\200\354\236\220", shapes        },
     { NULL,						  NULL	        }
 };
  
