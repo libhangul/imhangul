@@ -437,9 +437,13 @@ im_hangul_set_client_window (GtkIMContext *context,
   GtkIMContextHangul *hcontext;
 
   g_return_if_fail (GTK_IS_IM_CONTEXT_HANGUL (context));
-  g_return_if_fail (GDK_IS_WINDOW (client_window));
 
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
+
+  if (client_window == NULL) {
+    hcontext->toplevel = NULL;
+    return;
+  }
 
   /* find toplevel window (GtkWidget) */
   hcontext->toplevel = get_toplevel_window (client_window);
@@ -1600,11 +1604,6 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   GtkWidget *frame;
   GtkWidget *label;
   StatusWindow *status_window;
-
-  /*
-  if (!pref_use_status_window)
-    return NULL;
-    */
 
   toplevel = hcontext->toplevel;
   if (toplevel == NULL)
