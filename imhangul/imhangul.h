@@ -44,8 +44,10 @@
 #include <gtk/gtkeventbox.h>
 #include <gtk/gtkframe.h>
 #include <gtk/gtklabel.h>
+#include <gtk/gtkvbox.h>
 #include <gtk/gtkhbox.h>
 #include <gtk/gtktable.h>
+#include <gtk/gtknotebook.h>
 #include <gtk/gtkwindow.h>
 #include <gtk/gtkimcontext.h>
 
@@ -107,25 +109,11 @@ static void im_hangul_set_automata(GtkIMContextHangul *hcontext,
 				   GtkIMContextHangulAutomata automata);
 
 /* asistant function for hangul automata */
-#define is_set(state, mask)		((state & mask) == mask)
-#define im_hangul_is_modifier(state)	(is_set(state, GDK_CONTROL_MASK) || \
-					 is_set(state, GDK_MOD1_MASK))
+#define im_hangul_is_modifier(state)	((state & GDK_CONTROL_MASK) || \
+					 (state & GDK_MOD1_MASK))
 #define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1159)
 #define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x11A2)
 #define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11F9)
-
-/* asistant function for hangul_context */
-/*
-#define get_cho(ctx)  (((ctx)->lindex >= 0) ? \
-                                (ctx)->choseong[(ctx)->lindex] : 0)
-#define get_jung(ctx) (((ctx)->vindex >= 0) ? \
-                                (ctx)->jungseong[(ctx)->vindex] : 0)
-#define get_jong(ctx) (((ctx)->tindex >= 0) ? \
-                                (ctx)->jongseong[(ctx)->tindex] : 0)
-#define put_cho(ctx,ch)  ((ctx)->choseong[++((ctx)->lindex)] = ch)
-#define put_jung(ctx,ch) ((ctx)->jungseong[++((ctx)->vindex)] = ch)
-#define put_jong(ctx,ch) ((ctx)->jongseong[++((ctx)->tindex)] = ch)
-*/
 
 #define im_hangul_is_empty(ctx)		((ctx)->choseong[0]  == 0 &&	\
 					 (ctx)->jungseong[0] == 0 &&	\
@@ -149,18 +137,22 @@ static gboolean	im_hangul_commit	(GtkIMContextHangul *hcontext);
 static void	im_hangul_commit_utf8	(GtkIMContextHangul *hcontext,
 					 gchar *utf8);
 static gboolean im_hangul_process_nonhangul(GtkIMContextHangul *hcontext,
-						 GdkEventKey *key);
+					    GdkEventKey *key);
 static void im_hangul_class_init	(GtkIMContextHangulClass *klass);
 static void im_hangul_init		(GtkIMContextHangul *hcontext);
 static void im_hangul_finalize		(GObject *obj);
 
 static gboolean	im_hangul_filter_keypress(GtkIMContext *context,
-					      GdkEventKey *key);
+				          GdkEventKey *key);
 
-static void im_hangul_preedit_underline (PangoAttrList **attrs, gint start, gint end);
-static void im_hangul_preedit_foreground (PangoAttrList **attrs, gint start, gint end);
-static void im_hangul_preedit_background (PangoAttrList **attrs, gint start, gint end);
-static void im_hangul_preedit_nothing (PangoAttrList **attrs, gint start, gint end);
+static void im_hangul_preedit_underline		(PangoAttrList **attrs,
+    						 gint start, gint end);
+static void im_hangul_preedit_foreground 	(PangoAttrList **attrs,
+    						 gint start, gint end);
+static void im_hangul_preedit_background	(PangoAttrList **attrs,
+    						 gint start, gint end);
+static void im_hangul_preedit_nothing 		(PangoAttrList **attrs,
+    						 gint start, gint end);
 static void im_hangul_get_preedit_string(GtkIMContext *ic,
 					 gchar **str,
 					 PangoAttrList **attrs,
@@ -171,12 +163,12 @@ static void im_hangul_focus_out	(GtkIMContext *context);
 static GtkWidget* get_toplevel_window (GdkWindow *window);
 static void im_hangul_set_client_window	(GtkIMContext *context,
 				         GdkWindow *client_window);
-static void status_window_show     (GtkIMContextHangul *hcontext);
-static void status_window_hide     (GtkIMContextHangul *hcontext);
+static void status_window_show      (GtkIMContextHangul *hcontext);
+static void status_window_hide      (GtkIMContextHangul *hcontext);
 static void status_window_set_label (GtkIMContextHangul *hcontext);
 
 static void popup_hanja_window	   (GtkIMContextHangul *hcontext);
-
+static void popup_char_table_window      (GtkIMContextHangul *hcontext);
 
 /*
  * global variables for hangul immodule
@@ -184,8 +176,10 @@ static void popup_hanja_window	   (GtkIMContextHangul *hcontext);
 
 static GObjectClass *parent_class;
 
+static GtkIMContextHangul *current_context = NULL;
 static GSList *status_windows = NULL;
 static GtkWidget *hanja_window = NULL;
+static GtkWidget *char_table_window = NULL;
 
 enum {
   INPUT_MODE_DIRECT,
@@ -199,8 +193,10 @@ enum {
   INPUT_MODE_INFO_HANGUL
 } IMHangulInputModeInfo;
 
-#define STATE_DIRECT            -1 
-#define STATE_HANGUL            0 
+enum {
+  STATE_DIRECT,
+  STATE_HANGUL
+};
 
 #define OUTPUT_MODE_AUTOMATIC   0 
 #define OUTPUT_MODE_MANUAL      1
@@ -296,7 +292,7 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
     gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-status",
   						         "Status Window",
 						         "Whether to show status window or not",
-						         TRUE,
+						         FALSE,
 						         G_PARAM_READWRITE));
   if (!have_property("gtk-imhangul-use-capslock"))
     gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-use-capslock",
@@ -397,6 +393,10 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 static void
 im_hangul_finalize(GObject *obj)
 {
+  GtkIMContextHangul* hcontext = GTK_IM_CONTEXT_HANGUL(obj);
+
+  if (hcontext == current_context)
+    current_context = NULL;
   parent_class->finalize (obj);
 }
 
@@ -447,12 +447,12 @@ im_hangul_set_client_window(GtkIMContext *context,
         pref_fg.red 	= style->text[GTK_STATE_NORMAL].red;
         pref_fg.green 	= style->text[GTK_STATE_NORMAL].green;
         pref_fg.blue 	= style->text[GTK_STATE_NORMAL].blue;
-        pref_bg.red 	= (style->base[GTK_STATE_NORMAL].red * 80 + 
-      			   style->text[GTK_STATE_NORMAL].red * 20) / 100;
-        pref_bg.green 	= (style->base[GTK_STATE_NORMAL].green * 80 + 
-        	           style->text[GTK_STATE_NORMAL].green * 20) / 100;
-        pref_bg.blue 	= (style->base[GTK_STATE_NORMAL].blue * 80 + 
-        	           style->text[GTK_STATE_NORMAL].blue * 20) / 100;
+        pref_bg.red 	= (style->base[GTK_STATE_NORMAL].red   * 90 + 
+      			   style->text[GTK_STATE_NORMAL].red   * 10) / 100;
+        pref_bg.green 	= (style->base[GTK_STATE_NORMAL].green * 90 + 
+        	           style->text[GTK_STATE_NORMAL].green * 10) / 100;
+        pref_bg.blue 	= (style->base[GTK_STATE_NORMAL].blue  * 90 + 
+        	           style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
 	break;
       default:
         pref_fg.red 	= style->text[GTK_STATE_NORMAL].red;
@@ -800,7 +800,6 @@ im_hangul_preedit_background (PangoAttrList **attrs, gint start, gint end)
   pango_attr_list_insert (*attrs, attr);
 
   attr = pango_attr_background_new(pref_bg.red, pref_bg.green, pref_bg.blue);
-  //attr = pango_attr_background_new(0xCCCC, 0xCCCC, 0xCCCC);
   attr->start_index = start;
   attr->end_index = end;
   pango_attr_list_insert (*attrs, attr);
@@ -853,6 +852,7 @@ im_hangul_focus_in(GtkIMContext *context)
       hcontext->state = STATE_HANGUL;
   }
 
+  current_context = hcontext;
   status_window_show(hcontext);
 }
 
@@ -867,6 +867,7 @@ im_hangul_focus_out(GtkIMContext *context)
       hcontext->state = STATE_HANGUL;
     }
   }
+
   status_window_hide(hcontext);
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
 }
@@ -887,7 +888,7 @@ static gboolean
 im_hangul_is_trigger(GdkEventKey *key)
 {
   return ( key->keyval == GDK_Hangul || 
-	  (key->keyval == GDK_space && is_set(key->state, GDK_SHIFT_MASK)));
+	  (key->keyval == GDK_space && (key->state & GDK_SHIFT_MASK)));
 }
 
 static gboolean
@@ -1212,11 +1213,15 @@ im_hangul_mapping(guint keyval, guint state)
   if (keyboard_table == NULL)
     return 0;
 
+  /* treat for dvorak */
+  if (pref_use_dvorak)
+    keyval = im_hangul_dvorak_to_qwerty(keyval);
+
   /* hangul jamo keysym */
   if (keyval >= 0x01001100 && keyval <= 0x010011ff)
     return keyval & 0x0000ffff;
 
-  if (keyval >= GDK_exclam  && keyval <= GDK_asciitilde) {
+  if (keyval >= GDK_exclam && keyval <= GDK_asciitilde) {
     /* treat capslock, as capslock is not on */
     if (state & GDK_LOCK_MASK) {
       if (state & GDK_SHIFT_MASK) {
@@ -1228,8 +1233,9 @@ im_hangul_mapping(guint keyval, guint state)
       }
     }
     return keyboard_table[keyval - GDK_exclam];
-  } else
-    return 0;
+  }
+
+  return 0;
 }
 
 /* use hangul automata */
@@ -1247,7 +1253,7 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return FALSE;
 
   /* on Ctrl-Hangul we turn on/off manual_mode */
-  if (key->keyval == GDK_Hangul && key->state & GDK_CONTROL_MASK)
+  if (key->keyval == GDK_Hangul && (key->state & GDK_CONTROL_MASK))
     manual_mode = !manual_mode;
 
   /* on capslock, we use Hangul Jamo */
@@ -1288,6 +1294,23 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return TRUE;
   }
 
+  /* char table */
+  if (key->keyval == GDK_F3 || (
+      key->keyval == GDK_Hangul_Hanja && (key->state & GDK_CONTROL_MASK))) {
+    if (im_hangul_commit(hcontext))
+      g_signal_emit_by_name (hcontext, "preedit_changed");
+    popup_char_table_window(hcontext);
+    return TRUE;
+  }
+
+  /* trigger key: mode change to direct mode */
+  if (im_hangul_is_trigger(key)) {
+    if (im_hangul_commit(hcontext))
+      g_signal_emit_by_name(hcontext, "preedit_changed");
+    im_hangul_mode_direct(hcontext);
+    return TRUE;
+  }
+
   /* here we must hangul mode, so set STATE_HANGUL
    * static variable input_mode is not yet applied so we change it
    * below line must not removed */
@@ -1298,8 +1321,10 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
 
   if (hcontext->automata)
     return hcontext->automata(hcontext, key);
-  else
+  else {
+    g_print("imhangul: null automata\n");
     return FALSE;
+  }
 }
 
 
@@ -1576,7 +1601,7 @@ get_index_of_hanjatable(gunichar ch)
 }
 
 static gboolean
-on_keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
+on_hanja_window_keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
   if (event->keyval == GDK_Escape) {
     gtk_widget_destroy(hanja_window);
@@ -1586,7 +1611,7 @@ on_keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
 }
 
 static void
-on_destroy(GtkWidget *widget, gpointer data)
+on_hanja_window_destroy(GtkWidget *widget, gpointer data)
 {
   gtk_grab_remove(widget);
   hanja_window = NULL;
@@ -1631,7 +1656,7 @@ create_hanja_window(GtkIMContextHangul *hcontext, gunichar ch)
 
   hanja_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   window = hanja_window;
-  table = gtk_table_new(10, 1, TRUE);
+  table = gtk_table_new(1, 10, TRUE);
 
   if (pref_hanja_font)
     desc = pango_font_description_from_string(pref_hanja_font);
@@ -1674,9 +1699,9 @@ create_hanja_window(GtkIMContextHangul *hcontext, gunichar ch)
   gtk_container_add(GTK_CONTAINER(window), table);
 
   g_signal_connect (G_OBJECT(window), "key-press-event",
-		    G_CALLBACK (on_keypress), NULL);
+		    G_CALLBACK (on_hanja_window_keypress), NULL);
   g_signal_connect (G_OBJECT(window), "destroy",
-		    G_CALLBACK (on_destroy), NULL);
+		    G_CALLBACK (on_hanja_window_destroy), NULL);
 
   parent = hcontext->toplevel;
   if (parent)
@@ -1705,6 +1730,101 @@ popup_hanja_window(GtkIMContextHangul *hcontext)
     create_hanja_window(hcontext, ch);
 }
 
+static gboolean
+on_char_table_keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
+{
+  if (event->keyval == GDK_Escape) {
+    gtk_widget_hide(widget);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static void
+on_char_table_clicked(GtkWidget *widget, gpointer data)
+{
+  gchar *str = (gchar *)gtk_button_get_label(GTK_BUTTON(widget));
+
+  if (current_context != NULL && str != NULL) {
+    im_hangul_commit_utf8(current_context, str);
+  }
+}
+
+#include "chartable.h"
+
+static GtkWidget*
+create_char_window(GtkIMContextHangul *hcontext)
+{
+  GtkWidget *window;
+  GtkWidget* notebook;
+  GtkWidget* table;
+  GtkWidget* label;
+  GtkWidget* button;
+  GtkWidget* parent;
+  gchar buf[8];
+  gint i, j, x, y, n;
+
+  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_widget_show(window);
+
+  notebook = gtk_notebook_new();
+  gtk_container_add(GTK_CONTAINER(window), notebook);
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_LEFT);
+  gtk_widget_show(notebook);
+
+  i = 0;
+  while (char_table[i].name != NULL) {
+    label = gtk_label_new(char_table[i].name);
+    gtk_widget_show(label);
+
+    x = 0;
+    y = 0;
+    table = gtk_table_new(1, 16, TRUE);
+    gtk_widget_show(table);
+    for (j = 0; char_table[i].list[j] != 0; j++) {
+      n = g_unichar_to_utf8(char_table[i].list[j], buf);
+      buf[n] = 0;
+      button = gtk_button_new_with_label(buf);
+      gtk_widget_show(button);
+      gtk_table_attach(GTK_TABLE(table), button, x, x + 1, y, y + 1,
+		       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		       (GtkAttachOptions) (GTK_FILL),
+		       0, 0);
+      g_signal_connect(G_OBJECT(button), "clicked",
+		       G_CALLBACK (on_char_table_clicked), NULL);
+      x++;
+      if (x >= 16) {
+        x = 0;
+	y++;
+      }
+    }
+
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table, label);
+    i++;
+  }
+
+  g_signal_connect (G_OBJECT(window), "key-press-event",
+		    G_CALLBACK (on_char_table_keypress), NULL);
+  g_signal_connect (G_OBJECT(window), "delete_event",
+		    G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+
+  parent = hcontext->toplevel;
+  if (parent)
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent));
+
+  return window;
+}
+
+static void
+popup_char_table_window(GtkIMContextHangul *hcontext)
+{
+  if (char_table_window != NULL) {
+    gtk_widget_show(char_table_window);
+  } else {
+    char_table_window = create_char_window(hcontext);
+  }
+}
+
 /*
  * im_hangul_shutdown:
  *
@@ -1721,6 +1841,12 @@ im_hangul_shutdown(void)
   if (hanja_window) {
     gtk_widget_destroy(hanja_window);
     hanja_window = NULL;
+  }
+
+  /* remove character selection dialog */
+  if (char_table_window != NULL) {
+    gtk_widget_destroy(char_table_window);
+    char_table_window = NULL;
   }
 
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);

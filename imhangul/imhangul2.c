@@ -32,9 +32,6 @@
 
 #include "imhangul.h"
 
-/* preferences */
-static gboolean		pref_enable_inverse_sequence = TRUE;
-
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
   "Hangul 2bul",
@@ -258,20 +255,11 @@ static gboolean
 im_hangul2_automata(GtkIMContextHangul *hcontext,
 		    GdkEventKey *key)
 {
-  guint keyval, state;
   gunichar ch;
   gunichar comp_ch;
   gunichar jong_ch;
 
-  if (pref_use_dvorak) {
-    keyval = im_hangul_dvorak_to_qwerty(key->keyval);
-    state = key->state;
-  } else {
-    keyval = key->keyval;
-    state = key->state;
-  }
-
-  ch = im_hangul_mapping(keyval, state);
+  ch = im_hangul_mapping(key->keyval, key->state);
 
   if (hcontext->jongseong[0]) {
     if (im_hangul_is_choseong(ch)) {
@@ -394,14 +382,6 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
       goto done;
     }
     return FALSE;
-  }
-
-  if (im_hangul_is_trigger(key)) {
-    /* hangul mode change to englishmode */
-    if (im_hangul_commit(hcontext))
-      g_signal_emit_by_name (hcontext, "preedit_changed");
-    im_hangul_mode_direct(hcontext);
-    return TRUE;
   }
 
   if (im_hangul_commit(hcontext))

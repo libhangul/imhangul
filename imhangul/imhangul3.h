@@ -21,11 +21,7 @@
  */
 
 
-/* we dont use this func anymore
-static gunichar	im_hangul_compchoseong_to_single	(gunichar ch);
-*/
-
-static void	im_hangul_commit_unicode(GtkIMContextHangul *hcontext,
+static void im_hangul_commit_unicode(GtkIMContextHangul *hcontext,
 					 gunichar ch);
 
 static gboolean
@@ -107,17 +103,8 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
 		    GdkEventKey *key)
 {
   gunichar ch;
-  guint keyval, state;
 
-  if (pref_use_dvorak) {
-    keyval = im_hangul_dvorak_to_qwerty(key->keyval);
-    state = key->state;
-  } else {
-    keyval = key->keyval;
-    state = key->state;
-  }
-
-  ch = im_hangul_mapping(keyval, state);
+  ch = im_hangul_mapping(key->keyval, key->state);
 
   if (manual_mode) {
     if (hcontext->jongseong[0]) {
@@ -313,17 +300,9 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
     goto done;
   }
 
-  if (im_hangul_is_trigger(key)) {
-    im_hangul_commit(hcontext);
-    g_signal_emit_by_name(hcontext, "preedit_changed");
-    im_hangul_mode_direct(hcontext);
-    return TRUE;
-  }
+  if (im_hangul_commit(hcontext))
+      g_signal_emit_by_name(hcontext, "preedit_changed");
 
-  if (hcontext->index >= 0) {
-    im_hangul_commit(hcontext);
-    g_signal_emit_by_name(hcontext, "preedit_changed");
-  }
   return im_hangul_process_nonhangul(hcontext, key);
 
 done:
@@ -331,4 +310,4 @@ done:
   return TRUE;
 }
 
-/* vim: set nocindent: */
+/* vim: set cindent sw=2 : */
