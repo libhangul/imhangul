@@ -32,6 +32,9 @@
 
 #include "imhangul.h"
 
+/* preferences */
+static gboolean		pref_enable_inverse_sequence = TRUE;
+
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
   "Hangul 2bul",

@@ -56,6 +56,7 @@ im_hangul_pop(GtkIMContextHangul *context_hangul)
   return context_hangul->stack[context_hangul->index--];
 }
 
+#if 0
 /* this funcs used for backspace in hangul 3 set keyboard */
 static gunichar
 im_hangul_compchoseong_to_single(gunichar ch)
@@ -116,6 +117,8 @@ im_hangul_compchoseong_to_single(gunichar ch)
   }
   return 0;
 }
+
+#endif
 
 static gboolean
 im_hangul3_automata(GtkIMContextHangul *context_hangul,
