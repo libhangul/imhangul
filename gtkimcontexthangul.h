@@ -69,6 +69,7 @@ struct _GtkIMContextHangul
 
   /* options */
   gboolean always_use_jamo : 1;
+  gboolean use_preedit : 1;
 };
 
 struct _GtkIMContextHangulClass
