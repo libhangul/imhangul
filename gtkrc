@@ -1,22 +1,22 @@
 style "mydefault"
 {
-#	fg[NORMAL]	= "#00FF00"	# ±ÛÀÚ, Å×µÎ¸®»ö
-#	bg[NORMAL]	= "#DDDDDD"	# ¹ÙÅÁ»ö
-#	text[NORMAL]	= "#0000FF"	# ±ÛÀÚ
+#	fg[NORMAL]	= "#00FF00"	# ê¸€ì, í…Œë‘ë¦¬ìƒ‰
+#	bg[NORMAL]	= "#DDDDDD"	# ë°”íƒ•ìƒ‰
+#	text[NORMAL]	= "#0000FF"	# ê¸€ì
 #	font_name = "code2000 20"
 #	font_name = "sans 20"
 	font_name = "Andale Sans UI 20"
 }
 
-# »óÅÂÃ¢¿¡¼­ ³ªÅ¸³ª´Â ±ÛÀÚÀÇ »ö°ú Å©±â¸ğ¾ç
+# ìƒíƒœì°½ì—ì„œ ë‚˜íƒ€ë‚˜ëŠ” ê¸€ìì˜ ìƒ‰ê³¼ í¬ê¸°ëª¨ì–‘
 style "imhangul-status-style"
 {
-	fg[NORMAL]	= "#990000"	# ±ÛÀÚ, Å×µÎ¸®»ö
-	bg[NORMAL]	= "#EEEEE0"	# ¹ÙÅÁ»ö
+	fg[NORMAL]	= "#990000"	# ê¸€ì, í…Œë‘ë¦¬ìƒ‰
+	bg[NORMAL]	= "#EEEEE0"	# ë°”íƒ•ìƒ‰
 	font_name	= "Sans 16"
 }
 
-# ÇÑÀÚ ¼±ÅÃÃ¢ ¿¡¼­ ³ªÅ¸³ª´Â ±ÛÀÚÀÇ »ö°ú Å©±â¸ğ¾ç
+# í•œì ì„ íƒì°½ ì—ì„œ ë‚˜íƒ€ë‚˜ëŠ” ê¸€ìì˜ ìƒ‰ê³¼ í¬ê¸°ëª¨ì–‘
 style "imhangul-hanja-style"
 {
 	font_name	= "Sans 20"
@@ -27,28 +27,28 @@ style "imhangul-hanja-style"
 widget "*imhangul_status*" style "imhangul-status-style"
 widget "*imhangul_hanja*" style "imhangul-hanja-style"
 
-# »óÅÂÃ¢À» º¸ÀÌ°Ô/¾Èº¸ÀÌ°Ô ¼³Á¤
-# 0 : ¾Èº¸ÀÓ
-# 1 : º¸ÀÓ
+# ìƒíƒœì°½ì„ ë³´ì´ê²Œ/ì•ˆë³´ì´ê²Œ ì„¤ì •
+# 0 : ì•ˆë³´ì„
+# 1 : ë³´ì„
 gtk-im-hangul-status-window = 1
 
-# Dvorak ÀÚÆÇ »ç¿ë
-# 0 : ¾È¾¸
-# 1 : ¾¸
+# Dvorak ìíŒ ì‚¬ìš©
+# 0 : ì•ˆì”€
+# 1 : ì”€
 gtk-im-hangul-use-dvorak = 0
 
 # Preedit style
-# 0 : ¹ØÁÙ
-# 1 : ºÓÀº»ö ±ÛÀÚ
-# 2 : ¿ª»ó
-# 3 : È¸»ö ¹è°æ
-# 4 : ¾øÀ½
+# 0 : ë°‘ì¤„
+# 1 : ë¶‰ì€ìƒ‰ ê¸€ì
+# 2 : ì—­ìƒ
+# 3 : íšŒìƒ‰ ë°°ê²½
+# 4 : ì—†ìŒ
 gtk-im-hangul-preedit-style = 1
 
-# Caps LockÅ°¸¦ ¾¸/¾È¾¸
-# ÀÌ ¿É¼ÇÀÌ ÄÑÁ® ÀÖÀ¸¸é Caps LockÀÌ ÄÑÁ® ÀÖÀ»¶§  Ã¹°¡³¡ ÄÚµå·Î °á°ú¸¦ Ãâ·ÂÇÔ 
-# 0 : ¾È¾¸
-# 1 : ¾¸
+# Caps Lockí‚¤ë¥¼ ì”€/ì•ˆì”€
+# ì´ ì˜µì…˜ì´ ì¼œì ¸ ìˆìœ¼ë©´ Caps Lockì´ ì¼œì ¸ ìˆì„ë•Œ  ì²«ê°€ë ì½”ë“œë¡œ ê²°ê³¼ë¥¼ ì¶œë ¥í•¨ 
+# 0 : ì•ˆì”€
+# 1 : ì”€
 gtk-im-hangul-use-capslock = 1
 
 gtk-im-hangul-use-manual-mode = 1
