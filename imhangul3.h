@@ -57,7 +57,7 @@ im_hangul_pop(GtkIMContextHangul *hcontext)
 }
 
 static gboolean
-add_cho(GtkIMContextHangul *hcontext, gunichar ch)
+im_hangul_add_choseong(GtkIMContextHangul *hcontext, gunichar ch)
 {
   if (hcontext->lindex >= 3)
     return FALSE;
@@ -67,7 +67,7 @@ add_cho(GtkIMContextHangul *hcontext, gunichar ch)
 }
 
 static gboolean
-add_jung(GtkIMContextHangul *hcontext, gunichar ch)
+im_hangul_add_jungseong(GtkIMContextHangul *hcontext, gunichar ch)
 {
   if (hcontext->vindex >= 3)
     return FALSE;
@@ -77,7 +77,7 @@ add_jung(GtkIMContextHangul *hcontext, gunichar ch)
 }
 
 static gboolean
-add_jong(GtkIMContextHangul *hcontext, gunichar ch)
+im_hangul_add_jongseong(GtkIMContextHangul *hcontext, gunichar ch)
 {
   if (hcontext->tindex >= 3)
     return FALSE;
@@ -250,7 +250,7 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
         goto done;
       }
       if (im_hangul_is_jongseong(ch)) {
-        if (!add_jong(hcontext, ch)) {
+        if (!im_hangul_add_jongseong(hcontext, ch)) {
           im_hangul_commit(hcontext);
           hcontext->jongseong[0] = ch;
         }
@@ -265,7 +265,7 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
         goto done;
       }
       if (im_hangul_is_jungseong(ch)) {
-        if (!add_jung(hcontext, ch)) {
+        if (!im_hangul_add_jungseong(hcontext, ch)) {
           im_hangul_commit(hcontext);
           hcontext->jungseong[0] = ch;
         }
@@ -279,7 +279,7 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
       }
     } else if (hcontext->choseong[0]) {
       if (im_hangul_is_choseong(ch)) {
-        if (!add_cho(hcontext, ch)) {
+        if (!im_hangul_add_choseong(hcontext, ch)) {
           im_hangul_commit(hcontext);
           hcontext->choseong[0] = ch;
         }

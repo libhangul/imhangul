@@ -171,8 +171,8 @@ im_module_create (const gchar *context_id)
   if (strcmp (context_id, "hangul3s") == 0) {
     GtkIMContext *context = im_hangul_new();
     if (context) {
-      GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(context);
-      im_hangul_set_automata(context_hangul, im_hangul3_automata);
+      GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+      im_hangul_set_automata(hcontext, im_hangul3_automata);
 
       keyboard_table = keyboard_table_3sun;
 
