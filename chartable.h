@@ -135,6 +135,132 @@ unicode_t symbols[] = {
     0
 };
 
+unicode_t char_symbol[] = {
+    0x2070,  /* superscript zero                                             */
+    0x2071,  /* superscript latin small letter i                             */
+    0x2074,  /* superscript four                                             */
+    0x2075,  /* superscript five                                             */
+    0x2076,  /* superscript six                                              */
+    0x2077,  /* superscript seven                                            */
+    0x2078,  /* superscript eight                                            */
+    0x2079,  /* superscript nine                                             */
+    0x207a,  /* superscript plus sign                                        */
+    0x207b,  /* superscript minus                                            */
+    0x207c,  /* superscript equals sign                                      */
+    0x207d,  /* superscript left parenthesis                                 */
+    0x207e,  /* superscript right parenthesis                                */
+    0x207f,  /* superscript latin small letter n                             */
+    0x2080,  /* subscript zero                                               */
+    0x2081,  /* subscript one                                                */
+    0x2082,  /* subscript two                                                */
+    0x2083,  /* subscript three                                              */
+    0x2084,  /* subscript four                                               */
+    0x2085,  /* subscript five                                               */
+    0x2086,  /* subscript six                                                */
+    0x2087,  /* subscript seven                                              */
+    0x2088,  /* subscript eight                                              */
+    0x2089,  /* subscript nine                                               */
+    0x208a,  /* subscript plus sign                                          */
+    0x208b,  /* subscript minus                                              */
+    0x208c,  /* subscript equals sign                                        */
+    0x208d,  /* subscript left parenthesis                                   */
+    0x208e,  /* subscript right parenthesis                                  */
+    0x20a0,  /* euro-currency sign                                           */
+    0x20a1,  /* colon sign                                                   */
+    0x20a2,  /* cruzeiro sign                                                */
+    0x20a3,  /* french franc sign                                            */
+    0x20a4,  /* lira sign                                                    */
+    0x20a5,  /* mill sign                                                    */
+    0x20a6,  /* naira sign                                                   */
+    0x20a7,  /* peseta sign                                                  */
+    0x20a8,  /* rupee sign                                                   */
+    0x20a9,  /* won sign                                                     */
+    0x20aa,  /* new sheqel sign                                              */
+    0x20ab,  /* dong sign                                                    */
+    0x20ac,  /* euro sign                                                    */
+    0x20ad,  /* kip sign                                                     */
+    0x20ae,  /* tugrik sign                                                  */
+    0x20af,  /* drachma sign                                                 */
+    0x20b0,  /* german penny sign                                            */
+    0x20b1,  /* peso sign                                                    */
+
+    0x2100,  /* account of                                                   */
+    0x2101,  /* addressed to the subject                                     */
+    0x2102,  /* double-struck capital c                                      */
+    0x2103,  /* degree celsius                                               */
+    0x2104,  /* centre line symbol                                           */
+    0x2105,  /* care of                                                      */
+    0x2106,  /* cada una                                                     */
+    0x2107,  /* euler constant                                               */
+    0x2108,  /* scruple                                                      */
+    0x2109,  /* degree fahrenheit                                            */
+    0x210a,  /* script small g                                               */
+    0x210b,  /* script capital h                                             */
+    0x210c,  /* black-letter capital h                                       */
+    0x210d,  /* double-struck capital h                                      */
+    0x210e,  /* planck constant                                              */
+    0x210f,  /* planck constant over two pi                                  */
+    0x2110,  /* script capital i                                             */
+    0x2111,  /* black-letter capital i                                       */
+    0x2112,  /* script capital l                                             */
+    0x2113,  /* script small l                                               */
+    0x2114,  /* l b bar symbol                                               */
+    0x2115,  /* double-struck capital n                                      */
+    0x2116,  /* numero sign                                                  */
+    0x2117,  /* sound recording copyright                                    */
+    0x2118,  /* script capital p                                             */
+    0x2119,  /* double-struck capital p                                      */
+    0x211a,  /* double-struck capital q                                      */
+    0x211b,  /* script capital r                                             */
+    0x211c,  /* black-letter capital r                                       */
+    0x211d,  /* double-struck capital r                                      */
+    0x211e,  /* prescription take                                            */
+    0x211f,  /* response                                                     */
+    0x2120,  /* service mark                                                 */
+    0x2121,  /* telephone sign                                               */
+    0x2122,  /* trade mark sign                                              */
+    0x2123,  /* versicle                                                     */
+    0x2124,  /* double-struck capital z                                      */
+    0x2125,  /* ounce sign                                                   */
+    0x2126,  /* ohm sign                                                     */
+    0x2127,  /* inverted ohm sign                                            */
+    0x2128,  /* black-letter capital z                                       */
+    0x2129,  /* turned greek small letter iota                               */
+    0x212a,  /* kelvin sign                                                  */
+    0x212b,  /* angstrom sign                                                */
+    0x212c,  /* script capital b                                             */
+    0x212d,  /* black-letter capital c                                       */
+    0x212e,  /* estimated symbol                                             */
+    0x212f,  /* script small e                                               */
+    0x2130,  /* script capital e                                             */
+    0x2131,  /* script capital f                                             */
+    0x2132,  /* turned capital f                                             */
+    0x2133,  /* script capital m                                             */
+    0x2134,  /* script small o                                               */
+    0x2135,  /* alef symbol                                                  */
+    0x2136,  /* bet symbol                                                   */
+    0x2137,  /* gimel symbol                                                 */
+    0x2138,  /* dalet symbol                                                 */
+    0x2139,  /* information source                                           */
+    0x213a,  /* rotated capital q                                            */
+    0x213d,  /* double-struck small gamma                                    */
+    0x213e,  /* double-struck capital gamma                                  */
+    0x213f,  /* double-struck capital pi                                     */
+    0x2140,  /* double-struck n-ary summation                                */
+    0x2141,  /* turned sans-serif capital g                                  */
+    0x2142,  /* turned sans-serif capital l                                  */
+    0x2143,  /* reversed sans-serif capital l                                */
+    0x2144,  /* turned sans-serif capital y                                  */
+    0x2145,  /* double-struck italic capital d                               */
+    0x2146,  /* double-struck italic small d                                 */
+    0x2147,  /* double-struck italic small e                                 */
+    0x2148,  /* double-struck italic small i                                 */
+    0x2149,  /* double-struck italic small j                                 */
+    0x214a,  /* property line                                                */
+    0x214b,  /* turned ampersand                                             */
+    0
+};
+
 unicode_t punctuation[] = {
     0x2018,  /* left single quotation mark            */
     0x2019,  /* right single quotation mark           */
@@ -158,36 +284,6 @@ unicode_t punctuation[] = {
 };
  
 unicode_t parenthesized[] = {
-    0x3200,  /* parenthesized hangul kiyeok  */
-    0x3201,  /* parenthesized hangul nieun   */
-    0x3202,  /* parenthesized hangul tikeut  */
-    0x3203,  /* parenthesized hangul rieul   */
-    0x3204,  /* parenthesized hangul mieum   */
-    0x3205,  /* parenthesized hangul pieup   */
-    0x3206,  /* parenthesized hangul sios    */
-    0x3207,  /* parenthesized hangul ieung   */
-    0x3208,  /* parenthesized hangul cieuc   */
-    0x3209,  /* parenthesized hangul chieuch */
-    0x320a,  /* parenthesized hangul khieukh */
-    0x320b,  /* parenthesized hangul thieuth */
-    0x320c,  /* parenthesized hangul phieuph */
-    0x320d,  /* parenthesized hangul hieuh   */
-
-    0x320e,  /* parenthesized hangul kiyeok  a */
-    0x320f,  /* parenthesized hangul nieun   a */
-    0x3210,  /* parenthesized hangul tikeut  a */
-    0x3211,  /* parenthesized hangul rieul   a */
-    0x3212,  /* parenthesized hangul mieum   a */
-    0x3213,  /* parenthesized hangul pieup   a */
-    0x3214,  /* parenthesized hangul sios    a */
-    0x3215,  /* parenthesized hangul ieung   a */
-    0x3216,  /* parenthesized hangul cieuc   a */
-    0x3217,  /* parenthesized hangul chieuch a */
-    0x3218,  /* parenthesized hangul khieukh a */
-    0x3219,  /* parenthesized hangul thieuth a */
-    0x321a,  /* parenthesized hangul phieuph a */
-    0x321b,  /* parenthesized hangul hieuh   a */
-
     0x2474,  /* parenthesized digit one                                      */
     0x2475,  /* parenthesized digit two                                      */
     0x2476,  /* parenthesized digit three                                    */
@@ -303,36 +399,6 @@ unicode_t parenthesized[] = {
 };
 
 unicode_t circled[] = {
-    0x3260,  /* circled hangul kiyeok  */
-    0x3261,  /* circled hangul nieun   */
-    0x3262,  /* circled hangul tikeut  */
-    0x3263,  /* circled hangul rieul   */
-    0x3264,  /* circled hangul mieum   */
-    0x3265,  /* circled hangul pieup   */
-    0x3266,  /* circled hangul sios    */
-    0x3267,  /* circled hangul ieung   */
-    0x3268,  /* circled hangul cieuc   */
-    0x3269,  /* circled hangul chieuch */
-    0x326a,  /* circled hangul khieukh */
-    0x326b,  /* circled hangul thieuth */
-    0x326c,  /* circled hangul phieuph */
-    0x326d,  /* circled hangul hieuh   */
-
-    0x326e,  /* circled hangul kiyeok  a */
-    0x326f,  /* circled hangul nieun   a */
-    0x3270,  /* circled hangul tikeut  a */
-    0x3271,  /* circled hangul rieul   a */
-    0x3272,  /* circled hangul mieum   a */
-    0x3273,  /* circled hangul pieup   a */
-    0x3274,  /* circled hangul sios    a */
-    0x3275,  /* circled hangul ieung   a */
-    0x3276,  /* circled hangul cieuc   a */
-    0x3277,  /* circled hangul chieuch a */
-    0x3278,  /* circled hangul khieukh a */
-    0x3279,  /* circled hangul thieuth a */
-    0x327a,  /* circled hangul phieuph a */
-    0x327b,  /* circled hangul hieuh   a */
-
     0x2460,  /* circled number 1  */
     0x2461,  /* circled number 2  */
     0x2462,  /* circled number 3  */
@@ -592,53 +658,6 @@ unicode_t circled[] = {
     0x32bd,  /* circled number forty eight                                   */
     0x32be,  /* circled number forty nine                                    */
     0x32bf,  /* circled number fifty                                         */
-    0x32d0,  /* circled katakana a                                           */
-    0x32d1,  /* circled katakana i                                           */
-    0x32d2,  /* circled katakana u                                           */
-    0x32d3,  /* circled katakana e                                           */
-    0x32d4,  /* circled katakana o                                           */
-    0x32d5,  /* circled katakana ka                                          */
-    0x32d6,  /* circled katakana ki                                          */
-    0x32d7,  /* circled katakana ku                                          */
-    0x32d8,  /* circled katakana ke                                          */
-    0x32d9,  /* circled katakana ko                                          */
-    0x32da,  /* circled katakana sa                                          */
-    0x32db,  /* circled katakana si                                          */
-    0x32dc,  /* circled katakana su                                          */
-    0x32dd,  /* circled katakana se                                          */
-    0x32de,  /* circled katakana so                                          */
-    0x32df,  /* circled katakana ta                                          */
-    0x32e0,  /* circled katakana ti                                          */
-    0x32e1,  /* circled katakana tu                                          */
-    0x32e2,  /* circled katakana te                                          */
-    0x32e3,  /* circled katakana to                                          */
-    0x32e4,  /* circled katakana na                                          */
-    0x32e5,  /* circled katakana ni                                          */
-    0x32e6,  /* circled katakana nu                                          */
-    0x32e7,  /* circled katakana ne                                          */
-    0x32e8,  /* circled katakana no                                          */
-    0x32e9,  /* circled katakana ha                                          */
-    0x32ea,  /* circled katakana hi                                          */
-    0x32eb,  /* circled katakana hu                                          */
-    0x32ec,  /* circled katakana he                                          */
-    0x32ed,  /* circled katakana ho                                          */
-    0x32ee,  /* circled katakana ma                                          */
-    0x32ef,  /* circled katakana mi                                          */
-    0x32f0,  /* circled katakana mu                                          */
-    0x32f1,  /* circled katakana me                                          */
-    0x32f2,  /* circled katakana mo                                          */
-    0x32f3,  /* circled katakana ya                                          */
-    0x32f4,  /* circled katakana yu                                          */
-    0x32f5,  /* circled katakana yo                                          */
-    0x32f6,  /* circled katakana ra                                          */
-    0x32f7,  /* circled katakana ri                                          */
-    0x32f8,  /* circled katakana ru                                          */
-    0x32f9,  /* circled katakana re                                          */
-    0x32fa,  /* circled katakana ro                                          */
-    0x32fb,  /* circled katakana wa                                          */
-    0x32fc,  /* circled katakana wi                                          */
-    0x32fd,  /* circled katakana we                                          */
-    0x32fe,  /* circled katakana wo                                          */
     0
 };                                            
 
@@ -966,12 +985,13 @@ struct table_item {
 struct table_item char_table[] = {
     { "\354\235\274\353\260\230\352\270\260\355\230\270", symbols       },
     { "\353\254\270\354\236\245\353\266\200\355\230\270", punctuation   },
+    { "\353\254\270\354\236\245\353\266\200\355\230\270", char_symbol   },
     { "\352\264\204\355\230\270\352\270\200\354\236\220", parenthesized },
     { "\354\233\220\352\270\200\354\236\220",             circled       },
     { "\355\225\234\352\270\200\353\202\261\354\236\220", hangul_cjamo  },
     { "\352\260\200\355\203\200\352\260\200\353\202\230", katakana      },
     { "\355\236\210\353\235\274\352\260\200\353\202\230", hiragana      },
-    { NULL,						  NULL		 }
+    { NULL,						  NULL	        }
 };
  
 /* vim: set sw=4 : */
