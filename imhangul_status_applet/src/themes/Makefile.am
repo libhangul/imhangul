@@ -1,7 +1,8 @@
 THEMES = \
 	SimplyRed \
 	MSWindows \
-	Mac
+	Mac \
+	keyboard
 
 THEMES_DIR = @IMHANGUL_STATUS_THEMES_DIR@
 
