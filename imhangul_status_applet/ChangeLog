@@ -1,3 +1,8 @@
+2003-10-28  Choe Hwanjin <krisna@kldp.org>
+	* 번역 수정 (#297)
+	* 테마 수정
+	* autoconf/automake 업데이트
+
 2003-07-24  Choe Hwanjin <krisna@kldp.org>
 	* 테마 선택 창에서 각 테마의 아이콘이 보이게 함
 	* 테마의 인스톨 스크립트를 수정
