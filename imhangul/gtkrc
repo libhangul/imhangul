@@ -26,7 +26,7 @@ widget "*imhangul_hanja*" style "imhangul-hanja-style"
 # 상태창을 보이게/안보이게 설정
 # 0 : 안보임
 # 1 : 보임
-gtk-imhangul-status = 0
+gtk-imhangul-status = 1
 
 # Dvorak 자판 사용
 # 0 : 안씀
