@@ -1702,4 +1702,4 @@ im_hangul_shutdown(void)
 
 #endif /* __GTK_IM_CONTEXT_HANGUL_H__ */
 
-/* vim: set cindent et sw=2 : */
+/* vim: set cindent sw=2 : */
