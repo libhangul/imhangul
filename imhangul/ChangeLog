@@ -1,3 +1,8 @@
+2002-12-05 (Thu) 21:15 Choe Hwanjin <krisna@kldp.org>
+	* imhangul2.c: 기존의 automata 루틴을 완전이 바꿈 (stack 사용)
+	* imhangul.h, imhangul3.h: 스택 관련 함수를 imhangul3.h에서
+	  imhangul.h 로 옮김
+
 2002-12-04 (Wed) 16:20 Choe Hwanjin <krisna@kldp.org>
 	* imhangul2.c: im_hangul2_jongseong_dicompose() 함수 추가
 	  state7, state9 에서 이 함수를 이용해서 복종성을 분리한다.
