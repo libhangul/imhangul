@@ -29,7 +29,9 @@
 /*
 #include "gtk/gtkmain.h"
 #include "gtk/gtkbutton.h"
+#include "gtk/gtkeventbox.h"
 #include "gtk/gtklabel.h"
+#include "gtk/gtkhbox.h"
 #include "gtk/gtksignal.h"
 #include "gtk/gtkwindow.h"
 #include "gtk/gtkintl.h"
@@ -39,7 +41,10 @@
 #include <gtk/gtkmain.h>
 #include <gtk/gtksignal.h>
 #include <gtk/gtkbutton.h>
+#include <gtk/gtkeventbox.h>
+#include <gtk/gtkframe.h>
 #include <gtk/gtklabel.h>
+#include <gtk/gtkhbox.h>
 #include <gtk/gtktable.h>
 #include <gtk/gtkwindow.h>
 #include <gtk/gtkimcontext.h>
@@ -79,6 +84,8 @@ struct _GtkIMContextHangulClass
 struct _StatusWindow
 {
   GtkWidget *window;
+  GtkWidget *hangul_label;
+  GtkWidget *johab_label;
   GtkWidget *toplevel;
   guint destroy_handler_id;
   guint configure_handler_id;
@@ -142,7 +149,7 @@ static void im_hangul_set_client_window	(GtkIMContext *context,
 				         GdkWindow *client_window);
 static void status_window_show     (GtkIMContextHangul *context_hangul);
 static void status_window_hide     (GtkIMContextHangul *context_hangul);
-static void status_window_set_mode (GtkIMContextHangul *context_hangul);
+static void status_window_set_label (GtkIMContextHangul *context_hangul);
 
 static void popup_hanja_window	   (GtkIMContextHangul *context_hangul);
 
@@ -302,7 +309,7 @@ im_hangul_mode_hangul(GtkIMContextHangul *context_hangul)
 {
   input_mode = MODE_HANGUL;
   context_hangul->state = STATE_HANGUL;
-  status_window_set_mode(context_hangul);
+  status_window_set_label(context_hangul);
 }
 
 static void 
@@ -310,7 +317,7 @@ im_hangul_mode_direct(GtkIMContextHangul *context_hangul)
 {
   input_mode = MODE_DIRECT;
   context_hangul->state = STATE_DIRECT;
-  status_window_set_mode(context_hangul);
+  status_window_set_label(context_hangul);
 }
 
 /* this funcs used for backspace */
@@ -1010,6 +1017,12 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return TRUE;
   }
 
+  /* here we must hangul mode, so set STATE_HANGUL
+   * static variable input_mode is not yet applied so we change it
+   * below line must not removed */
+  if (context_hangul->state == STATE_DIRECT)
+    context_hangul->state = STATE_HANGUL;
+
   if (context_hangul->automata)
     return context_hangul->automata(context_hangul, key);
   else
@@ -1020,37 +1033,20 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
 /*
  * status window
  */
-
 static gboolean
 status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
 {
   gdk_draw_rectangle (widget->window,
-		      widget->style->bg_gc[GTK_STATE_NORMAL],
-		      TRUE,
-		      0, 0,
-		      widget->allocation.width, widget->allocation.height);
-  gdk_draw_rectangle (widget->window,
 		      widget->style->fg_gc[GTK_STATE_NORMAL],
 		      FALSE,
 		      0, 0,
-		      widget->allocation.width - 1, widget->allocation.height - 1);
+		      widget->allocation.width-1, widget->allocation.height-1);
 
   return FALSE;
 }
 
 static void
-status_window_style_set(GtkWidget *window,
-			GtkStyle *previous_style,
-			GtkWidget *label)
-{
-  gint i;
-
-  for (i = 0; i < 5; i++)
-    gtk_widget_modify_fg(label, i, &window->style->text[i]);
-}
-
-static void
-status_window_free(StatusWindow *swindow)
+status_window_free(StatusWindow *_status_window)
 {
   if (status_window) {
     g_signal_handler_disconnect(status_window->toplevel,
@@ -1060,29 +1056,72 @@ status_window_free(StatusWindow *swindow)
     gtk_widget_destroy(status_window->window);
     g_free(status_window);
     status_window = NULL;
-    /* g_print("Status window destroyed\n"); */
   }
 }
 
 static gboolean
 status_window_configure	(GtkWidget *toplevel,
 			 GdkEventConfigure *event,
-			 StatusWindow *swindow)
+			 GtkWidget *window)
 {
   GdkRectangle rect;
   GtkRequisition requisition;
   gint y;
 
   gdk_window_get_frame_extents(toplevel->window, &rect);
-  gtk_widget_size_request(status_window->window, &requisition);
+  gtk_widget_size_request(window, &requisition);
 
   if (rect.y + rect.height + requisition.height < gdk_screen_height())
     y = rect.y + rect.height;
   else
     y = gdk_screen_height() - requisition.height;
 
-  gtk_window_move(GTK_WINDOW(status_window->window), rect.x, y);
+  gtk_window_move(GTK_WINDOW(window), rect.x, y);
   return FALSE;
+}
+
+static gboolean
+on_click_hangul (GtkWidget *widget,
+		 GdkEventButton *event,
+		 gpointer data)
+{
+  GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(data);
+
+  if (input_mode == STATE_DIRECT) {
+    /* english mode change to hangul mode */
+    im_hangul_mode_hangul(context_hangul);
+  } else {
+    /* hangul mode change to english mode */
+    im_hangul_commit(context_hangul);
+    g_signal_emit_by_name (context_hangul, "preedit_changed");
+    im_hangul_mode_direct(context_hangul);
+  }
+  return TRUE;
+}
+
+static gboolean
+on_click_johab (GtkWidget *widget,
+		 GdkEventButton *event,
+		 gpointer data)
+{
+  GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(data);
+
+  pref_use_hangul_jamo = !pref_use_hangul_jamo;
+  status_window_set_label(context_hangul);
+
+  return TRUE;
+}
+
+static gboolean
+on_click_hanja (GtkWidget *widget,
+		 GdkEventButton *event,
+		 gpointer data)
+{
+  GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(data);
+
+  popup_hanja_window(context_hangul);
+
+  return TRUE;
 }
 
 static GtkWidget *
@@ -1111,53 +1150,93 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 {
   GtkWidget *toplevel;
   GtkWidget *window;
+  GtkWidget *hbox;
+  GtkWidget *ebox;
+  GtkWidget *frame;
   GtkWidget *label;
 
   if (!pref_use_status_window)
+    return NULL;
+
+  if (status_window) {
+    /*
+    status_window_configure(status_window->toplevel, NULL,
+    			    status_window->window);
+    */
+    return status_window->window;
+  } else if (!create)
     return NULL;
 
   toplevel = get_toplevel_window(context_hangul->client_window);
   if (toplevel == NULL)
     return NULL;
 
-  if (status_window) {
-    status_window_configure(toplevel, NULL, status_window);
-    return status_window->window;
-  } else if (!create)
-    return NULL;
-
   status_window = g_new(StatusWindow, 1);
   status_window->window = gtk_window_new(GTK_WINDOW_POPUP);
+  window = status_window->window;
   status_window->toplevel = toplevel;
 
-  window = status_window->window;
-  gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
+  gtk_container_set_border_width(GTK_CONTAINER(window), 1);
+  /* gtk_window_set_decorated(GTK_WINDOW(window), FALSE); */
   gtk_widget_set_name(window, "imhangul");
   gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, FALSE);
   gtk_widget_set_app_paintable(window, TRUE);
 
+  frame = gtk_frame_new(NULL);
+  gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
+  gtk_widget_show(frame);
+  gtk_container_add(GTK_CONTAINER(window), frame);
+
+  hbox = gtk_hbox_new(TRUE, 3);
+  gtk_widget_show(hbox);
+  gtk_container_add(GTK_CONTAINER(frame), hbox);
+
+  /* yeongeo/hangul label */
   label = gtk_label_new(""); 
-  gtk_misc_set_padding(GTK_MISC(label), 2, 2);
+  status_window->hangul_label = label;
   gtk_widget_show(label);
-  gtk_container_add(GTK_CONTAINER(window), label);
+  ebox = gtk_event_box_new();
+  gtk_widget_show(ebox);
+  gtk_container_add(GTK_CONTAINER(ebox), label);
+  gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
+  g_signal_connect(G_OBJECT(ebox), "button-press-event",
+  		   G_CALLBACK(on_click_hangul), context_hangul);
+
+  /* wanseong/johab label */
+  label = gtk_label_new("");
+  status_window->johab_label = label;
+  gtk_widget_show(label);
+  ebox = gtk_event_box_new();
+  gtk_widget_show(ebox);
+  gtk_container_add(GTK_CONTAINER(ebox), label);
+  gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
+  g_signal_connect(G_OBJECT(ebox), "button-press-event",
+  		   G_CALLBACK(on_click_johab), context_hangul);
+
+  /* hanja label */
+  label = gtk_label_new("[\355\225\234\354\236\220]");
+  gtk_widget_show(label);
+  ebox = gtk_event_box_new();
+  gtk_widget_show(ebox);
+  gtk_container_add(GTK_CONTAINER(ebox), label);
+  gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
+  g_signal_connect(G_OBJECT(ebox), "button-press-event",
+  		   G_CALLBACK(on_click_hanja), context_hangul);
 
   status_window->destroy_handler_id =
-			g_signal_connect_swapped(toplevel, "destroy",
+			g_signal_connect_swapped(G_OBJECT(toplevel), "destroy",
 					       G_CALLBACK(status_window_free),
 					       status_window);
   status_window->configure_handler_id = 
-			g_signal_connect(toplevel, "configure-event",
+			g_signal_connect(G_OBJECT(toplevel), "configure-event",
 					 G_CALLBACK(status_window_configure),
-					 status_window);
+					 window);
+  status_window_configure(toplevel, NULL, window);
 
-  status_window_configure(toplevel, NULL, status_window);
-
-  g_signal_connect(window, "style-set",
-		   G_CALLBACK(status_window_style_set), label);
-  g_signal_connect(window, "expose-event",
+  g_signal_connect(G_OBJECT(window), "expose-event",
 		   G_CALLBACK(status_window_expose_event), NULL);
 
-  status_window_set_mode(context_hangul);
+  status_window_set_label(context_hangul);
 
   return window;
 }
@@ -1168,7 +1247,7 @@ status_window_show(GtkIMContextHangul *context_hangul)
   GtkWidget *window = status_window_get (context_hangul, TRUE);
 
   if (window) {
-    status_window_set_mode(context_hangul);
+    status_window_set_label(context_hangul);
     gtk_widget_show(window);
   }
 }
@@ -1184,29 +1263,46 @@ status_window_hide(GtkIMContextHangul *context_hangul)
 }
 
 static void
-status_window_set_mode(GtkIMContextHangul *context_hangul)
+status_window_set_label(GtkIMContextHangul *context_hangul)
 {
-  static const gchar english[] = { 
+  static const gchar yeongeo[] = { 
 	'[', 0xec, 0x98, 0x81, 0xec, 0x96, 0xb4, ']', 0	/* utf8 string */
   };
   static const gchar hangul[] = { 
 	'[', 0xed, 0x95, 0x9c, 0xea, 0xb8, 0x80, ']', 0 /* utf8 string */
   };
+  static const gchar wanseong[] = { 
+	'[', 0xec, 0x99, 0x84, 0xec, 0x84, 0xb1, ']', 0	/* utf8 string */
+  };
+  static const gchar johab[] = { 
+	'[', 0xec, 0xa1, 0xb0, 0xed, 0x95, 0xa9, ']', 0 /* utf8 string */
+  };
+ 
+  GtkWidget *label;
+  if (status_window == NULL)
+    return;
 
-  GtkWidget *status_window = status_window_get(context_hangul, TRUE);
-  if (status_window) {
-    GtkWidget *label = GTK_BIN(status_window)->child;
+  label = status_window->hangul_label;
+  if (label) {
     if (input_mode == MODE_DIRECT)
-      gtk_label_set_text(GTK_LABEL(label), english);
+      gtk_label_set_text(GTK_LABEL(label), yeongeo);
     else
       gtk_label_set_text(GTK_LABEL(label), hangul);
   }
+
+  label = status_window->johab_label;
+  if (label) {
+    if (pref_use_hangul_jamo)
+      gtk_label_set_text(GTK_LABEL(label), johab);
+    else
+      gtk_label_set_text(GTK_LABEL(label), wanseong);
+  }
 }
+
 
 /*
  * Hanja selection window
  */
-
 static gint
 get_index_of_hanjatable(gunichar ch)
 {
