@@ -1,3 +1,6 @@
+화 10월  8 20:44:36 KST 2002
+	* imhangul.h: 상태창에서 [완성/조합] 라벨을 없앰
+
 2002. 10. 08. (화) 14:26:25 KST
 	* imhangul.h: 환경설정값 "gtk-imhangul-style" 추가, pref_fg, pref_bg를
 	  추가해서 preedit style을 결정 (im_hangul_preedit_attr 함수)

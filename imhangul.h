@@ -86,7 +86,6 @@ struct _StatusWindow
 {
   GtkWidget *window;
   GtkWidget *hangul_label;
-  GtkWidget *johab_label;
   GtkWidget *toplevel;
   guint destroy_handler_id;
   guint configure_handler_id;
@@ -1233,19 +1232,6 @@ on_click_hangul (GtkWidget *widget,
 }
 
 static gboolean
-on_click_johab (GtkWidget *widget,
-		 GdkEventButton *event,
-		 gpointer data)
-{
-  GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(data);
-
-  pref_use_hangul_jamo = !pref_use_hangul_jamo;
-  status_window_set_label(context_hangul);
-
-  return TRUE;
-}
-
-static gboolean
 on_click_hanja (GtkWidget *widget,
 		 GdkEventButton *event,
 		 gpointer data)
@@ -1346,17 +1332,6 @@ status_window_get_window(GtkIMContextHangul *context_hangul, gboolean create)
   g_signal_connect(G_OBJECT(ebox), "button-press-event",
   		   G_CALLBACK(on_click_hangul), context_hangul);
 
-  /* wanseong/johab label */
-  label = gtk_label_new("");
-  status_window->johab_label = label;
-  gtk_widget_show(label);
-  ebox = gtk_event_box_new();
-  gtk_widget_show(ebox);
-  gtk_container_add(GTK_CONTAINER(ebox), label);
-  gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
-  g_signal_connect(G_OBJECT(ebox), "button-press-event",
-  		   G_CALLBACK(on_click_johab), context_hangul);
-
   /* hanja label */
   label = gtk_label_new("[\355\225\234\354\236\220]");
   gtk_widget_show(label);
@@ -1417,13 +1392,7 @@ status_window_set_label(GtkIMContextHangul *context_hangul)
   static const gchar hangul[] = { 
 	'[', 0xed, 0x95, 0x9c, 0xea, 0xb8, 0x80, ']', 0 /* utf8 string */
   };
-  static const gchar wanseong[] = { 
-	'[', 0xec, 0x99, 0x84, 0xec, 0x84, 0xb1, ']', 0	/* utf8 string */
-  };
-  static const gchar johab[] = { 
-	'[', 0xec, 0xa1, 0xb0, 0xed, 0x95, 0xa9, ']', 0 /* utf8 string */
-  };
- 
+
   GtkWidget *label;
   StatusWindow *status_window = status_window_get(context_hangul);
 
@@ -1436,14 +1405,6 @@ status_window_set_label(GtkIMContextHangul *context_hangul)
       gtk_label_set_text(GTK_LABEL(label), yeongeo);
     else
       gtk_label_set_text(GTK_LABEL(label), hangul);
-  }
-
-  label = status_window->johab_label;
-  if (label) {
-    if (pref_use_hangul_jamo)
-      gtk_label_set_text(GTK_LABEL(label), johab);
-    else
-      gtk_label_set_text(GTK_LABEL(label), wanseong);
   }
 }
 
