@@ -1,5 +1,24 @@
-2003-10-30  Choe Hwanjin <krisna@kldp.org>
+2003-11-20  Choe Hwanjin  <krisna@people.kldp.org>
+	* relase 0.9.8
+	* configure.in: version up to 0.9.8
+	* gtkimcontexthangul.c: remove type-punned pointer expression
+	* gtkimcontexthangul.c, gtkrc:
+	  widget name을 imhangul_hanja에서 imhangul_candidate로 변경
+	* gtkrc: change default encoding from euckr to utf8
+	* gtkimcontexthangul.c, hanjatable.h, hanjatable.py:
+	  rename hanjatable to hanja_table
+
+2003-11-11  Choe Hwanjin  <krisna@people.kldp.org>
+	* gtkimcontexthangul.c: apply new candidate window routine
+	* gtkrc: gtkrc 기본값 수정
+
+2003-11-10  Choe Hwanjin  <krisna@people.kldp.org>
+	* gtkimcontexthangul.h: new candidate window code 적용
+	* gtkimcontexthangul.c: candidate window 코드 추가
+
+2003-10-30  Choe Hwanjin  <krisna@people.kldp.org>
 	* 여러 텍스트 파일을 모두 UTF-8 인코딩으로 변환
+	* ChangeLog, NEWS, README: 텍스트 인코딩을 UTF-8로 변환
 
 2003-10-20  Choe Hwanjin <krisna@kldp.org>
 	* Makefile.am: CFLAGS 정리, GTK_BINARY_VERSION 사용
