@@ -31,6 +31,7 @@
 #include <gtk/gtkimmodule.h>
 
 #include "imhangul.h"
+#include "imhangul3.h"
 
 static const GtkIMContextInfo hangul3y_info = {
   "hangul3y",
@@ -43,8 +44,6 @@ static const GtkIMContextInfo hangul3y_info = {
 static const GtkIMContextInfo *info_list[] = {
   &hangul3y_info
 };
-
-#include "imhangul3.h"
 
 /* return ucs4 code jamo choseong value(U+1100 ~ U+1159) 
  * in 3bul yesgeul keyboard
