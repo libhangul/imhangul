@@ -1,3 +1,6 @@
+2003-09-05  Choe Hwanjin <krisna@kldp.org>
+	* gtkimcontexthangul.c: xkb compatibility
+
 2003-06-24  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: preedit_start, preedit_end signal ¹ß»ý½ÃÅ´
 	  (from Nam SungHyun <namsh@kldp.org>)

@@ -2200,6 +2200,8 @@ im_hangul_choseong_to_jongseong (gunichar ch)
     0x11c2	/* choseong hieuh	  ->	jongseong hieuh       */
   };
 
+  if (ch >= 0x11a8 && ch <= 0x11c2)
+    return ch;
   if (ch < 0x1100 || ch > 0x1112)
     return 0;
   return table[ch - 0x1100];
