@@ -78,6 +78,19 @@ im_hangul_compchoseong_to_single(gunichar ch)
     case 0x112b:	/* hangul choseong kapyeounpieup */
       return 0x1107;	/* hangul choseong pieup */
     case 0x110a:	/* hangul choseong ssangsios */
+    case 0x112d:	/* hangul choseong sios-kiyeok */
+    case 0x112e:	/* hangul choseong sios-nieun */
+    case 0x112f:	/* hangul choseong sios-tikeut */
+    case 0x1130:	/* hangul choseong sios-rieul */
+    case 0x1131:	/* hangul choseong sios-mieum */
+    case 0x1132:	/* hangul choseong sios-pieup */
+    case 0x1135:	/* hangul choseong sios-ieung */
+    case 0x1136:	/* hangul choseong sios-cieuc */
+    case 0x1137:	/* hangul choseong sios-chieuch */
+    case 0x1138:	/* hangul choseong sios-khieukh */
+    case 0x1139:	/* hangul choseong sios-thieuth */
+    case 0x113a:	/* hangul choseong sios-phieuph */
+    case 0x113b:	/* hangul choseong sios-hieuh */
       return 0x1109;	/* hangul choseong sios */
     case 0x110d:	/* hangul choseong ssangcieuc */
       return 0x110c;	/* hangul choseong cieuc */
@@ -201,6 +214,7 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
   }
 
   /* backspace */
+  /*
   if (im_hangul_is_backspace(key)) {
     ch = im_hangul_pop(context_hangul);
     if (ch == 0)
@@ -219,6 +233,29 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
       context_hangul->jongseong = im_hangul_compjongseong_to_single(ch);
       if (context_hangul->jongseong != im_hangul_peek(context_hangul))
         context_hangul->jongseong = 0;
+      goto done;
+    }
+    return FALSE;
+  }
+  */
+
+  if (im_hangul_is_backspace(key)) {
+    ch = im_hangul_pop(context_hangul);
+    if (ch == 0)
+      return FALSE;
+    if (context_hangul->choseong == ch) {
+      ch = im_hangul_peek(context_hangul);
+      context_hangul->choseong = im_hangul_is_choseong(ch) ? ch : 0;
+      goto done;
+    }
+    if (context_hangul->jungseong == ch) {
+      ch = im_hangul_peek(context_hangul);
+      context_hangul->jungseong = im_hangul_is_jungseong(ch) ? ch : 0;
+      goto done;
+    }
+    if (context_hangul->jongseong == ch) {
+      ch = im_hangul_peek(context_hangul);
+      context_hangul->jongseong = im_hangul_is_jongseong(ch) ? ch : 0;
       goto done;
     }
     return FALSE;
