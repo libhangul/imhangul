@@ -1,3 +1,12 @@
+2002. 11. 08. (금) 23:48:44 KST
+	* imhangul.h: X 서버에게 한영 상태를 알려주는
+	  im_hangul_set_input_mode_info() 함수를 추가
+
+2002. 11. 08. (금) 23:46:14 KST
+	* configure.in, imhangul.spec.in: GTK+의 Binary Version을 pkg-config를
+	  통해서 가져오게 함
+	  (Nam SungHyun <namsh@kldp.org>님에게 감사드립니다.)
+
 2002. 10. 25. (금) 23:38:34 KST
 	* imhangul32.c: 변형 두벌식 자판으로 세벌식 입력을 흉내내는 모듈 추가
 	* imhangul.h: Ctrl-Hangul키로 manual mode를 토글 가능
