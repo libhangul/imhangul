@@ -995,7 +995,7 @@ static gboolean
 status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
 {
   gdk_draw_rectangle (widget->window,
-		      widget->style->base_gc[GTK_STATE_NORMAL],
+		      widget->style->bg_gc[GTK_STATE_NORMAL],
 		      TRUE,
 		      0, 0,
 		      widget->allocation.width, widget->allocation.height);
@@ -1101,6 +1101,7 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
   status_window->toplevel = toplevel;
 
   window = status_window->window;
+  gtk_widget_set_name(window, "imhangul");
   gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, FALSE);
   gtk_widget_set_app_paintable(window, TRUE);
 
