@@ -525,12 +525,7 @@ im_hangul_set_client_window (GtkIMContext *context,
 
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
-  if (client_window == NULL)
-    {
-      hcontext->toplevel = NULL;
-      return;
-    }
-
+  /* free status window which is created previosly */
   if (hcontext->client_window != NULL)
     {
       StatusWindow *status_window = status_window_get (hcontext);
@@ -538,6 +533,11 @@ im_hangul_set_client_window (GtkIMContext *context,
 	status_window_free (status_window);
     }
 
+  if (client_window == NULL)
+    {
+      hcontext->toplevel = NULL;
+      return;
+    }
   hcontext->client_window = client_window;
 
   /* find toplevel window (GtkWidget) */
@@ -1817,16 +1817,12 @@ static GtkWidget *
 get_toplevel_window (GdkWindow *window)
 {
   GtkWidget *gtk_toplevel;
-  GdkWindow *gdk_toplevel;
   gpointer ptr;
 
   if (window == NULL)
     return NULL;
 
-  gdk_toplevel = gdk_window_get_toplevel(window);
-  if (gdk_toplevel == NULL)
-    gdk_toplevel = window;
-  gdk_window_get_user_data (gdk_toplevel, &ptr);
+  gdk_window_get_user_data (window, &ptr);
   memcpy(&gtk_toplevel, &ptr, sizeof(gtk_toplevel));
   if (gtk_toplevel != NULL)
     gtk_toplevel = gtk_widget_get_toplevel(GTK_WIDGET(gtk_toplevel));
