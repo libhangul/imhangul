@@ -1,3 +1,11 @@
+목 10월 10 21:25:44 KST 2002
+	* imhangul3.h: backspace를 눌렀을때 im_hangul_compchoseong_to_single,
+	  im_hangul_compjungseong_to_single,im_hangul_compjongseong_to_single를
+	  안쓰고 지우도록 변경
+	* imhangul.h: "gtk-imhangul-style"의 기본값을 0(밑줄)로 변경
+	* imhangul.h: use_caps_lock 변수 추가
+	* imhangul3y.c: capslock으로 jamo/syllable 모드가 바뀌지 않게 함
+
 화 10월  8 20:44:36 KST 2002
 	* imhangul.h: 상태창에서 [완성/조합] 라벨을 없앰
 	* imhangul.h, imhangul3.h: im_hangul_pop, im_hangul_peek,
