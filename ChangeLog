@@ -1,3 +1,8 @@
+2003-02-11  Choe Hwanjin <krisna@kldp.org>
+	* im_hangul_set_client_window()에서 두번째 인자를 NULL인지 검사하는
+	  부분 추가
+	  (Nam SungHyun <namsh@kldp.org>님에게 감사드립니다.)
+
 2003-02-09  Choe Hwanjin <krisna@kldp.org>
 	* GtkSettings 관련 부분을 im_hangul_set_client_window 안쪽으로 옮김
 	* GtkSettings 설정값이 바뀔때 실행될 콜백 연결
