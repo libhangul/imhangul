@@ -134,7 +134,7 @@ static void im_hangul_set_automata(GtkIMContextHangul *hcontext,
 static gboolean	im_hangul_is_trigger			(GdkEventKey *key);
 static gboolean	im_hangul_is_backspace			(GdkEventKey *key);
 
-static void     im_hangul_reset(GtkIMContextHangul *hcontext);
+static void     im_hangul_reset(GtkIMContext *context);
 static void	im_hangul_mode_hangul(GtkIMContextHangul *hcontext);
 static void	im_hangul_mode_direct(GtkIMContextHangul *hcontext);
 
@@ -257,6 +257,7 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
 
   im_context_class->set_client_window = im_hangul_set_client_window;
   im_context_class->filter_keypress = im_hangul_filter_keypress;
+  im_context_class->reset = im_hangul_reset;
   im_context_class->focus_in = im_hangul_focus_in;
   im_context_class->focus_out = im_hangul_focus_out;
   im_context_class->get_preedit_string = im_hangul_get_preedit_string;
@@ -331,9 +332,10 @@ im_hangul_clear_buf (GtkIMContextHangul *hcontext)
 static void 
 im_hangul_init (GtkIMContextHangul *hcontext)
 {
-  im_hangul_reset(hcontext);
+  im_hangul_clear_buf(hcontext);
 
-  hcontext->automata = NULL;	/* initial value: automata == null */
+  hcontext->state = STATE_DIRECT;	/* english mode */
+  hcontext->automata = NULL;	        /* initial value: automata == null */
   hcontext->toplevel = NULL;
 
   g_object_get (gtk_settings_get_default(),
@@ -815,20 +817,18 @@ im_hangul_is_backspace(GdkEventKey *key)
 }
 
 static void
-im_hangul_reset(GtkIMContextHangul *hcontext)
+im_hangul_reset(GtkIMContext *context)
 {
-  im_hangul_clear_buf(hcontext);
+  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
 
-  hcontext->state = STATE_DIRECT;		/* english mode */
+  if (im_hangul_commit(hcontext))
+    g_signal_emit_by_name (hcontext, "preedit_changed");
 }
 
 static gboolean
 im_hangul_process_nonhangul(GtkIMContextHangul *hcontext,
 		            GdkEventKey *key)
 {
-  if (key->keyval == GDK_Tab)
-    return FALSE;
-
   if (!im_hangul_is_modifier(key->state)) {
     gunichar ch = gdk_keyval_to_unicode(key->keyval);
     if (ch != 0) {
@@ -850,9 +850,8 @@ im_hangul_handle_direct_mode(GtkIMContextHangul *hcontext,
   if (im_hangul_is_trigger(key)) {
     if (im_hangul_commit(hcontext))
       g_signal_emit_by_name (hcontext, "preedit_changed");
-    im_hangul_reset(hcontext);
     im_hangul_mode_hangul(hcontext);
-    return TRUE;
+    return FALSE;
   }
   return im_hangul_process_nonhangul(hcontext, key);
 }
