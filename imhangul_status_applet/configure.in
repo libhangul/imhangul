@@ -1,5 +1,5 @@
 AC_INIT(src/imhangul_status.c)
-AM_INIT_AUTOMAKE(imhangul_status_applet, 0.3)
+AM_INIT_AUTOMAKE(imhangul_status_applet, 0.4)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_INTLTOOL
@@ -40,6 +40,7 @@ src/Makefile
 src/themes/Makefile
 src/themes/SimplyRed/Makefile
 src/themes/MSWindows/Makefile
+src/themes/MSWindowsXP/Makefile
 src/themes/Mac/Makefile
 src/themes/Onion/Makefile
 src/themes/KingSejong/Makefile

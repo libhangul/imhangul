@@ -506,7 +506,6 @@ update_state (AppletData *data, int state)
 static GdkFilterReturn
 mode_info_cb (GdkXEvent *gxevent, GdkEvent *event, gpointer data)
 {
-	int *state;
 	AppletData *applet_data;
 	XEvent *xevent;
 	XPropertyEvent *pevent;
@@ -518,6 +517,8 @@ mode_info_cb (GdkXEvent *gxevent, GdkEvent *event, gpointer data)
 
 	pevent = (XPropertyEvent*)xevent;
 	if (pevent->atom == applet_data->mode_info_xatom) {
+		int state;
+		guchar *buf;
 		gboolean ret;
 
 		ret = gdk_property_get (applet_data->root_window,
@@ -525,9 +526,10 @@ mode_info_cb (GdkXEvent *gxevent, GdkEvent *event, gpointer data)
 					applet_data->mode_info_type,
 					0, 32, 0,
 					NULL, NULL, NULL,
-					(guchar**)&state);
-		update_state(applet_data, *state);
-		g_free(state);
+					&buf);
+		memcpy(&state, buf, sizeof(state));
+		update_state(applet_data, state);
+		g_free(buf);
 	}
 
 	return GDK_FILTER_CONTINUE;
