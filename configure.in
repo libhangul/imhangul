@@ -13,8 +13,8 @@ AC_PROG_LIBTOOL
 
 dnl Checks for libraries.
 dnl AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.0.0,,
-		  AC_MSG_ERROR([im-hangul needs GTK+ 2.0.0 or higher]))
+PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.2.0,,
+		  AC_MSG_ERROR([im-hangul needs GTK+ 2.2.0 or higher]))
 
 dnl Checks for header files.
 
