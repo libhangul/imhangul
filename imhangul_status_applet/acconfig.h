@@ -1,0 +1,2 @@
+#undef GNOME_ICONDIR
+#undef GETTEXT_PACKAGE

@@ -1,0 +1,30 @@
+<oaf_info>
+
+<oaf_server iid="OAFIID:GNOME_IMHangulStatusApplet_Factory"
+	    type="exe"
+	    location="@LIBEXECDIR@/imhangul-status-applet">
+
+	<oaf_attribute name="repo_ids" type="stringv">
+		<item value="IDL:Bonobo/GenericFactory:1.0"/>
+		<item value="IDL:Bonobo/Unknown:1.0"/>
+	</oaf_attribute>
+	<oaf_attribute name="name" type="string" value="imhangul Status Applet Factory"/>
+	<oaf_attribute name="description" type="string" value="Factory for imhangul status applet"/>
+</oaf_server>
+
+<oaf_server iid="OAFIID:GNOME_IMHangulStatusApplet"
+	    type="factory" 
+	    location="OAFIID:GNOME_IMHangulStatusApplet_Factory">
+
+	<oaf_attribute name="repo_ids" type="stringv">
+		<item value="IDL:GNOME/Vertigo/PanelAppletShell:1.0"/>
+		<item value="IDL:Bonobo/Control:1.0"/>
+		<item value="IDL:Bonobo/Unknown:1.0"/>
+	</oaf_attribute>
+	<oaf_attribute name="name" type="string" _value="imhangul Status Applet"/>
+	<oaf_attribute name="description" type="string" _value="Show status of imhangul modules"/>
+	<oaf_attribute name="panel:category" type="string" _value="Utility"/>
+	<oaf_attribute name="panel:icon" type="string" value="imhangul-status-applet.png"/>
+</oaf_server>
+
+</oaf_info>

@@ -1,0 +1,40 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-11-10 22:29+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/imhangul_status.c:288
+msgid "imhangul status applet: Select Theme"
+msgstr ""
+
+#: src/imhangul_status.c:315
+#, fuzzy
+msgid "Theme Name"
+msgstr "테마 이름"
+
+#: src/imhangul_status.c:370
+msgid "IMHangul Status Applet"
+msgstr ""
+
+#: src/imhangul_status.c:371
+msgid "(C) 2002 Choe Hwanjin"
+msgstr ""
+
+#: src/imhangul_status.c:372
+msgid "Showing status of IMHangul input module"
+msgstr "imhangul의 한영 상태를 보여줍니다"
+
+#: src/imhangul_status.schemas.in.h:1
+msgid "theme name"
+msgstr "테마 이름"

@@ -1,0 +1,8 @@
+GTK+2의 input module imhangul의 상태를 보여주는 GNOME2의 애플릿
+
+설치방법은 
+  ./configure --prefix=<GNOME2가 설치된 디렉토리>
+  make
+  make install
+
+주의 사항은 imhangul 0.9.4 버젼 이상을 사용해야 상태가 표시됩니다.
