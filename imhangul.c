@@ -42,7 +42,7 @@ static const GtkIMContextInfo hangul2_info = {
   N_("Hangul 2bul"),
   GETTEXT_PACKAGE,
   IM_HANGUL_LOCALEDIR,
-  ""
+  DEFAULT_KEYBOARD_2 
 };
 
 static const GtkIMContextInfo hangul32_info = {
@@ -58,7 +58,7 @@ static const GtkIMContextInfo hangul39_info = {
   N_("Hangul 3bul 390"),
   GETTEXT_PACKAGE,
   IM_HANGUL_LOCALEDIR,
-  ""
+  DEFAULT_KEYBOARD_39 
 };
 
 static const GtkIMContextInfo hangul3f_info = {
@@ -66,7 +66,7 @@ static const GtkIMContextInfo hangul3f_info = {
   N_("Hangul 3bul Final"),
   GETTEXT_PACKAGE,
   IM_HANGUL_LOCALEDIR,
-  ""
+  DEFAULT_KEYBOARD_3F 
 };
 
 static const GtkIMContextInfo hangul3s_info = {
