@@ -1280,13 +1280,6 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return FALSE;
   }
 
-  /* modifiler key */
-  if (im_hangul_is_modifier(key->state)) {
-    if (im_hangul_commit(hcontext))
-      g_signal_emit_by_name (hcontext, "preedit_changed");
-    return FALSE;
-  }
-
   /* hanja key */
   if (key->keyval == GDK_F9 || key->keyval == GDK_Hangul_Hanja) {
     popup_hanja_window(hcontext);
@@ -1299,6 +1292,13 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
       g_signal_emit_by_name (hcontext, "preedit_changed");
     popup_char_table_window(hcontext);
     return TRUE;
+  }
+
+  /* modifiler key */
+  if (im_hangul_is_modifier(key->state)) {
+    if (im_hangul_commit(hcontext))
+      g_signal_emit_by_name (hcontext, "preedit_changed");
+    return FALSE;
   }
 
   /* trigger key: mode change to direct mode */
