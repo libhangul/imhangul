@@ -35,6 +35,9 @@
 /* preferences */
 static gboolean		pref_enable_inverse_sequence = TRUE;
 
+static gunichar	im_hangul_compjungseong_to_single	(gunichar ch);
+static gunichar	im_hangul_compjongseong_to_single	(gunichar ch);
+
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
   "Hangul 2bul",
@@ -46,6 +49,48 @@ static const GtkIMContextInfo hangul2_info = {
 static const GtkIMContextInfo *info_list[] = {
   &hangul2_info
 };
+
+static gunichar
+im_hangul_compjungseong_to_single(gunichar ch)
+{
+  switch (ch) {
+    case 0x116a:	/* hangul jungseong wa */
+    case 0x116b:	/* hangul jungseong wae */
+    case 0x116c:	/* hangul jungseong oe */
+      return 0x1169;	/* hangul jungseong o */
+    case 0x116f:	/* hangul jungseong weo */
+    case 0x1170:	/* hangul jungseong we */
+    case 0x1171:	/* hangul jungseong wi */
+      return 0x116e;	/* hangul jungseong u */
+    case 0x1174:	/* hangul jungseong yi */
+      return 0x1173;	/* hangul jungseong eu */
+  }
+  return 0;
+}
+
+static gunichar
+im_hangul_compjongseong_to_single(gunichar ch)
+{
+  switch (ch) {
+    case 0x11a9:	/* hangul jongseong ssangkiyeok */
+    case 0x11aa:	/* hangul jongseong kiyeok-sios */
+      return 0x11a8;	/* hangul jongseong kiyeok */
+    case 0x11ac:	/* hangul jongseong nieun-cieuc */
+    case 0x11ad:	/* hangul jongseong nieun-hieuh */
+      return 0x11ab;	/* hangul jongseong nieun */
+    case 0x11b0:	/* hangul jongseong rieul-kiyeok */
+    case 0x11b1:	/* hangul jongseong rieul-mieum */
+    case 0x11b2:	/* hangul jongseong rieul-pieup */
+    case 0x11b3:	/* hangul jongseong rieul-sios */
+    case 0x11b4:	/* hangul jongseong rieul-thieuth */
+    case 0x11b5:	/* hangul jongseong rieul-phieuph */
+    case 0x11b6:	/* hangul jongseong rieul-hieuh */
+      return 0x11af;	/* hangul jongseong rieul */
+    case 0x11b9:	/* hangul jongseong ssangsios */
+      return 0x11b8;	/* hangul jongseong sios */
+  }
+  return 0;
+}
 
 /* return ucs4 code jamo choseong value(U+1100 ~ U+1112) in 2bul keyboard
  * if it is not hangul key, return 0 */

@@ -114,16 +114,12 @@ static void im_hangul_set_automata(GtkIMContextHangul *context_hangul,
 
 static gboolean	im_hangul_is_trigger			(GdkEventKey *key);
 static gboolean	im_hangul_is_backspace			(GdkEventKey *key);
-static gunichar	im_hangul_compjungseong_to_single	(gunichar ch);
-static gunichar	im_hangul_compjongseong_to_single	(gunichar ch);
 
 static void	im_hangul_mode_hangul(GtkIMContextHangul *context_hangul);
 static void	im_hangul_mode_direct(GtkIMContextHangul *context_hangul);
 
 /* commit function */
 static gboolean	im_hangul_commit	(GtkIMContextHangul *context_hangul);
-static void	im_hangul_commit_unicode(GtkIMContextHangul *context_hangul,
-					 gunichar ch);
 static void	im_hangul_commit_utf8	(GtkIMContextHangul *context_hangul,
 					 gchar *utf8);
 static gboolean im_hangul_process_nonhangul(GtkIMContextHangul *context_hangul,
@@ -170,9 +166,9 @@ static GtkWidget *hanja_window = NULL;
 #define MODE_DIRECT	-1
 #define MODE_HANGUL	 0
 static gint		input_mode = MODE_DIRECT;
-static gboolean		use_caps_lock = TRUE;
 
 /* preferences */
+static gboolean		pref_use_caps_lock = FALSE;
 static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
@@ -221,6 +217,14 @@ im_hangul_register_type(GTypeModule *type_module, const gchar *type_name)
 				  &im_context_hangul_info, 0);
 }
 
+static gboolean
+have_property (const gchar* str)
+{
+  GtkSettingsClass *klass = gtk_type_class (GTK_TYPE_SETTINGS);
+
+  return (g_object_class_find_property (G_OBJECT_CLASS (klass), str) != NULL);
+}
+
 static void 
 im_hangul_class_init (GtkIMContextHangulClass *klass)
 {
@@ -237,23 +241,33 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
   gobject_class->finalize = im_hangul_finalize;
 
   /* install settings */
-  gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-status",
-  						       "Status Window",
-						       "Whether to show status window or not",
-						       TRUE,
-						       G_PARAM_READWRITE));
-  gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-dvorak",
-  						       "Dvorak Keyboard",
-						       "Whether to use dvorak keyboard or not",
-						       FALSE,
-						       G_PARAM_READWRITE));
-  gtk_settings_install_property (g_param_spec_int ("gtk-imhangul-style",
-  						   "Preedit Style",
-						   "Preedit string style",
-						   0,
-						   4,
-						   0,
-						   G_PARAM_READWRITE));
+  /* check whether installed or not */
+  if (!have_property("gtk-imhangul-status"))
+    gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-status",
+  						         "Status Window",
+						         "Whether to show status window or not",
+						         TRUE,
+						         G_PARAM_READWRITE));
+  if (!have_property("gtk-imhangul-use-capslock"))
+    gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-use-capslock",
+  						         "Use Caps Lock",
+						         "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
+						         FALSE,
+						         G_PARAM_READWRITE));
+  if (!have_property("gtk-imhangul-dvorak"))
+    gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-dvorak",
+  						         "Dvorak Keyboard",
+						         "Whether to use dvorak keyboard or not",
+						         FALSE,
+						         G_PARAM_READWRITE));
+  if (!have_property("gtk-imhangul-style"))
+    gtk_settings_install_property (g_param_spec_int ("gtk-imhangul-style",
+  						     "Preedit Style",
+						     "Preedit string style",
+						     0,
+						     4,
+						     0,
+						     G_PARAM_READWRITE));
 }
 
 static void 
@@ -280,6 +294,7 @@ im_hangul_init (GtkIMContextHangul *context_hangul)
 
   g_object_get (gtk_settings_get_default(),
   		"gtk-imhangul-status", &pref_use_status_window,
+  		"gtk-imhangul-use-capslock", &pref_use_caps_lock,
   		"gtk-imhangul-dvorak", &pref_use_dvorak,
   		"gtk-imhangul-style", &pref_preedit_style,
 		NULL);
@@ -379,48 +394,6 @@ im_hangul_mode_direct(GtkIMContextHangul *context_hangul)
   input_mode = MODE_DIRECT;
   context_hangul->state = STATE_DIRECT;
   status_window_set_label(context_hangul);
-}
-
-static gunichar
-im_hangul_compjungseong_to_single(gunichar ch)
-{
-  switch (ch) {
-    case 0x116a:	/* hangul jungseong wa */
-    case 0x116b:	/* hangul jungseong wae */
-    case 0x116c:	/* hangul jungseong oe */
-      return 0x1169;	/* hangul jungseong o */
-    case 0x116f:	/* hangul jungseong weo */
-    case 0x1170:	/* hangul jungseong we */
-    case 0x1171:	/* hangul jungseong wi */
-      return 0x116e;	/* hangul jungseong u */
-    case 0x1174:	/* hangul jungseong yi */
-      return 0x1173;	/* hangul jungseong eu */
-  }
-  return 0;
-}
-
-static gunichar
-im_hangul_compjongseong_to_single(gunichar ch)
-{
-  switch (ch) {
-    case 0x11a9:	/* hangul jongseong ssangkiyeok */
-    case 0x11aa:	/* hangul jongseong kiyeok-sios */
-      return 0x11a8;	/* hangul jongseong kiyeok */
-    case 0x11ac:	/* hangul jongseong nieun-cieuc */
-    case 0x11ad:	/* hangul jongseong nieun-hieuh */
-      return 0x11ab;	/* hangul jongseong nieun */
-    case 0x11b0:	/* hangul jongseong rieul-kiyeok */
-    case 0x11b1:	/* hangul jongseong rieul-mieum */
-    case 0x11b2:	/* hangul jongseong rieul-pieup */
-    case 0x11b3:	/* hangul jongseong rieul-sios */
-    case 0x11b4:	/* hangul jongseong rieul-thieuth */
-    case 0x11b5:	/* hangul jongseong rieul-phieuph */
-    case 0x11b6:	/* hangul jongseong rieul-hieuh */
-      return 0x11af;	/* hangul jongseong rieul */
-    case 0x11b9:	/* hangul jongseong ssangsios */
-      return 0x11b8;	/* hangul jongseong sios */
-  }
-  return 0;
 }
 
 static gunichar
@@ -914,23 +887,6 @@ im_hangul_commit(GtkIMContextHangul *context_hangul)
 }
 
 static void
-im_hangul_commit_unicode(GtkIMContextHangul *context_hangul, gunichar ch)
-{
-  int n;
-  gchar buf[6];
-
-  n = g_unichar_to_utf8(ch, buf);
-  buf[n] = '\0';
-
-  context_hangul->choseong = 0;
-  context_hangul->jungseong = 0;
-  context_hangul->jongseong = 0;
-  context_hangul->index = -1;
-
-  g_signal_emit_by_name(context_hangul, "commit", buf);
-}
-
-static void
 im_hangul_commit_utf8(GtkIMContextHangul *context_hangul, gchar *utf8)
 {
   gchar buf[9];
@@ -1070,7 +1026,7 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
     return FALSE;
 
   /* on capslock, we use Hangul Jamo */
-  if (use_caps_lock && key->keyval == GDK_Caps_Lock)
+  if (pref_use_caps_lock && key->keyval == GDK_Caps_Lock)
     pref_use_hangul_jamo = !pref_use_hangul_jamo;
 
   /* some keys are ignored: Ctrl, Alt, Meta */

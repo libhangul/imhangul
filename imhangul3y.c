@@ -455,41 +455,80 @@ im_hangul3y_jungseong(guint keyval, guint state) {
  * if it is not hangul key, return 0 */
 static gunichar
 im_hangul3y_comp_jungseong(gunichar ch, guint keyval, guint state) {
-  if (is_set(state, GDK_SHIFT_MASK))
-    return 0;
-  switch (ch) {
-    case 0x1169:		/* jungseong o */
-      switch (keyval) {
-        case GDK_F:	
-        case GDK_f:	
-          return 0x116a;	/* jungseong wa */
-        case GDK_R:	        
-        case GDK_r:	        
-          return 0x116b;        /* jungseong wae */
-        case GDK_D:	        
-        case GDK_d:	        
-          return 0x116c;        /* jungseong oe */
-      }
-      break;
-    case 0x116e:		/* jungseong u */
-      switch (keyval) {
-        case GDK_T:	
-        case GDK_t:	
-          return 0x116f;	/* jungseong weo */
-        case GDK_C:	        
-        case GDK_c:	        
-          return 0x1170;        /* jungseong we */
-        case GDK_D:	        
-        case GDK_d:	        
-          return 0x1171;        /* jungseong wi */  
-      }
-      break;
-    case 0x1173:		/* jungseong eu */
-      switch (keyval) {
-        case GDK_D:
-        case GDK_d:
-          return 0x1174;	/* jungseong yi */
-      }
+  if (is_set(state, GDK_SHIFT_MASK)) {
+    switch (ch) {
+      case 0x116d:		/* jungseong yo */
+        switch (keyval) {
+          case GDK_R:	
+          case GDK_r:	
+            return 0x1185;	/* jungseong yo-yae */
+        }
+        break;
+    }
+  } else {
+    switch (ch) {
+      case 0x1169:		/* jungseong o */
+        switch (keyval) {
+          case GDK_F:	
+          case GDK_f:	
+            return 0x116a;	/* jungseong wa */
+          case GDK_R:	        
+          case GDK_r:	        
+            return 0x116b;      /* jungseong wae */
+          case GDK_D:	        
+          case GDK_d:	        
+            return 0x116c;      /* jungseong oe */
+        }
+        break;
+      case 0x116d:		/* jungseong yo */
+        switch (keyval) {
+          case GDK_6:	
+            return 0x1184;	/* jungseong yo-ya */
+          case GDK_E:	        
+          case GDK_e:	        
+            return 0x1188;      /* jungseong yo-i */
+        }
+        break;
+      case 0x116e:		/* jungseong u */
+        switch (keyval) {
+          case GDK_T:	
+          case GDK_t:	
+            return 0x116f;	/* jungseong weo */
+          case GDK_C:	        
+          case GDK_c:	        
+            return 0x1170;      /* jungseong we */
+          case GDK_D:	        
+          case GDK_d:	        
+            return 0x1171;      /* jungseong wi */  
+        }
+        break;
+      case 0x1172:		/* jungseong yu */
+        switch (keyval) {
+          case GDK_E:	
+          case GDK_e:	
+            return 0x1191;	/* jungseong yu-yeo */
+          case GDK_7:	        
+            return 0x1192;      /* jungseong yu-ye */
+          case GDK_D:	        
+          case GDK_d:	        
+            return 0x1194;      /* jungseong yu-i */  
+        }
+        break;
+      case 0x1173:		/* jungseong eu */
+        switch (keyval) {
+          case GDK_D:
+          case GDK_d:
+            return 0x1174;	/* jungseong yi */
+        }
+	break;
+      case 0x119e:		/* jungseong araea */
+        switch (keyval) {
+          case GDK_D:
+          case GDK_d:
+            return 0x11a1;	/* jungseong araea-i */
+        }
+	break;
+    }
   }
   return 0;
 }
@@ -797,6 +836,69 @@ im_hangul3y_comp_jongseong(gunichar ch, guint keyval, guint state)
             return 0x11f8;	/* jongseong hieuh-pieup */
         }
 	break;
+      case 0x11aa:		/* jongseong kiyeok-sios */
+	switch (keyval) {
+          case GDK_X:
+          case GDK_x:
+            return 0x11c4;	/* jongseong kiyeok-sios-kiyeok */
+        }
+	break;
+      case 0x11b0:		/* jongseong rieul-kiyeok */
+	switch (keyval) {
+          case GDK_Q:
+          case GDK_q:
+            return 0x11cc;	/* jongseong rieul-kiyeok-sios */
+        }
+	break;
+      case 0x11ce:		/* jongseong rieul-tikeut */
+	switch (keyval) {
+          case GDK_1:
+            return 0x11cf;	/* jongseong rieul-tikeut-hieuh */
+        }
+	break;
+      case 0x11b1:		/* jongseong rieul-mieum */
+	switch (keyval) {
+          case GDK_X:
+          case GDK_x:
+            return 0x11d1;	/* jongseong rieul-mieum-kiyeok */
+          case GDK_Q:
+          case GDK_q:
+            return 0x11d2;	/* jongseong rieul-mieum-sios */
+        }
+	break;
+      case 0x11b2:		/* jongseong rieul-pieup */
+	switch (keyval) {
+          case GDK_Q:
+          case GDK_q:
+            return 0x11d3;	/* jongseong rieul-pieup-sios */
+          case GDK_1:
+            return 0x11d4;	/* jongseong rieul-pieup-hieuh */
+          case GDK_A:
+          case GDK_a:
+            return 0x11d5;	/* jongseong rieul-kapyeounpieup */
+        }
+	break;
+      case 0x11b3:		/* jongseong rieul-sios */
+	switch (keyval) {
+          case GDK_Q:
+          case GDK_q:
+            return 0x11d6;	/* jongseong rieul-ssangsios */
+        }
+	break;
+      case 0x11dd:		/* jongseong mieum-sios */
+	switch (keyval) {
+          case GDK_Q:
+          case GDK_q:
+            return 0x11de;	/* jongseong mieum-ssangsios */
+        }
+	break;
+      case 0x11ec:		/* jongseong ieung-kiyeok */
+	switch (keyval) {
+          case GDK_X:
+          case GDK_x:
+            return 0x11ed;	/* jongseong ieung-ssangkiyeok */
+        }
+	break;
     }
   }
   return 0;
@@ -846,7 +948,9 @@ im_module_create (const gchar *context_id)
       im_hangul3_comp_choseong = im_hangul3y_comp_choseong;
       im_hangul3_comp_jungseong = im_hangul3y_comp_jungseong;
       im_hangul3_comp_jongseong = im_hangul3y_comp_jongseong;
-      use_caps_lock = FALSE;
+
+      /* we fix pref_use_caps_lock to FALSE */
+      pref_use_caps_lock = FALSE;
       pref_use_hangul_jamo = TRUE;
       return context;
     }
