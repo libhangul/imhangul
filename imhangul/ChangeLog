@@ -1,3 +1,8 @@
+2004-06-28  Choe Hwanjin <krisna@kldp.org>
+	* nabi의 candidate table로 부터 추출한 한자 데이터 사용
+	* 컴파일시 기본 자판 설정 메뉴 추가: --with-default-keyboard=2/39/3f
+	  옵션을 사용하여 configure 스크립트 실행시 설정 가능
+
 2004-05-13  Choe Hwanjin <krisna@kldp.org>
 	* Internationalization: 메뉴에서 한글로 보이게 함
 
