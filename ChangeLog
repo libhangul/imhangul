@@ -1,0 +1,12 @@
+2002. 06. 06. (목) 12:28:56 KST
+	* im-hangul2.c, im-hangul2.c 를
+	각각 imhangul2.c imhangul3.c 로 이름 변경
+
+2002. 06. 05. (수) 16:03:10 KST
+	* ChangeLog 작성
+
+	* 세벌식 390 지원 자판 추가 (Lee KwanHong <sorcerer@jerimo.org>)
+
+	* 세벌식의 경우 환경변수 HANGUL_KEYBOARD_TYPE에 따라 자판을 선택하
+	도록 변경
+	참고(http://www.mizi.com/ko/prod/desktop/mizios/mos-pro3.htm)
