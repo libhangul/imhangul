@@ -87,7 +87,8 @@ struct _StatusWindow
 static Candidate*  candidate_new             (char *label_str,
 					      int n_per_window,
 					      const gunichar *data,
-					      GdkWindow *parent);
+					      GdkWindow *parent,
+					      GdkRectangle *area);
 static void        candidate_prev            (Candidate *candidate);
 static void        candidate_next            (Candidate *candidate);
 static void        candidate_prev_row        (Candidate *candidate);
@@ -115,6 +116,8 @@ static void	im_hangul_set_client_window  (GtkIMContext *context,
 					      GdkWindow    *client_window);
 static void	im_hangul_set_use_preedit    (GtkIMContext *context,
     					      gboolean     use_preedit);
+static void	im_hangul_set_cursor_location(GtkIMContext *context,
+    					      GdkRectangle *area);
 
 /* asistant function for hangul composer */
 static inline gboolean im_hangul_is_modifier  (guint state);
@@ -287,6 +290,7 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
   im_context_class->focus_out = im_hangul_focus_out;
   im_context_class->get_preedit_string = im_hangul_get_preedit_string;
   im_context_class->set_use_preedit = im_hangul_set_use_preedit;
+  im_context_class->set_cursor_location = im_hangul_set_cursor_location;
 
   gobject_class->finalize = im_hangul_finalize;
 }
@@ -335,6 +339,10 @@ im_hangul_init (GtkIMContextHangul *hcontext)
   hcontext->client_window = NULL;
   hcontext->toplevel = NULL;
   hcontext->candidate = NULL;
+  hcontext->cursor.x = 0;
+  hcontext->cursor.y = 0;
+  hcontext->cursor.width = -1;
+  hcontext->cursor.height = -1;
 
   hcontext->input_mode = INPUT_MODE_DIRECT;	/* english mode */
   hcontext->composer = NULL;		/* initial value: composer == null */
@@ -1135,6 +1143,14 @@ im_hangul_set_use_preedit (GtkIMContext *context, gboolean use_preedit)
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
   hcontext->use_preedit = use_preedit;
+}
+
+static void
+im_hangul_set_cursor_location (GtkIMContext *context, GdkRectangle *area)
+{
+  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+
+  hcontext->cursor = *area;
 }
 
 static inline gboolean
@@ -2049,7 +2065,8 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
 	hcontext->candidate = candidate_new (char_table[index].name,
 					     10,
 					     char_table[index].list,
-					     hcontext->client_window);
+					     hcontext->client_window,
+					     &hcontext->cursor);
     }
   else if (hcontext->choseong[0] != 0 && hcontext->jungseong[0] != 0)
     {
@@ -2070,7 +2087,8 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
 	      hcontext->candidate = candidate_new (buf,
 						   10,
 						   hanja_table[index] + 1,
-						   hcontext->client_window);
+						   hcontext->client_window,
+						   &hcontext->cursor);
 	    }
 	}
     }
@@ -2933,7 +2951,10 @@ candidate_on_realize (GtkWidget *widget, Candidate *candidate)
     cand_w = requisition.width;
     cand_h = requisition.height;
 
-    absy += height;
+    absx += candidate->cursor.x;
+    absy += (candidate->cursor.height < 0)? 
+	    height : candidate->cursor.y + candidate->cursor.height;
+
     if (absy + cand_h > root_h)
       absy = root_h - cand_h;
     if (absx + cand_w > root_w)
@@ -3012,7 +3033,8 @@ static Candidate*
 candidate_new(char *label_str,
 	      int n_per_window,
 	      const gunichar *data,
-	      GdkWindow *parent)
+	      GdkWindow *parent,
+	      GdkRectangle *area)
 {
   int n;
   Candidate *candidate;
@@ -3025,6 +3047,7 @@ candidate_new(char *label_str,
   candidate->n = 0;
   candidate->data = NULL;
   candidate->parent = parent;
+  candidate->cursor = *area;
   candidate->label = g_strdup(label_str);
 
   for (n = 0; data[n] != 0; n++)
