@@ -34,6 +34,7 @@ extern GType gtk_type_im_context_hangul;
 typedef struct _GtkIMContextHangul	GtkIMContextHangul;
 typedef struct _GtkIMContextHangulClass	GtkIMContextHangulClass;
 
+typedef struct _Candidate               Candidate;
 typedef struct _IMHangulCombination	IMHangulCombination;
 typedef gboolean (*IMHangulComposer)   (GtkIMContextHangul *, GdkEventKey *);
 
@@ -53,6 +54,11 @@ struct _GtkIMContextHangul
   int compose_table_size;
   const IMHangulCombination *compose_table;
 
+  /* window */
+  GdkWindow *client_window;
+  GtkWidget *toplevel;
+  Candidate *candidate;
+
   /* hangul buffer */
   int input_mode;
   int index;			/* stack index */
@@ -65,8 +71,6 @@ struct _GtkIMContextHangul
   gunichar jungseong[4];
   gunichar jongseong[4];
 
-  GtkWidget *toplevel;
-
   /* options */
   gboolean always_use_jamo : 1;
   gboolean use_preedit : 1;
@@ -75,6 +79,20 @@ struct _GtkIMContextHangul
 struct _GtkIMContextHangulClass
 {
   GtkIMContextClass parent_class;
+};
+
+/* Candidate window */
+struct _Candidate {
+    GtkWidget *window;
+    GdkWindow *parent;
+    gchar *label;
+    GtkWidget **children;
+    const gunichar *data;
+    int first;
+    int n_per_window;
+    int n_per_row;
+    int n;
+    int current;
 };
 
 struct _IMHangulCombination 
