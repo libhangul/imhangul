@@ -1,3 +1,6 @@
+2004-08-09  Choe Hwanjin <krisna@kldp.org>
+	* #300388 문제 해결
+
 2004-07-21  Choe Hwanjin <krisna@kldp.org>
 	* gtk_im_context_get_surrounding에서 널 포인터 체크
 	* candidate 창에서 mouse wheel event 처리
