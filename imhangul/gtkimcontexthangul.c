@@ -19,6 +19,8 @@
  * Author: Choe Hwanjin <krisna@kldp.org>
  */
 
+#include <config.h>
+
 #include <string.h>
 
 #include <gdk/gdkkeysyms.h>

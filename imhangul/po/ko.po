@@ -1,0 +1,41 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: imhangul 0.9.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-05-13 14:12+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: imhangul.c:44
+msgid "Hangul 2bul"
+msgstr "한글 두벌식"
+
+#: imhangul.c:52
+msgid "Hangul 3bul 2bul-shifted"
+msgstr "한글 세벌식 두벌자판"
+
+#: imhangul.c:60
+msgid "Hangul 3bul 390"
+msgstr "한글 세벌식 390"
+
+#: imhangul.c:68
+msgid "Hangul 3bul Final"
+msgstr "한글 세벌식 최종"
+
+#: imhangul.c:76
+msgid "Hangul 3bul No-Shift"
+msgstr "한글 세벌식 순아래"
+
+#: imhangul.c:84
+msgid "Hangul 3bul Yetgeul"
+msgstr "한글 세벌식 옛글"

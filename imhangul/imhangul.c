@@ -20,6 +20,8 @@
  * this module is for hangul(Korean)
  */
 
+#include <config.h>
+
 #include <string.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -27,6 +29,7 @@
 #include <gtk/gtkwidget.h>
 #include <gtk/gtkimmodule.h>
 
+#include "gettext.h"
 #include "gtkimcontexthangul.h"
 
 static GtkIMContext *im_hangul_new_2      (void);
@@ -38,49 +41,49 @@ static GtkIMContext *im_hangul_new_3yet   (void);
 
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
-  "Hangul 2bul",
-  "gtk+",
-  GTK_LOCALEDIR,
+  N_("Hangul 2bul"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
   ""
 };
 
 static const GtkIMContextInfo hangul32_info = {
   "hangul32",
-  "Hangul 3bul 2bul-shifted",
-  "gtk+",
-  GTK_LOCALEDIR,
+  N_("Hangul 3bul 2bul-shifted"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
   ""
 };
 
 static const GtkIMContextInfo hangul39_info = {
   "hangul39",
-  "Hangul 3bul 390",
-  "gtk+",
-  GTK_LOCALEDIR,
+  N_("Hangul 3bul 390"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
   ""
 };
 
 static const GtkIMContextInfo hangul3f_info = {
   "hangul3f",
-  "Hangul 3bul Final",
-  "gtk+",
-  GTK_LOCALEDIR,
+  N_("Hangul 3bul Final"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
   ""
 };
 
 static const GtkIMContextInfo hangul3s_info = {
   "hangul3s",
-  "Hangul 3bul No-Shift",
-  "gtk+",
-  GTK_LOCALEDIR,
+  N_("Hangul 3bul No-Shift"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
   ""
 };
 
 static const GtkIMContextInfo hangul3y_info = {
   "hangul3y",
-  "Hangul 3bul Yetgeul",
-  "gtk+",
-  GTK_LOCALEDIR,
+  N_("Hangul 3bul Yetgeul"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
   ""
 };
 
