@@ -1806,24 +1806,20 @@ on_click_hanja (GtkWidget *widget,
 static GtkWidget *
 get_toplevel_window (GdkWindow *window)
 {
-  GtkWidget *toplevel;
+  GtkWidget *gtk_toplevel;
+  GdkWindow *gdk_toplevel;
   gpointer ptr;
-  GdkWindow *parent;
 
   if (window == NULL)
     return NULL;
 
-  while (TRUE) {
-    parent = gdk_window_get_parent (window);
-    if (parent == gdk_get_default_root_window ())
-      break;
-    else
-      window = parent;
-  }
+  gdk_toplevel = gdk_window_get_toplevel(window);
+  gdk_window_get_user_data (gdk_toplevel, &ptr);
+  memcpy(&gtk_toplevel, &ptr, sizeof(gtk_toplevel));
+  if (gtk_toplevel != NULL)
+    gtk_toplevel = gtk_widget_get_toplevel(GTK_WIDGET(gtk_toplevel));
 
-  gdk_window_get_user_data (window, &ptr);
-  memcpy(&toplevel, &ptr, sizeof(toplevel));
-  return toplevel;
+  return gtk_toplevel;
 }
 
 static StatusWindow*
