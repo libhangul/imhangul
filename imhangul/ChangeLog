@@ -1,3 +1,6 @@
+2003-12-20  Choe Hwanjin <krisna@kldp.org>
+	* release 0.9.9
+
 2003-12-18  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: set_client_window 함수를 반복해서 호출할 경우에
 	  대한 처리
@@ -15,7 +18,7 @@
         * NEWS, TODO: 문서 업데이트
 
 2003-11-20  Choe Hwanjin  <krisna@people.kldp.org>
-	* relase 0.9.8
+	* release 0.9.8
 	* configure.in: version up to 0.9.8
 	* gtkimcontexthangul.c: remove type-punned pointer expression
 	* gtkimcontexthangul.c, gtkrc:
