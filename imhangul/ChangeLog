@@ -1,3 +1,6 @@
+2004-07-09  Choe Hwanjin <krisna@kldp.org>
+	* toplevel 윈도우마다 한영 상태를 저장하도록 함
+
 2004-06-28  Choe Hwanjin <krisna@kldp.org>
 	* nabi의 candidate table로 부터 추출한 한자 데이터 사용
 	* 컴파일시 기본 자판 설정 메뉴 추가: --with-default-keyboard=2/39/3f

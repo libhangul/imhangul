@@ -81,6 +81,18 @@ on_quit_clicked (GtkWidget *window)
 }
 
 void
+on_popup_new_window(GtkWidget *widget)
+{
+	GtkWidget *window;
+    GtkWidget *entry;
+
+    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    entry = gtk_entry_new ();
+    gtk_container_add (GTK_CONTAINER (window), entry);
+	gtk_widget_show_all(window);
+}
+
+void
 on_destroy (GtkWidget *window, gpointer data)
 {
     gtk_main_quit();
@@ -113,6 +125,11 @@ int main (int argc, char *argv[])
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
     entry = gtk_entry_new ();
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
+
+    button = gtk_button_new_with_label ("Popup new window");
+    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
+    g_signal_connect_swapped (G_OBJECT (button), "clicked",
+		              G_CALLBACK(on_popup_new_window), window);
 
     button = gtk_button_new_with_label ("gtk-im-hangul-status-window");
     gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
