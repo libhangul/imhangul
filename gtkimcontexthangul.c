@@ -65,6 +65,7 @@ struct _DesktopInfo
   guint use_capslock_cb;
   guint use_dvorak_cb;
   guint preedit_style_cb;
+  guint use_manual_mode_cb;
 };
 
 typedef struct _StatusWindow StatusWindow;
@@ -201,6 +202,7 @@ static gboolean		pref_use_global_state = TRUE;
 static gboolean		pref_use_capslock = FALSE;
 static gboolean		pref_use_status_window = FALSE;
 static gboolean		pref_use_dvorak = FALSE;
+static gboolean		pref_use_manual_mode = FALSE;
 static gchar           *pref_hanja_font = NULL;
 static gint		pref_preedit_style = 0;
 static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
@@ -425,6 +427,17 @@ use_capslock_change (GtkSettings *settings, gpointer data)
 }
 
 static void
+use_manual_mode_change (GtkSettings *settings, gpointer data)
+{
+  g_return_if_fail (GTK_IS_SETTINGS (settings));
+
+  g_object_get (settings,
+		"gtk-im-hangul-use-manual-mode", &pref_use_manual_mode,
+		NULL);
+}
+
+
+static void
 use_dvorak_change (GtkSettings *settings, gpointer data)
 {
   g_return_if_fail (GTK_IS_SETTINGS (settings));
@@ -555,6 +568,22 @@ im_hangul_set_client_window (GtkIMContext *context,
 			  G_CALLBACK(preedit_style_change),
 			  widget);
       preedit_style_change (settings, widget);
+    }
+  if (!have_property (settings, "gtk-im-hangul-use-manual-mode"))
+    {
+      GtkWidget *widget = NULL;
+      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-manual-mode",
+						           "Use manual mode",
+						           "Whether use manual mode or not",
+						           FALSE,
+						           G_PARAM_READWRITE));
+      gdk_window_get_user_data (client_window, (gpointer *)&widget);
+      desktop_info->use_manual_mode_cb =
+	g_signal_connect (G_OBJECT(settings),
+			  "notify::gtk-im-hangul-use-manual-mode",
+			  G_CALLBACK(use_manual_mode_change),
+			  NULL);
+      use_manual_mode_change (settings, NULL);
     }
 
   current_root_window = gdk_screen_get_root_window(screen);
@@ -1444,7 +1473,8 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     return FALSE;
 
   /* on Ctrl-Hangul we turn on/off manual_mode */
-  if (key->keyval == GDK_Hangul && (key->state & GDK_CONTROL_MASK))
+  if (pref_use_manual_mode &&
+      key->keyval == GDK_Hangul && (key->state & GDK_CONTROL_MASK))
     output_mode ^= OUTPUT_MODE_JAMO_EXT;
 
   /* on capslock, we use Hangul Jamo */
@@ -2083,6 +2113,8 @@ gtk_im_context_hangul_shutdown (void)
 	g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
       if (info->preedit_style_cb > 0)
 	g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
+      if (info->use_manual_mode_cb > 0)
+	g_signal_handler_disconnect (info->settings, info->use_manual_mode_cb);
       g_free(info);
     }
   g_slist_free(desktops);

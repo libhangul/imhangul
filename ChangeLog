@@ -1,3 +1,6 @@
+2003-04-08  Choe Hwanjin <krisna@kldp.org>
+	* gtkimcontexthangul.c: gtk-im-hangul-use-manual-mode 설정 변수 추가
+
 2003-03-30  Choe Hwanjin <krisna@kldp.org>
 	* release 0.9.6
 	* 모듈 파일을 인스톨한 후 gtk-query-immodules-2.0를 실행함
