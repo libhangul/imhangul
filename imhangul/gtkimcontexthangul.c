@@ -67,6 +67,7 @@ struct _Toplevel
   int input_mode;
   GtkWidget *widget;
   GtkWidget *status;
+  GSList *contexts;
   guint destroy_handler_id;
   guint configure_handler_id;
 };
@@ -178,6 +179,8 @@ static void     im_hangul_set_toplevel_input_mode(GtkIMContextHangul *hcontext,
 
 static Toplevel*  toplevel_new(GtkWidget *toplevel_widget);
 static Toplevel*  toplevel_get(GdkWindow *window);
+static void       toplevel_append_context(Toplevel *toplevel,
+					  GtkIMContextHangul *context);
 static void       toplevel_delete(Toplevel *toplevel);
 static GtkWidget* status_window_new(GtkWidget *parent);
 
@@ -344,9 +347,9 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 }
 
 static void
-im_hangul_finalize (GObject *obj)
+im_hangul_finalize (GObject *object)
 {
-  parent_class->finalize (obj);
+  G_OBJECT_CLASS(parent_class)->finalize (object);
 }
 
 static void
@@ -492,6 +495,12 @@ add_desktop (GdkScreen *screen)
 }
 
 static void
+on_client_window_destroy(GdkWindow *window, GtkIMContext *context)
+{
+  im_hangul_set_client_window(context, window);
+}
+
+static void
 im_hangul_set_client_window (GtkIMContext *context,
 			     GdkWindow *client_window)
 {
@@ -506,14 +515,16 @@ im_hangul_set_client_window (GtkIMContext *context,
   g_return_if_fail (GTK_IS_IM_CONTEXT_HANGUL (context));
 
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
+
   if (hcontext->client_window == client_window)
     return;
 
   hcontext->client_window = client_window;
   hcontext->toplevel = toplevel_get (client_window);
-  g_print("set client window : %x, %x\n", client_window, hcontext->toplevel);
   if (client_window == NULL)
     return;
+
+  toplevel_append_context(hcontext->toplevel, hcontext);
 
   gdk_window_get_user_data (client_window, &ptr);
   memcpy(&widget, &ptr, sizeof(widget));
@@ -1823,6 +1834,7 @@ toplevel_new(GtkWidget *toplevel_widget)
   toplevel->input_mode = INPUT_MODE_DIRECT;
   toplevel->widget = toplevel_widget;
   toplevel->status = NULL;
+  toplevel->contexts = NULL;
   toplevel->destroy_handler_id = 
 	    g_signal_connect_swapped (G_OBJECT(toplevel->widget), "destroy",
 			     G_CALLBACK(on_toplevel_destroy), toplevel);
@@ -1858,6 +1870,15 @@ toplevel_get(GdkWindow *window)
 }
 
 static void
+toplevel_append_context(Toplevel *toplevel, GtkIMContextHangul *context)
+{
+  if (toplevel == NULL || context == NULL)
+    return;
+
+  toplevel->contexts = g_slist_prepend(toplevel->contexts, context);
+}
+
+static void
 toplevel_delete(Toplevel *toplevel)
 {
   if (toplevel != NULL) {
@@ -1867,6 +1888,15 @@ toplevel_delete(Toplevel *toplevel)
 				   toplevel->destroy_handler_id);
       g_signal_handler_disconnect (toplevel->widget,
 				   toplevel->configure_handler_id);
+    }
+    if (toplevel->contexts != NULL) {
+      GSList *item = toplevel->contexts;
+      while (item != NULL) {
+	GtkIMContextHangul *context = (GtkIMContextHangul *)(item->data);
+	context->toplevel = NULL;
+	item = g_slist_next(item);
+      }
+      g_slist_free(toplevel->contexts);
     }
     g_object_set_data (G_OBJECT(toplevel->widget),
 		       "gtk-imhangul-toplevel-info", NULL);
@@ -2754,8 +2784,8 @@ candidate_on_key_press(GtkWidget *widget,
       candidate_next(candidate);
       break;
     case GDK_Escape:
+      candidate->hangul_context->candidate = NULL;
       candidate_delete(candidate);
-      candidate = NULL;
       break;
     case GDK_0:
       ch = candidate_get_nth(candidate, 9);
