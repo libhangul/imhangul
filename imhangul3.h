@@ -32,13 +32,14 @@ static void	im_hangul_push	(GtkIMContextHangul *context_hangul, gunichar ch);
 static void	im_hangul_commit_unicode(GtkIMContextHangul *context_hangul,
 					 gunichar ch);
 
+static const gunichar *keyboard_table;
 static gunichar (*im_hangul3_choseong)		(guint, guint);
 static gunichar (*im_hangul3_jungseong)		(guint, guint);
 static gunichar (*im_hangul3_jongseong)		(guint, guint);
 static gunichar (*im_hangul3_punct)		(guint, guint);
-static gunichar (*im_hangul3_comp_choseong)	(gunichar, guint, guint);
-static gunichar (*im_hangul3_comp_jungseong)	(gunichar, guint, guint);
-static gunichar (*im_hangul3_comp_jongseong)	(gunichar, guint, guint);
+static gunichar (*im_hangul3_comp_choseong)	(gunichar, gunichar);
+static gunichar (*im_hangul3_comp_jungseong)	(gunichar, gunichar);
+static gunichar (*im_hangul3_comp_jongseong)	(gunichar, gunichar);
 
 static void
 im_hangul_push(GtkIMContextHangul *context_hangul, gunichar ch)
@@ -79,70 +80,28 @@ im_hangul_commit_unicode(GtkIMContextHangul *context_hangul, gunichar ch)
   g_signal_emit_by_name(context_hangul, "commit", buf);
 }
 
-
-#if 0
-/* this funcs used for backspace in hangul 3 set keyboard */
 static gunichar
-im_hangul_compchoseong_to_single(gunichar ch)
+im_hangul3_mapping(guint keyval, guint state)
 {
-  switch (ch) {
-    case 0x1101:	/* hangul choseong ssangkiyeok */
-      return 0x1100;	/* hangul choseong kiyeok */
-    case 0x1104:	/* hangul choseong ssangtikeut */
-    case 0x1117:	/* hangul choseong tikeut-kiyeok */
-      return 0x1103;	/* hangul choseong tikeut */
-    case 0x1108:	/* hangul choseong ssangpieup */
-    case 0x111e:	/* hangul choseong pieup-kiyeok */
-    case 0x111f:	/* hangul choseong pieup-nieun */
-    case 0x1120:	/* hangul choseong pieup-tikeut */
-    case 0x1121:	/* hangul choseong pieup-sios */
-    case 0x1127:	/* hangul choseong pieup-cieuc */
-    case 0x1128:	/* hangul choseong pieup-chieuch */
-    case 0x1129:	/* hangul choseong pieup-thieuth */
-    case 0x112a:	/* hangul choseong pieup-phieuph */
-    case 0x112b:	/* hangul choseong kapyeounpieup */
-      return 0x1107;	/* hangul choseong pieup */
-    case 0x110a:	/* hangul choseong ssangsios */
-    case 0x112d:	/* hangul choseong sios-kiyeok */
-    case 0x112e:	/* hangul choseong sios-nieun */
-    case 0x112f:	/* hangul choseong sios-tikeut */
-    case 0x1130:	/* hangul choseong sios-rieul */
-    case 0x1131:	/* hangul choseong sios-mieum */
-    case 0x1132:	/* hangul choseong sios-pieup */
-    case 0x1135:	/* hangul choseong sios-ieung */
-    case 0x1136:	/* hangul choseong sios-cieuc */
-    case 0x1137:	/* hangul choseong sios-chieuch */
-    case 0x1138:	/* hangul choseong sios-khieukh */
-    case 0x1139:	/* hangul choseong sios-thieuth */
-    case 0x113a:	/* hangul choseong sios-phieuph */
-    case 0x113b:	/* hangul choseong sios-hieuh */
-      return 0x1109;	/* hangul choseong sios */
-    case 0x110d:	/* hangul choseong ssangcieuc */
-      return 0x110c;	/* hangul choseong cieuc */
-    case 0x1113:	/* hangul choseong nieun-kiyeok */
-    case 0x1114:	/* hangul choseong ssangnieun */
-    case 0x1115:	/* hangul choseong nieun-tikeut */
-    case 0x1116:	/* hangul choseong nieun-pieup */
-      return 0x1102;	/* hangul choseong nieun */
-    case 0x1118:	/* hangul choseong rieul-neiun */
-    case 0x1119:	/* hangul choseong ssangrieul */
-    case 0x111a:	/* hangul choseong rieul-hieuh */
-    case 0x111b:	/* hangul choseong kapyeounrieul */
-      return 0x1105;	/* hangul choseong rieul */
-    case 0x111c:	/* hangul choseong mieum-pieup */
-    case 0x111d:	/* hangul choseong kapyeounmieum */
-      return 0x1106;	/* hangul choseong mieum */
-    case 0x1122:	/* hangul choseong pieup-sios-kiyeok */
-    case 0x1123:	/* hangul choseong pieup-sios-tikeut */
-    case 0x1124:	/* hangul choseong pieup-sios-pieup */
-    case 0x1125:	/* hangul choseong pieup-ssangsois */
-    case 0x1126:	/* hangul choseong pieup-sios-cieuc */
-      return 0x1121;	/* hangul choseong pieup-sios */
-  }
-  return 0;
-}
+  if (keyboard_table == NULL)
+    return 0;
 
-#endif
+  /* treat capslock, as capslock is not on */
+  if (state & GDK_LOCK_MASK) {
+    if (state & GDK_SHIFT_MASK) {
+      if (keyval >= GDK_a && keyval <= GDK_z)
+        keyval -= (GDK_a - GDK_A);
+    } else {
+      if (keyval >= GDK_A && keyval <= GDK_Z)
+        keyval += (GDK_a - GDK_A);
+    }
+  }
+
+  if (keyval >= GDK_exclam  && keyval <= GDK_asciitilde)
+    return keyboard_table[keyval - GDK_exclam];
+  else
+    return 0;
+}
 
 static gboolean
 im_hangul3_automata(GtkIMContextHangul *context_hangul,
@@ -159,8 +118,9 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
     state = key->state;
   }
 
+  ch = im_hangul3_mapping(keyval, state);
+
   /* choseong */
-  ch = im_hangul3_choseong(keyval, state);
   if (im_hangul_is_choseong(ch)) {
     gunichar choseong;
     if (context_hangul->choseong == 0) {
@@ -169,8 +129,7 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
       goto done;
     }
     if (im_hangul_is_choseong(im_hangul_peek(context_hangul))) {
-      choseong = im_hangul3_comp_choseong(context_hangul->choseong,
-					  keyval, state);
+      choseong = im_hangul3_comp_choseong(context_hangul->choseong, ch);
       if (choseong) {
         context_hangul->choseong = choseong;
         im_hangul_push(context_hangul, choseong);
@@ -184,7 +143,6 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
   }
 
   /* junseong */
-  ch = im_hangul3_jungseong(keyval, state);
   if (im_hangul_is_jungseong(ch)) {
     gunichar jungseong;
     if (context_hangul->jungseong == 0) {
@@ -193,8 +151,7 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
       goto done;
     }
     if (im_hangul_is_jungseong(im_hangul_peek(context_hangul))) {
-      jungseong = im_hangul3_comp_jungseong(context_hangul->jungseong,
-					    keyval, state);
+      jungseong = im_hangul3_comp_jungseong(context_hangul->jungseong, ch);
       if (jungseong) {
         context_hangul->jungseong = jungseong;
         im_hangul_push(context_hangul, jungseong);
@@ -208,7 +165,6 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
   }
 
   /* jongseong */
-  ch = im_hangul3_jongseong(keyval, state);
   if (im_hangul_is_jongseong(ch)) {
     if (context_hangul->jongseong == 0) {
       context_hangul->jongseong = ch;
@@ -217,8 +173,7 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
     }
     if (im_hangul_is_jongseong(im_hangul_peek(context_hangul))) {
       gunichar jongseong;
-      jongseong = im_hangul3_comp_jongseong(context_hangul->jongseong,
-					    keyval, state);
+      jongseong = im_hangul3_comp_jongseong(context_hangul->jongseong, ch);
       if (jongseong) {
         context_hangul->jongseong = jongseong;
         im_hangul_push(context_hangul, jongseong);
@@ -232,40 +187,14 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
   }
 
   /* number and puctuation */
-  ch = im_hangul3_punct(keyval, state);
-  if (ch) {
+  if (ch > 0) {
     im_hangul_commit(context_hangul);
     im_hangul_commit_unicode(context_hangul, ch);
     context_hangul->state = 0;
     goto done;
   }
 
-  /* backspace
-  if (im_hangul_is_backspace(key)) {
-    ch = im_hangul_pop(context_hangul);
-    if (ch == 0)
-      return FALSE;
-    if (context_hangul->choseong == ch) {
-      context_hangul->choseong = im_hangul_compchoseong_to_single(ch);
-      goto done;
-    }
-    if (context_hangul->jungseong == ch) {
-      context_hangul->jungseong = im_hangul_compjungseong_to_single(ch);
-      if (context_hangul->jungseong != im_hangul_peek(context_hangul))
-        context_hangul->jungseong = 0;
-      goto done;
-    }
-    if (context_hangul->jongseong == ch) {
-      context_hangul->jongseong = im_hangul_compjongseong_to_single(ch);
-      if (context_hangul->jongseong != im_hangul_peek(context_hangul))
-        context_hangul->jongseong = 0;
-      goto done;
-    }
-    return FALSE;
-  }
-  */
-
-  /* new backspace treat routine */
+  /* treat backspace */
   if (im_hangul_is_backspace(key)) {
     ch = im_hangul_pop(context_hangul);
     if (ch == 0)
