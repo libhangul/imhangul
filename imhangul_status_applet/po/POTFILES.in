@@ -1,2 +1,4 @@
 src/imhangul_status.c
 src/imhangul_status.schemas.in
+src/GNOME_IMHangulStatusApplet.xml
+src/GNOME_IMHangulStatusApplet.server.in.in

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-11-10 22:29+0900\n"
+"POT-Creation-Date: 2002-11-12 10:07+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: src/imhangul_status.c:288
 msgid "imhangul status applet: Select Theme"
-msgstr ""
+msgstr "imhangul status applet: 테마를 선택하세요"
 
 #: src/imhangul_status.c:315
 #, fuzzy
@@ -38,3 +38,24 @@ msgstr "imhangul의 한영 상태를 보여줍니다"
 #: src/imhangul_status.schemas.in.h:1
 msgid "theme name"
 msgstr "테마 이름"
+
+#: src/GNOME_IMHangulStatusApplet.xml.h:1
+msgid "_About..."
+msgstr "정보(_A)..."
+
+#: src/GNOME_IMHangulStatusApplet.xml.h:2
+msgid "_Themes..."
+msgstr "테마선택(_T)..."
+
+#: src/GNOME_IMHangulStatusApplet.server.in.in.h:1
+#, fuzzy
+msgid "Show status of imhangul modules"
+msgstr "imhangul의 한영 상태를 보여줍니다"
+
+#: src/GNOME_IMHangulStatusApplet.server.in.in.h:2
+msgid "Utility"
+msgstr ""
+
+#: src/GNOME_IMHangulStatusApplet.server.in.in.h:3
+msgid "imhangul Status Applet"
+msgstr "한글입력모듈의 상태 정보"
