@@ -19,6 +19,8 @@
  * Author: Choe Hwanjin <krisna@kldp.org>
  */
 
+#include <string.h>
+
 #include <gdk/gdkkeysyms.h>
 
 #include <gtk/gtkmain.h>
@@ -505,6 +507,7 @@ im_hangul_set_client_window (GtkIMContext *context,
   GdkScreen *screen;
   GtkSettings *settings;
   GtkWidget *widget = NULL;
+  gpointer ptr;
   DesktopInfo *desktop_info;
   GtkIMContextHangul *hcontext;
 
@@ -521,7 +524,8 @@ im_hangul_set_client_window (GtkIMContext *context,
 
   /* find toplevel window (GtkWidget) */
   hcontext->toplevel = get_toplevel_window (client_window);
-  gdk_window_get_user_data (client_window, (gpointer *)&widget);
+  gdk_window_get_user_data (client_window, &ptr);
+  memcpy(&widget, &ptr, sizeof(widget));
 
   /* install settings */
   /* check whether installed or not */
@@ -1787,6 +1791,7 @@ static GtkWidget *
 get_toplevel_window (GdkWindow *window)
 {
   GtkWidget *toplevel;
+  gpointer ptr;
   GdkWindow *parent;
 
   if (window == NULL)
@@ -1800,7 +1805,8 @@ get_toplevel_window (GdkWindow *window)
       window = parent;
   }
 
-  gdk_window_get_user_data (window, (gpointer *)&toplevel);
+  gdk_window_get_user_data (window, &ptr);
+  memcpy(&toplevel, &ptr, sizeof(toplevel));
   return toplevel;
 }
 
