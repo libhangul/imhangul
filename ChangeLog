@@ -1,3 +1,11 @@
+일  9월 29 11:28:15 KST 2002
+	* version up: 0.9.3
+	* imhangul2.c imhangul3.h imhangul3f.c imhangul3s.c imhangul39.c
+	  imhangul3y.c:
+	  한글 모듈을 자판 별로 모두 분리함
+	* Makefile.am: gtk-query-immodules-2.0을 $(DESTDIR)이 nul 스트링인
+	  경우만 실행하도록 수정(패키징시의 문제점을 해결하기 위해)
+
 월  9월  9 19:13:06 KST 2002
 	* version up: 0.9.2
 
