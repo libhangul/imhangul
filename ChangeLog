@@ -1,3 +1,7 @@
+2002. 10. 25. (금) 23:38:34 KST
+	* imhangul32.c: 변형 두벌식 자판으로 세벌식 입력을 흉내내는 모듈 추가
+	* imhangul.h: Ctrl-Hangul키로 manual mode를 토글 가능
+
 2002. 10. 24. (목) 18:25:09 KST
 	* imhangul3f.c imhangul39.c imhangul3s.c imhangul3y.c: 자판 배열을 모두
 	  table을 사용하도록 수정함. 자판에 종속적이지 않은 compose 테이블을 
