@@ -64,7 +64,7 @@ static const gunichar keyboard_table_390[] = {
   0x002c,	/* GDK_comma:		comma				*/
   0x002d,	/* GDK_minus:		minus sign			*/
   0x002e,	/* GDK_period:		period				*/
-  0x1169,	/* GDK_slash:		jungseong u			*/
+  0x1169,	/* GDK_slash:		jungseong o			*/
   0x110f,	/* GDK_0:		choseong  khieukh		*/
   0x11c2,	/* GDK_1:		jongseong hieuh			*/
   0x11bb,	/* GDK_2:		jongseong ssangsios		*/
