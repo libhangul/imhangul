@@ -1,5 +1,5 @@
-/* GTK - The GIMP Toolkit
- * Copyright (C) 2002 Choe Hwanjin
+/* ImHangul - Gtk+ 2.0 Input Method Module for Hangul
+ * Copyright (C) 2002,2003,2004 Choe Hwanjin
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -15,18 +15,17 @@
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * Author: Choe Hwanjin <krisna@kldp.org>
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <string.h>
-
 #include <gdk/gdkkeysyms.h>
-
 #include <gtk/gtk.h>
 
+#include "gettext.h"
 #include "gtkimcontexthangul.h"
 
 enum {
@@ -178,7 +177,6 @@ static void	im_hangul_preedit_nothing    (PangoAttrList **attrs,
 static GtkWidget* get_toplevel_window (GdkWindow *window);
 static void status_window_show	    (GtkIMContextHangul *hcontext);
 static void status_window_hide	    (GtkIMContextHangul *hcontext);
-static void status_window_set_label (GtkIMContextHangul *hcontext);
 static StatusWindow* status_window_get (GtkIMContextHangul *hcontext);
 static void status_window_free      (StatusWindow *status_window);
 
@@ -392,7 +390,7 @@ status_window_change (GtkSettings *settings, gpointer data)
   list = status_windows;
   if (!pref_use_status_window)
     {
-      while (list)
+      while (list != NULL)
 	{
 	  status_window = (StatusWindow*)(list->data);
 	  gtk_widget_hide (status_window->window);
@@ -721,7 +719,7 @@ im_hangul_mode_hangul (GtkIMContextHangul *hcontext)
   input_mode = INPUT_MODE_HANGUL;
   hcontext->input_mode = INPUT_MODE_HANGUL;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
-  status_window_set_label (hcontext);
+  status_window_show(hcontext);
   g_signal_emit_by_name (hcontext, "preedit_start");
 }
 
@@ -731,7 +729,7 @@ im_hangul_mode_direct (GtkIMContextHangul *hcontext)
   input_mode = INPUT_MODE_DIRECT;
   hcontext->input_mode = INPUT_MODE_DIRECT;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
-  status_window_set_label (hcontext);
+  status_window_hide(hcontext);
   g_signal_emit_by_name (hcontext, "preedit_end");
 }
 
@@ -1120,16 +1118,17 @@ im_hangul_focus_in (GtkIMContext *context)
       im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
       if (pref_use_global_state)
 	hcontext->input_mode = INPUT_MODE_DIRECT;
+      status_window_hide (hcontext);
     }
   else
     {
       im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
       if (pref_use_global_state)
 	hcontext->input_mode = INPUT_MODE_HANGUL;
+      status_window_show (hcontext);
     }
 
   current_context = hcontext;
-  status_window_show (hcontext);
 }
 
 static inline void
@@ -1786,39 +1785,6 @@ status_window_configure	(GtkWidget *toplevel,
   return FALSE;
 }
 
-static gboolean
-on_click_hangul (GtkWidget *widget,
-		 GdkEventButton *event,
-		 gpointer data)
-{
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(data);
-
-  if (hcontext->input_mode == INPUT_MODE_DIRECT)
-    {
-      /* english mode change to hangul mode */
-      im_hangul_mode_hangul (hcontext);
-    }
-  else
-    {
-      /* hangul mode change to english mode */
-      if (im_hangul_commit (hcontext))
-	im_hangul_emit_preedit_changed (hcontext);
-      im_hangul_mode_direct (hcontext);
-    }
-  return TRUE;
-}
-
-static gboolean
-on_click_hanja (GtkWidget *widget,
-		GdkEventButton *event,
-		gpointer data)
-{
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (data);
-
-  popup_candidate_window (hcontext);
-  return TRUE;
-}
-
 static GtkWidget *
 get_toplevel_window (GdkWindow *window)
 {
@@ -1854,11 +1820,12 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
 {
   GtkWidget *toplevel;
   GtkWidget *window;
-  GtkWidget *hbox;
-  GtkWidget *ebox;
   GtkWidget *frame;
   GtkWidget *label;
   StatusWindow *status_window;
+
+  if (!pref_use_status_window)
+    return NULL;
 
   toplevel = hcontext->toplevel;
   if (toplevel == NULL)
@@ -1889,30 +1856,10 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   gtk_widget_show (frame);
   gtk_container_add (GTK_CONTAINER(window), frame);
 
-  hbox = gtk_hbox_new (TRUE, 3);
-  gtk_widget_show (hbox);
-  gtk_container_add (GTK_CONTAINER(frame), hbox);
-
-  /* yeongeo/hangul label */
-  label = gtk_label_new (""); 
-  status_window->hangul_label = label;
+  /* hangul status window label */
+  label = gtk_label_new (_("hangul")); 
+  gtk_container_add (GTK_CONTAINER(frame), label);
   gtk_widget_show (label);
-  ebox = gtk_event_box_new ();
-  gtk_widget_show (ebox);
-  gtk_container_add (GTK_CONTAINER(ebox), label);
-  gtk_box_pack_start (GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
-  g_signal_connect (G_OBJECT(ebox), "button-press-event",
-		    G_CALLBACK(on_click_hangul), hcontext);
-
-  /* hanja label */
-  label = gtk_label_new ("[\355\225\234\354\236\220]");
-  gtk_widget_show (label);
-  ebox = gtk_event_box_new ();
-  gtk_widget_show (ebox);
-  gtk_container_add (GTK_CONTAINER(ebox), label);
-  gtk_box_pack_start (GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
-  g_signal_connect (G_OBJECT(ebox), "button-press-event",
-		    G_CALLBACK(on_click_hanja), hcontext);
 
   status_window->destroy_handler_id =
 			g_signal_connect_swapped (G_OBJECT(toplevel), "destroy",
@@ -1927,7 +1874,6 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   g_signal_connect (G_OBJECT(window), "expose-event",
 		   G_CALLBACK(status_window_expose_event), NULL);
 
-  status_window_set_label (hcontext);
   g_object_set_data (G_OBJECT(toplevel),
 		    "gtk-imhangul-status-window", status_window);
 
@@ -1941,7 +1887,6 @@ status_window_show (GtkIMContextHangul *hcontext)
 
   if (window)
     {
-      status_window_set_label (hcontext);
       if (pref_use_status_window)
         gtk_widget_show (window);
       else
@@ -1957,33 +1902,6 @@ status_window_hide (GtkIMContextHangul *hcontext)
   if (window)
     gtk_widget_hide (window);
 }
-
-static void
-status_window_set_label (GtkIMContextHangul *hcontext)
-{
-  static const gchar yeongeo[] = { 
-	'[', 0xec, 0x98, 0x81, 0xec, 0x96, 0xb4, ']', 0	/* utf8 string */
-  };
-  static const gchar hangul[] = { 
-	'[', 0xed, 0x95, 0x9c, 0xea, 0xb8, 0x80, ']', 0 /* utf8 string */
-  };
-
-  GtkWidget *label;
-  StatusWindow *status_window = status_window_get (hcontext);
-
-  if (status_window == NULL)
-    return;
-
-  label = status_window->hangul_label;
-  if (label)
-    {
-      if (hcontext->input_mode == INPUT_MODE_DIRECT)
-	gtk_label_set_text (GTK_LABEL(label), yeongeo);
-      else
-	gtk_label_set_text (GTK_LABEL(label), hangul);
-    }
-}
-
 
 /*
  * candidate selection window

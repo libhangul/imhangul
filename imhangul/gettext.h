@@ -25,7 +25,7 @@
 /* Get declarations of GNU message catalog functions.  */
 # include <libintl.h>
 
-# define _(x) dgettext(GETEXT_PACKAGE, x)
+# define _(x) dgettext(GETTEXT_PACKAGE, x)
 # define N_(String) gettext_noop (String)
 
 #else

@@ -19,7 +19,7 @@ style "imhangul-status-style"
 # 한자 선택창 에서 나타나는 글자의 색과 크기모양
 style "imhangul-candidate-style"
 {
-	font_name	= "Sans 20"
+	font_name	= "Sans"
 #	font_name	= "Andale Sans UI 20"
 }
 
