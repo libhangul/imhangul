@@ -1,3 +1,15 @@
+토 10월 12 11:15:16 KST 2002
+	* imhangul.h: gtk_settings_install을 호출하기 전에 property가 이미
+	  인스톨 되어 있는지 체크함
+	  im_hangul_compjungseong_to_single, im_hangul_compjongseong_signle를
+	  imhangul2.c 로 옮김
+	  "gtk-imhangul-use-capslock" 세팅값을 추가
+	  use_caps_lock 을 pref_use_caps_lock로 이름 바꿈
+	* imhangul3y.c: 옛글 자판을 완성. 단 모음의 경우 우선은 compatibility
+	  Jamo(U+3130)영역에 있는 것들만 조합되도록 함 (U+1100 영역에 있는
+	  모음을 모두 조합 가능하게 하려면 너무 코딩량도 많고 불편할것 같아서
+	  그냥 이 정도로 구현해둠, 사실 쓰는 사람이 있을지도 의문임)
+
 목 10월 10 21:25:44 KST 2002
 	* imhangul3.h: backspace를 눌렀을때 im_hangul_compchoseong_to_single,
 	  im_hangul_compjungseong_to_single,im_hangul_compjongseong_to_single를

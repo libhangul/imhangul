@@ -20,11 +20,17 @@
  * this module is for hangul 3bul sik mode users
  */
 
+
+/* we dont use this func anymore
 static gunichar	im_hangul_compchoseong_to_single	(gunichar ch);
+*/
 
 static gunichar	im_hangul_pop	(GtkIMContextHangul *context_hangul);
 static gunichar	im_hangul_peek	(GtkIMContextHangul *context_hangul);
 static void	im_hangul_push	(GtkIMContextHangul *context_hangul, gunichar ch);
+
+static void	im_hangul_commit_unicode(GtkIMContextHangul *context_hangul,
+					 gunichar ch);
 
 static gunichar (*im_hangul3_choseong)		(guint, guint);
 static gunichar (*im_hangul3_jungseong)		(guint, guint);
@@ -55,6 +61,24 @@ im_hangul_pop(GtkIMContextHangul *context_hangul)
     return 0;
   return context_hangul->stack[context_hangul->index--];
 }
+
+static void
+im_hangul_commit_unicode(GtkIMContextHangul *context_hangul, gunichar ch)
+{
+  int n;
+  gchar buf[6];
+
+  n = g_unichar_to_utf8(ch, buf);
+  buf[n] = '\0';
+
+  context_hangul->choseong = 0;
+  context_hangul->jungseong = 0;
+  context_hangul->jongseong = 0;
+  context_hangul->index = -1;
+
+  g_signal_emit_by_name(context_hangul, "commit", buf);
+}
+
 
 #if 0
 /* this funcs used for backspace in hangul 3 set keyboard */
@@ -216,8 +240,7 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
     goto done;
   }
 
-  /* backspace */
-  /*
+  /* backspace
   if (im_hangul_is_backspace(key)) {
     ch = im_hangul_pop(context_hangul);
     if (ch == 0)
@@ -242,6 +265,7 @@ im_hangul3_automata(GtkIMContextHangul *context_hangul,
   }
   */
 
+  /* new backspace treat routine */
   if (im_hangul_is_backspace(key)) {
     ch = im_hangul_pop(context_hangul);
     if (ch == 0)
@@ -282,5 +306,4 @@ done:
   return TRUE;
 }
 
-/* vim: nocindent
- */
+/* vim: set nocindent: */
