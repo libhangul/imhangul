@@ -1,5 +1,7 @@
 2003-10-20  Choe Hwanjin <krisna@kldp.org>
-	* release 0.9.7
+	* Makefile.am: CFLAGS 정리, GTK_BINARY_VERSION 사용
+	* imhangul.spec.in: GTK_BINARY_VERSION 사용
+	* gtkimcontexthangul.c: 함수 정리
 
 2003-09-05  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: xkb compatibility
