@@ -205,7 +205,8 @@ static gchar           *pref_hanja_font = NULL;
 static gint		pref_preedit_style = 0;
 static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
 						  gint start,
-						  gint end) = NULL;
+						  gint end) =
+						im_hangul_preedit_underline;
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
 
