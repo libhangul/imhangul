@@ -11,7 +11,8 @@ AC_PROG_LIBTOOL
 
 dnl Checks for libraries.
 dnl AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-AM_PATH_GTK_2_0(2.0.0,,AC_MSG_ERROR(im-hangul needs GTK+ 2.0.0 or higher))
+PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.0.0,,
+		  AC_MSG_ERROR([im-hangul needs GTK+ 2.0.0 or higher]))
 
 dnl Checks for header files.
 
@@ -24,7 +25,10 @@ if test x$CC == xgcc; then
 	CFLAGS="$CFLAGS -Wall"
 fi
 
-GTK_BINARY_VERSION="2.0.0"
+dnl check for gtk binary version
+GTK_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
+GTK_PREFIX=`$PKG_CONFIG --variable=prefix gtk+-2.0`
 AC_SUBST(GTK_BINARY_VERSION)
+AC_SUBST(GTK_PREFIX)
 
 AC_OUTPUT(Makefile imhangul.spec)

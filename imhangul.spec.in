@@ -1,6 +1,8 @@
-%define name	imhangul
-%define ver	@VERSION@
-%define rel	1
+%define name		imhangul
+%define ver		@VERSION@
+%define rel		1
+%define gtk_prefix	@GTK_PREFIX@
+%define gtk_binver	@GTK_BINARY_VERSION@
 
 Summary:	Hangul input module for GTK+ 2.0
 Summary(ko):	GTK+ 2.0에서 사용할수 있는 한글 입력모듈
@@ -24,33 +26,34 @@ GTK+ 2.0에서 사용할수 있는 한글 입력모듈
 
 %prep
 %setup
-./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+./configure --prefix=%{gtk_prefix} --sysconfdir=%{_sysconfdir}
 
 %build
 make
 
 %install
-mkdir -p $RPM_BUILD_ROOT/etc/gtk-2.0
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gtk-2.0
 make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr( 0755, root, root )
-/usr/lib/gtk-2.0/2.0.0/immodules/*.la
-/usr/lib/gtk-2.0/2.0.0/immodules/*.so
-%defattr( 0644, root, root )
-/usr/lib/gtk-2.0/2.0.0/immodules/*.a
+%{gtk_prefix}/lib/gtk-2.0/%{gtk_binver}/immodules/*.la
+%{gtk_prefix}/lib/gtk-2.0/%{gtk_binver}/immodules/*.so
 
 %doc COPYING ChangeLog INSTALL TODO
 
 %post
-/usr/bin/gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
+/usr/bin/gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %postun
-/usr/bin/gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
+/usr/bin/gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %changelog
+* 2002. 10. 28. 15:38:10 KST <krisna@kldp.org>
+- add gtk_prefix, gtk_binver
+
 * Mon Jul 22 2002 Lee, Kwan-hong <sorcerer@jerimo.org>
 - Make RPM package

@@ -3,10 +3,10 @@
 
 EXTRA_DIST = test.sh gtkrc gen.py
 
-INCLUDES = -DGTK_LOCALEDIR=\"$(prefix)/share/locale\"
+INCLUDES = -DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"
 LDADDS = @GTK_LIBS@
 
-moduledir = $(libdir)/gtk-2.0/$(GTK_BINARY_VERSION)/immodules
+moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
 
 GTK_IMMODULES= $(sysconfdir)/gtk-2.0/gtk.immodules
 
