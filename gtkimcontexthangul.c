@@ -511,6 +511,7 @@ im_hangul_set_client_window (GtkIMContext *context,
 
   hcontext->client_window = client_window;
   hcontext->toplevel = toplevel_get (client_window);
+  g_print("set client window : %x, %x\n", client_window, hcontext->toplevel);
   if (client_window == NULL)
     return;
 
@@ -1701,25 +1702,29 @@ status_window_expose_event (GtkWidget *widget, GdkEventExpose *event)
 }
 
 static gboolean
-status_window_configure	(GtkWidget *toplevel,
+status_window_configure	(GtkWidget *widget,
 			 GdkEventConfigure *event,
-			 GtkWidget *window)
+			 Toplevel *toplevel)
 {
   GdkRectangle rect;
   GtkRequisition requisition;
   gint y;
 
-  gdk_window_get_frame_extents (toplevel->window, &rect);
-  gtk_widget_size_request (window, &requisition);
+  if (toplevel == NULL || toplevel->status == NULL)
+    return FALSE;
+
+  gdk_window_get_frame_extents (widget->window, &rect);
+  gtk_widget_size_request (toplevel->status, &requisition);
 
   if (rect.y + rect.height + requisition.height < gdk_screen_height ())
     y = rect.y + rect.height;
   else
     y = gdk_screen_height () - requisition.height;
 
-  gtk_window_move (GTK_WINDOW (window), rect.x, y);
+  gtk_window_move (GTK_WINDOW(toplevel->status), rect.x, y);
   return FALSE;
 }
+
 static GtkWidget*
 status_window_new(GtkWidget *parent)
 {
@@ -1759,14 +1764,15 @@ im_hangul_show_status_window (GtkIMContextHangul *hcontext)
 {
   g_return_if_fail (hcontext != NULL);
 
-  if (hcontext->toplevel != NULL) {
-    GtkWidget *window = hcontext->toplevel->status;
-    if (window != NULL) {
-	if (pref_use_status_window)
-	  gtk_widget_show (window);
-	else
-	  gtk_widget_hide (window);
+  if (pref_use_status_window && hcontext->toplevel != NULL) {
+    if (hcontext->toplevel->status == NULL) {
+      hcontext->toplevel->status =
+	status_window_new(hcontext->toplevel->widget);
+	status_window_configure (hcontext->toplevel->widget,
+				 NULL,
+				 hcontext->toplevel);
     }
+    gtk_widget_show (hcontext->toplevel->status);
   }
 }
 
@@ -1775,11 +1781,8 @@ im_hangul_hide_status_window (GtkIMContextHangul *hcontext)
 {
   g_return_if_fail (hcontext != NULL);
 
-  if (hcontext->toplevel != NULL) {
-    GtkWidget *window = hcontext->toplevel->status;
-    if (window != NULL) {
-      gtk_widget_hide (window);
-    }
+  if (hcontext->toplevel != NULL && hcontext->toplevel->status != NULL) {
+    gtk_widget_hide (hcontext->toplevel->status);
   }
 }
 
@@ -1819,15 +1822,14 @@ toplevel_new(GtkWidget *toplevel_widget)
   toplevel->ref_count = 1;
   toplevel->input_mode = INPUT_MODE_DIRECT;
   toplevel->widget = toplevel_widget;
-  toplevel->status = status_window_new(toplevel->widget);
+  toplevel->status = NULL;
   toplevel->destroy_handler_id = 
 	    g_signal_connect_swapped (G_OBJECT(toplevel->widget), "destroy",
 			     G_CALLBACK(on_toplevel_destroy), toplevel);
   toplevel->configure_handler_id = 
 	    g_signal_connect (G_OBJECT(toplevel->widget), "configure-event",
 			     G_CALLBACK(status_window_configure),
-			     toplevel->status);
-  status_window_configure (toplevel->widget, NULL, toplevel->status);
+			     toplevel);
 
   g_object_set_data(G_OBJECT(toplevel_widget),
 		     "gtk-imhangul-toplevel-info", toplevel);
@@ -2694,7 +2696,7 @@ candidate_on_scroll(GtkWidget *widget,
 {
   Candidate *candidate;
 
-  if (candidate == NULL)
+  if (data == NULL)
     return FALSE;
 
   candidate = (Candidate*)data;
@@ -2719,7 +2721,7 @@ candidate_on_key_press(GtkWidget *widget,
   Candidate *candidate;
   gunichar ch = 0;
 
-  if (candidate == NULL)
+  if (data == NULL)
     return FALSE;
 
   candidate = (Candidate*)data;
