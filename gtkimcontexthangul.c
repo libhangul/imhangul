@@ -174,6 +174,7 @@ GType gtk_type_im_context_hangul = 0;
 static GObjectClass *parent_class;
 
 static GtkIMContextHangul *current_context = NULL;
+static GdkWindow *current_root_window = NULL;
 static GSList *status_windows = NULL;
 static GtkWidget *hanja_window = NULL;
 static GtkWidget *char_table_window = NULL;
@@ -223,7 +224,7 @@ gtk_im_context_hangul_register_type (GTypeModule *type_module)
     NULL,
     sizeof(GtkIMContextHangul),
     0,
-    (GtkObjectInitFunc) im_hangul_init,
+    (GInstanceInitFunc) im_hangul_init,
   };
 
   gtk_type_im_context_hangul =
@@ -451,6 +452,7 @@ im_hangul_set_client_window (GtkIMContext *context,
   /* install settings */
   /* check whether installed or not */
   screen = gdk_drawable_get_screen (GDK_DRAWABLE (client_window));
+  current_root_window = gdk_screen_get_root_window(screen);
   settings = gtk_settings_get_for_screen (screen);
   g_return_if_fail (GTK_IS_SETTINGS (settings));
 
@@ -578,7 +580,10 @@ im_hangul_set_input_mode_info (int state)
 {
   long data = state;
 
-  gdk_property_change (GDK_ROOT_PARENT (),
+  if (current_root_window == NULL)
+    return;
+
+  gdk_property_change (current_root_window,
 		       gdk_atom_intern ("_HANGUL_INPUT_MODE", FALSE),
 		       gdk_atom_intern ("INTEGER", FALSE),
 		       32, GDK_PROP_MODE_REPLACE,
@@ -1626,7 +1631,7 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   gtk_container_set_border_width (GTK_CONTAINER(window), 1);
   /* gtk_window_set_decorated (GTK_WINDOW(window), FALSE); */
   gtk_widget_set_name (window, "imhangul_status");
-  gtk_window_set_policy (GTK_WINDOW(window), FALSE, FALSE, FALSE);
+  gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
   gtk_widget_set_app_paintable (window, TRUE);
 
   frame = gtk_frame_new (NULL);

@@ -11,18 +11,16 @@ void enter_callback( GtkWidget *widget,
   gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
 
-void entry_toggle_editable( GtkWidget *checkbutton,
-                            GtkWidget *entry )
-{
-  gtk_entry_set_editable(GTK_ENTRY(entry),
-			 GTK_TOGGLE_BUTTON(checkbutton)->active);
-}
-
 void entry_toggle_visibility( GtkWidget *checkbutton,
                               GtkWidget *entry )
 {
   gtk_entry_set_visibility(GTK_ENTRY(entry),
 			 GTK_TOGGLE_BUTTON(checkbutton)->active);
+}
+
+void quit( int ret )
+{
+    gtk_main_quit();
 }
 
 int main( int   argc,
@@ -39,46 +37,45 @@ int main( int   argc,
 
     /* create a new window */
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_usize( GTK_WIDGET (window), 200, 300);
     gtk_window_set_title(GTK_WINDOW (window), "GTK Entry");
-    gtk_signal_connect(GTK_OBJECT (window), "delete_event",
-                       (GtkSignalFunc) gtk_exit, NULL);
+    g_signal_connect_swapped(G_OBJECT (window), "delete_event",
+                             G_CALLBACK (quit), NULL);
 
     vbox = gtk_vbox_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER (window), vbox);
     gtk_widget_show (vbox);
 
-    entry = gtk_entry_new_with_max_length (200);
-    gtk_signal_connect(GTK_OBJECT(entry), "activate",
-		       GTK_SIGNAL_FUNC(enter_callback),
+    entry = gtk_entry_new ();
+    g_signal_connect(G_OBJECT(entry), "activate",
+		       G_CALLBACK(enter_callback),
 		       entry);
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
     gtk_widget_show (entry);
 
-    entry = gtk_entry_new_with_max_length (200);
-    gtk_signal_connect(GTK_OBJECT(entry), "activate",
-		       GTK_SIGNAL_FUNC(enter_callback),
+    entry = gtk_entry_new ();
+    g_signal_connect(G_OBJECT(entry), "activate",
+		       G_CALLBACK(enter_callback),
 		       entry);
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
     gtk_widget_show (entry);
 
-    entry = gtk_entry_new_with_max_length (200);
-    gtk_signal_connect(GTK_OBJECT(entry), "activate",
-		       GTK_SIGNAL_FUNC(enter_callback),
+    entry = gtk_entry_new ();
+    g_signal_connect(G_OBJECT(entry), "activate",
+		       G_CALLBACK(enter_callback),
 		       entry);
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
     gtk_widget_show (entry);
 
-    entry = gtk_entry_new_with_max_length (200);
-    gtk_signal_connect(GTK_OBJECT(entry), "activate",
-		       GTK_SIGNAL_FUNC(enter_callback),
+    entry = gtk_entry_new ();
+    g_signal_connect(G_OBJECT(entry), "activate",
+		       G_CALLBACK(enter_callback),
 		       entry);
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
     gtk_widget_show (entry);
 
-    entry = gtk_entry_new_with_max_length (200);
-    gtk_signal_connect(GTK_OBJECT(entry), "activate",
-		       GTK_SIGNAL_FUNC(enter_callback),
+    entry = gtk_entry_new ();
+    g_signal_connect(G_OBJECT(entry), "activate",
+		       G_CALLBACK(enter_callback),
 		       entry);
     gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
     gtk_widget_show (entry);
@@ -87,24 +84,16 @@ int main( int   argc,
     gtk_container_add (GTK_CONTAINER (vbox), hbox);
     gtk_widget_show (hbox);
                                   
-    check = gtk_check_button_new_with_label("Editable");
-    gtk_box_pack_start (GTK_BOX (hbox), check, TRUE, TRUE, 0);
-    gtk_signal_connect (GTK_OBJECT(check), "toggled",
-			GTK_SIGNAL_FUNC(entry_toggle_editable), entry);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
-    gtk_widget_show (check);
-    
     check = gtk_check_button_new_with_label("Visible");
     gtk_box_pack_start (GTK_BOX (hbox), check, TRUE, TRUE, 0);
-    gtk_signal_connect (GTK_OBJECT(check), "toggled",
-			GTK_SIGNAL_FUNC(entry_toggle_visibility), entry);
+    g_signal_connect (G_OBJECT(check), "toggled",
+			G_CALLBACK(entry_toggle_visibility), entry);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show (check);
                                    
     button = gtk_button_new_with_label ("Close");
-    gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-			       GTK_SIGNAL_FUNC(gtk_exit),
-			       GTK_OBJECT (window));
+    g_signal_connect (G_OBJECT (button), "clicked",
+		      G_CALLBACK(quit), NULL);
     gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
     GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
     gtk_widget_grab_default (button);
@@ -115,4 +104,5 @@ int main( int   argc,
     gtk_main();
     return(0);
 }
-/* example-end */
+
+/* vim: set sw=4 ts=8 : */

@@ -1,6 +1,11 @@
+2003-02-12  Choe Hwanjin <krisna@kldp.org>
+	* {G,GDK,GTK}_DISABLE_DEPRECATED 옵션 추가
+	* GDK_ROOT_PARENT대신 gdk_screen_get_root_window를 사용함
+
 2003-02-11  Choe Hwanjin <krisna@kldp.org>
 	* im_hangul_set_client_window()에서 두번째 인자를 NULL인지 검사하는
 	  부분 추가
+	* Makefile.am: CFLAGS 부분 제거
 	  (Nam SungHyun <namsh@kldp.org>님에게 감사드립니다.)
 
 2003-02-09  Choe Hwanjin <krisna@kldp.org>
