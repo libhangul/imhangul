@@ -535,14 +535,12 @@ im_hangul_jamo_to_syllable(gunichar choseong,
 /*  static int njungjong = 21 * 28; */
   gunichar ch;
 
-  if (choseong != HCF &&
-      !(choseong >= 0x1100 && choseong <= 0x1112))
+  if (!(choseong >= 0x1100 && choseong <= 0x1112))
     return 0;
-  if (jungseong != HJF &&
-      !(jungseong >= 0x1161 && jungseong <= 0x1175))
+  if (!(jungseong >= 0x1161 && jungseong <= 0x1175))
     return 0;
-  if (jongseong != 0x11A7 &&
-      !(jongseong >= 0x11a8 && jongseong <= 0x11c2))
+  /* we use 0x11a7 like a Jongseong filler */
+  if (!(jongseong >= 0x11a7 && jongseong <= 0x11c2))
     return 0;
 
   choseong -= choseong_base;
