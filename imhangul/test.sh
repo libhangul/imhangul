@@ -1,9 +1,7 @@
 #!/bin/bash
 
 immodules_file=./immodules
-if [ ! -f $immodules_file ]; then
-	gtk-query-immodules-2.0 .libs/*.so > $immodules_file
-fi
+gtk-query-immodules-2.0 .libs/*.so > $immodules_file
 
 export GTK_IM_MODULE=hangul2
 export GTK_RC_FILES=`pwd`/gtkrc

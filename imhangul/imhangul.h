@@ -177,8 +177,6 @@ static gboolean		pref_enable_inverse_sequence = TRUE;
 static gchar* 		pref_hanja_font = NULL;
 
 static guint16 gtk_compose_ignore[] = {
-  GDK_Shift_L,
-  GDK_Shift_R,
   GDK_Control_L,
   GDK_Control_R,
   GDK_Caps_Lock,
@@ -231,6 +229,13 @@ im_hangul_class_init (GtkIMContextHangulClass *class)
   im_context_class->focus_out = im_hangul_focus_out;
   im_context_class->get_preedit_string = im_hangul_get_preedit_string;
   gobject_class->finalize = im_hangul_finalize;
+
+  /* install settings */
+  gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-status",
+  						       "Status Window",
+						       "Whether to show status window or not",
+						       TRUE,
+						       G_PARAM_READWRITE));
 }
 
 static void 
