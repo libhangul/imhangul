@@ -1,4 +1,7 @@
 2003-01-12 (Sun) 16:00 Choe Hwanjin <krisna@kldp.org>
+	* gen.py 를 hanjatable.py로 이름 바꿈
+
+2003-01-15 (Wed) 20:57 Choe Hwanjin <krisna@kldp.org>
 	* 소스를 깨끗이 (탭, 빈칸 정리)
 	* imhangul.h: trigger 키를 처리하는 부분을 automata에서 filter
 	  함수로 옮김, STATE 상수를 enum으로 선언, 글자를 골라서 넣을수 있는
