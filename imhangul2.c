@@ -256,6 +256,45 @@ im_hangul2_jongseong_to_choseong(gunichar ch)
   return table[ch - 0x11a8];
 }
 
+static void
+im_hangul2_jongseong_dicompose(gunichar ch,
+			       gunichar* jong,
+			       gunichar* cho)
+{
+  static gunichar table[][2] = {
+    { 0,      0x1100 }, /* jong kiyeok	      = cho  kiyeok               */
+    { 0x11a8, 0x1100 }, /* jong ssangkiyeok   = jong kiyeok + cho kiyeok  */
+    { 0x11a8, 0x1109 }, /* jong kiyeok-sios   = jong kiyeok + cho sios    */
+    { 0,      0x1102 }, /* jong nieun	      = cho  nieun                */
+    { 0x11ab, 0x110c }, /* jong nieun-cieuc   = jong nieun  + cho cieuc   */
+    { 0x11ab, 0x1112 }, /* jong nieun-hieuh   = jong nieun  + cho hieuh   */
+    { 0,      0x1103 }, /* jong tikeut	      = cho  tikeut               */
+    { 0,      0x1105 }, /* jong rieul         = cho  rieul                */
+    { 0x11af, 0x1100 }, /* jong rieul-kiyeok  = jong rieul  + cho kiyeok  */
+    { 0x11af, 0x1106 }, /* jong rieul-mieum   = jong rieul  + cho mieum   */
+    { 0x11af, 0x1107 }, /* jong rieul-pieup   = jong rieul  + cho pieup   */
+    { 0x11af, 0x1109 }, /* jong rieul-sios    = jong rieul  + cho sios    */
+    { 0x11af, 0x1110 }, /* jong rieul-thieuth = jong rieul  + cho thieuth */
+    { 0x11af, 0x1111 }, /* jong rieul-phieuph = jong rieul  + cho phieuph */
+    { 0x11af, 0x1112 }, /* jong rieul-hieuh   = jong rieul  + cho hieuh   */
+    { 0,      0x1106 }, /* jong mieum         = cho  mieum                */
+    { 0,      0x1107 }, /* jong pieup         = cho  pieup                */
+    { 0x11b8, 0x1109 }, /* jong pieup-sios    = jong pieup  + cho sios    */
+    { 0,      0x1109 }, /* jong sios          = cho  sios                 */
+    { 0x11ba, 0x110a }, /* jong ssangsios     = jong sios   + cho sios    */
+    { 0,      0x110b }, /* jong ieung         = cho  ieung                */
+    { 0,      0x110c }, /* jong cieuc         = cho  cieuc                */
+    { 0,      0x110e }, /* jong chieuch       = cho  chieuch              */
+    { 0,      0x110f }, /* jong khieukh       = cho  khieukh              */
+    { 0,      0x1110 }, /* jong thieuth       = cho  thieuth              */
+    { 0,      0x1111 }, /* jong phieuph       = cho  phieuph              */
+    { 0,      0x1112 }  /* jong hieuh         = cho  hieuh                */
+  };
+
+  *jong = table[ch - 0x11a8][0];
+  *cho  = table[ch - 0x11a8][1];
+}
+
 static gboolean
 im_hangul2_automata(GtkIMContextHangul *hcontext,
 		    GdkEventKey *key)
@@ -451,10 +490,11 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
     if (im_hangul_is_jungseong(ch)) {
       /* complex final consonant
        * to single final consonant and initial consonant */
-      gunichar choseong = 
-		im_hangul2_jongseong_to_choseong(hcontext->jongseong[0]);
-      hcontext->jongseong[0] = 
-		im_hangul_compjongseong_to_single(hcontext->jongseong[0]);
+      gunichar choseong; 
+      gunichar jongseong; 
+      im_hangul2_jongseong_dicompose(hcontext->jongseong[0],
+      				     &jongseong, &choseong);
+      hcontext->jongseong[0] = jongseong;
       im_hangul_commit(hcontext);
       hcontext->choseong[0] = choseong;
       hcontext->jungseong[0] = ch;
@@ -506,10 +546,11 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
     if (im_hangul_is_jungseong(ch)) {
       /* complex final consonant
        * to single final consonant and initial consonant */
-      gunichar choseong = 
-		im_hangul2_jongseong_to_choseong(hcontext->jongseong[0]);
-      hcontext->jongseong[0] = 
-      		im_hangul_compjongseong_to_single(hcontext->jongseong[0]);
+      gunichar choseong; 
+      gunichar jongseong; 
+      im_hangul2_jongseong_dicompose(hcontext->jongseong[0],
+      				     &jongseong, &choseong);
+      hcontext->jongseong[0] = jongseong;
       im_hangul_commit(hcontext);
       hcontext->state = 3;
       hcontext->choseong[0] = choseong;
