@@ -281,7 +281,7 @@ im_hangul2_jongseong_dicompose(gunichar ch,
     { 0,      0x1107 }, /* jong pieup         = cho  pieup                */
     { 0x11b8, 0x1109 }, /* jong pieup-sios    = jong pieup  + cho sios    */
     { 0,      0x1109 }, /* jong sios          = cho  sios                 */
-    { 0x11ba, 0x110a }, /* jong ssangsios     = jong sios   + cho sios    */
+    { 0x11ba, 0x1109 }, /* jong ssangsios     = jong sios   + cho sios    */
     { 0,      0x110b }, /* jong ieung         = cho  ieung                */
     { 0,      0x110c }, /* jong cieuc         = cho  cieuc                */
     { 0,      0x110e }, /* jong chieuch       = cho  chieuch              */
