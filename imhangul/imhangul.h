@@ -157,6 +157,7 @@ static gint		input_mode = MODE_DIRECT;
 /* preferences */
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
+static gchar* 		pref_hanja_font = NULL;
 
 static guint16 gtk_compose_ignore[] = {
   GDK_Shift_L,
@@ -1209,10 +1210,14 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
   gunichar *p;
   gint x, y, n, index;
   GtkWidget *window, *table, *button, *label;
-  PangoAttrList *attrs;
-  PangoAttribute *attr;
+  PangoFontDescription *desc = NULL;
+  PangoAttrList *attrs = NULL;
+  PangoAttribute *attr = NULL;
   gchar buf[6];
   gulong id;
+
+  if (pref_hanja_font)
+  	desc = pango_font_description_from_string(pref_hanja_font);
 
   index = get_index_of_hanjatable(ch);
   g_print("index: %d\n", index);
@@ -1235,8 +1240,10 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
     button = gtk_button_new_with_label(buf);
     label = GTK_BIN(button)->child;
     attrs = pango_attr_list_new();
-    //attr = pango_attr_size_new(16000);
-    attr = pango_attr_scale_new(PANGO_SCALE_XX_LARGE);
+    if (desc)
+    	attr = pango_attr_font_desc_new(desc);
+    else
+    	attr = pango_attr_scale_new(PANGO_SCALE_XX_LARGE);
     attr->start_index = 0;
     attr->end_index = n;
     pango_attr_list_insert(attrs, attr);
@@ -1263,6 +1270,9 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
   g_signal_connect (G_OBJECT(window), "destroy",
 		    G_CALLBACK (on_destroy), NULL);
   gtk_widget_show_all(window);
+
+  pango_font_description_free(desc);
+
   return window;
 }
 
