@@ -176,27 +176,47 @@ static void popup_hanja_window	   (GtkIMContextHangul *hcontext);
 /*
  * global variables for hangul immodule
  */
-#define STATE_DIRECT -1 
-#define STATE_HANGUL 0 
+
 static GObjectClass *parent_class;
 
 static GSList *status_windows = NULL;
 static GtkWidget *hanja_window = NULL;
 
-#define MODE_HANJA	-2
-#define MODE_DIRECT	-1
-#define MODE_HANGUL	 0
+enum {
+  INPUT_MODE_DIRECT,
+  INPUT_MODE_HANGUL,
+  INPUT_MODE_HANJA
+} IMHangulInputMode;
+
+enum {
+  INPUT_MODE_INFO_NONE,
+  INPUT_MODE_INFO_ENGLISH,
+  INPUT_MODE_INFO_HANGUL
+} IMHangulInputModeInfo;
+
+#define STATE_DIRECT            -1 
+#define STATE_HANGUL            0 
+
+#define OUTPUT_MODE_AUTOMATIC   0 
+#define OUTPUT_MODE_MANUAL      1
+
+static GdkAtom          input_mode_info_atom;
+static GdkAtom          input_mode_info_type;
 static gboolean         manual_mode = FALSE;
-static gint		input_mode = MODE_DIRECT;
+static gint		input_mode = INPUT_MODE_DIRECT;
+static gint		output_mode = OUTPUT_MODE_AUTOMATIC;
 
 /* preferences */
+static gboolean		pref_use_global_state = TRUE;
 static gboolean		pref_use_caps_lock = FALSE;
 static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
 static gchar* 		pref_hanja_font = NULL;
 static gint		pref_preedit_style = 1;
-static void (*im_hangul_preedit_attr)(PangoAttrList **attrs, gint start, gint end) = NULL;
+static void             (*im_hangul_preedit_attr)(PangoAttrList **attrs,
+                                                  gint start,
+                                                  gint end) = NULL;
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
 
@@ -291,6 +311,9 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
 						     4,
 						     0,
 						     G_PARAM_READWRITE));
+  /* initiate input_mode_atom */
+  input_mode_info_atom = gdk_atom_intern("_HANGUL_INPUT_MODE", TRUE);
+  input_mode_info_type = gdk_atom_intern("INTEGER", TRUE);
 }
 
 static void
@@ -426,19 +449,36 @@ im_hangul_set_automata(GtkIMContextHangul *hcontext,
   hcontext->automata = automata;
 }
 
+static void
+im_hangul_set_input_mode_info(int state)
+{
+  static GdkWindow *current_root_window = NULL;
+
+  if (current_root_window == NULL)
+    current_root_window = GDK_ROOT_PARENT();
+
+  gdk_property_change(current_root_window,
+                      input_mode_info_atom,
+                      input_mode_info_type,
+                      32, GDK_PROP_MODE_REPLACE,
+                      (const guchar *)&state, 1);
+}
+
 static void 
 im_hangul_mode_hangul(GtkIMContextHangul *hcontext)
 {
-  input_mode = MODE_HANGUL;
+  input_mode = INPUT_MODE_HANGUL;
   hcontext->state = STATE_HANGUL;
+  im_hangul_set_input_mode_info(INPUT_MODE_INFO_HANGUL);
   status_window_set_label(hcontext);
 }
 
 static void 
 im_hangul_mode_direct(GtkIMContextHangul *hcontext)
 {
-  input_mode = MODE_DIRECT;
+  input_mode = INPUT_MODE_DIRECT;
   hcontext->state = STATE_DIRECT;
+  im_hangul_set_input_mode_info(INPUT_MODE_INFO_ENGLISH);
   status_window_set_label(hcontext);
 }
 
@@ -774,6 +814,16 @@ im_hangul_focus_in(GtkIMContext *context)
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
+  if (input_mode == INPUT_MODE_DIRECT) {
+    im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
+    if (pref_use_global_state)
+      hcontext->state = STATE_DIRECT;
+  } else {
+    im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
+    if (pref_use_global_state)
+      hcontext->state = STATE_HANGUL;
+  }
+
   status_window_show(hcontext);
 }
 
@@ -785,10 +835,11 @@ im_hangul_focus_out(GtkIMContext *context)
   if (hanja_window == NULL) {
     if (im_hangul_commit(hcontext)) {
       g_signal_emit_by_name (hcontext, "preedit_changed");
-      hcontext->state = MODE_HANGUL;
+      hcontext->state = STATE_HANGUL;
     }
   }
   status_window_hide(hcontext);
+  im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
 }
 
 static gboolean
@@ -1096,7 +1147,7 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   }
 
   /* handle direct mode */
-  if (input_mode == MODE_DIRECT) {
+  if (hcontext->state == STATE_DIRECT) {
     return im_hangul_handle_direct_mode(hcontext, key);
   }
 
@@ -1124,8 +1175,10 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   /* here we must hangul mode, so set STATE_HANGUL
    * static variable input_mode is not yet applied so we change it
    * below line must not removed */
-  if (hcontext->state == STATE_DIRECT)
+  if (hcontext->state == STATE_DIRECT) {
     hcontext->state = STATE_HANGUL;
+    g_print("This is really a error: our input mode is currupted\n");
+  }
 
   if (hcontext->automata)
     return hcontext->automata(hcontext, key);
@@ -1192,7 +1245,7 @@ on_click_hangul (GtkWidget *widget,
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(data);
 
-  if (input_mode == STATE_DIRECT) {
+  if (hcontext->state == STATE_DIRECT) {
     /* english mode change to hangul mode */
     im_hangul_mode_hangul(hcontext);
   } else {
@@ -1374,7 +1427,7 @@ status_window_set_label(GtkIMContextHangul *hcontext)
 
   label = status_window->hangul_label;
   if (label) {
-    if (input_mode == MODE_DIRECT)
+    if (hcontext->state == STATE_DIRECT)
       gtk_label_set_text(GTK_LABEL(label), yeongeo);
     else
       gtk_label_set_text(GTK_LABEL(label), hangul);
@@ -1421,7 +1474,7 @@ on_destroy(GtkWidget *widget, gpointer data)
 {
   gtk_grab_remove(widget);
   hanja_window = NULL;
-  input_mode = MODE_HANGUL;
+  input_mode = INPUT_MODE_HANGUL;
 }
 
 static void
@@ -1432,7 +1485,7 @@ on_hanja_button_clicked(GtkButton *button, gpointer data)
 
   if (str) {
     im_hangul_commit_utf8(hcontext, str);
-    hcontext->state = MODE_HANGUL;
+    hcontext->state = STATE_HANGUL;
     hcontext->index = -1;
     g_signal_emit_by_name (hcontext, "preedit_changed");
   }
@@ -1554,6 +1607,7 @@ im_hangul_shutdown(void)
     hanja_window = NULL;
   }
 
+  im_hangul_set_input_mode_info (INPUT_MODE_INFO_NONE);
   g_print("im-hangul module shutdown\n");
 }
 
