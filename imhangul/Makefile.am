@@ -38,7 +38,7 @@ entry_LDADD = @GTK_LIBS@
 
 install-data-local: install-moduleLTLIBRARIES
 	if test -z "$(DESTDIR)" ; then \
-		$(mkinstalldirs) $(sysconfdir)/gtk-2.0 \
+		$(mkinstalldirs) $(sysconfdir)/gtk-2.0; \
 		gtk-query-immodules-2.0 > $(DESTDIR)/$(GTK_IMMODULES); \
 	fi
 
