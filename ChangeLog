@@ -1,3 +1,7 @@
+2004-07-18  Choe Hwanjin <krisna@kldp.org>
+	* string commit하기 전에 preedit_changed 시그널을 발생시킴
+	  evolution 1.5에서 편지 편집창에서 생기던 문제 해결(#300276 참고)
+
 2004-07-12  Choe Hwanjin <krisna@kldp.org>
 	* configure 할때 sysconfdir을 따로 지정하지 않아도 알아서 찾도록 함
 
