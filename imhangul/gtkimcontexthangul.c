@@ -1921,41 +1921,36 @@ get_candidate_table (GtkIMContextHangul *hcontext,
 {
   gunichar ch = 0;
 
-  if (im_hangul_is_empty (hcontext))
-    {
-      gchar *text = NULL;
-      gint cursor_index;
-      gtk_im_context_get_surrounding (GTK_IM_CONTEXT(hcontext),
-				      &text, &cursor_index);
+  if (im_hangul_is_empty (hcontext)) {
+    gchar *text = NULL;
+    gint cursor_index = 0;
+    gtk_im_context_get_surrounding (GTK_IM_CONTEXT(hcontext),
+				    &text, &cursor_index);
+    if (text != NULL) {
       ch = g_utf8_get_char_validated (text + cursor_index, 3);
       g_free(text);
       hcontext->surrounding_delete_length = 1;
     }
-  else if (hcontext->choseong[0] != 0 &&
-	   hcontext->jungseong[0] == 0 &&
-	   hcontext->jongseong[0] == 0)
-    {
-      ch = im_hangul_choseong_to_cjamo(hcontext->choseong[0]);
-    }
-  else
-    {
-      ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
-				       hcontext->jungseong[0],
-				       hcontext->jongseong[0]);
-    }
+  } else if (hcontext->choseong[0] != 0 &&
+	     hcontext->jungseong[0] == 0 &&
+	     hcontext->jongseong[0] == 0) {
+    ch = im_hangul_choseong_to_cjamo(hcontext->choseong[0]);
+  } else {
+    ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
+				     hcontext->jungseong[0],
+				     hcontext->jongseong[0]);
+  }
 
-  if (ch > 0)
-    {
-      int index = get_index_of_candidate_table (ch);
-      if (index != -1)
-	{
-	  int n;
-	  n = g_unichar_to_utf8(ch, label_buf);
-	  label_buf[n] = '\0';
-	  *table = candidate_table[index] + 1;
-	  return TRUE;
-	}
+  if (ch > 0) {
+    int index = get_index_of_candidate_table (ch);
+    if (index != -1) {
+      int n;
+      n = g_unichar_to_utf8(ch, label_buf);
+      label_buf[n] = '\0';
+      *table = candidate_table[index] + 1;
+      return TRUE;
     }
+  }
 
   return FALSE;
 }
@@ -2693,6 +2688,30 @@ candidate_on_cursor_changed(GtkWidget *widget,
 }
 
 static gboolean
+candidate_on_scroll(GtkWidget *widget,
+		    GdkEventScroll *event,
+		    gpointer data)
+{
+  Candidate *candidate;
+
+  if (candidate == NULL)
+    return FALSE;
+
+  candidate = (Candidate*)data;
+  switch (event->direction) {
+    case GDK_SCROLL_UP:
+      candidate_prev_page(candidate);
+      break;
+    case GDK_SCROLL_DOWN:
+      candidate_next_page(candidate);
+      break;
+    default:
+      return FALSE;
+  }
+  return TRUE;
+}
+
+static gboolean
 candidate_on_key_press(GtkWidget *widget,
 		       GdkEventKey *event,
 		       gpointer data)
@@ -2899,6 +2918,8 @@ candidate_create_window(Candidate *candidate)
 		   G_CALLBACK(candidate_on_row_activated), candidate);
   g_signal_connect(G_OBJECT(treeview), "cursor-changed",
 		   G_CALLBACK(candidate_on_cursor_changed), candidate);
+  g_signal_connect(G_OBJECT(candidate->window), "scroll-event",
+		   G_CALLBACK(candidate_on_scroll), candidate);
   g_signal_connect(G_OBJECT(candidate->window), "key-press-event",
 		   G_CALLBACK(candidate_on_key_press), candidate);
   g_signal_connect_after(G_OBJECT(candidate->window), "expose-event",
