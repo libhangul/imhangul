@@ -2692,6 +2692,73 @@ candidate_on_cursor_changed(GtkWidget *widget,
     }
 }
 
+static gboolean
+candidate_on_key_press(GtkWidget *widget,
+		       GdkEventKey *event,
+		       gpointer data)
+{
+  Candidate *candidate;
+  gunichar ch = 0;
+
+  if (candidate == NULL)
+    return FALSE;
+
+  candidate = (Candidate*)data;
+  switch (event->keyval) {
+    case GDK_Return:
+    case GDK_KP_Enter:
+      ch = candidate_get_current(candidate);
+      break;
+    case GDK_Left:
+    case GDK_h:
+    case GDK_Page_Up:
+      candidate_prev_page(candidate);
+      break;
+    case GDK_Right:
+    case GDK_l:
+    case GDK_Page_Down:
+      candidate_next_page(candidate);
+      break;
+    case GDK_Up:
+    case GDK_k:
+    case GDK_BackSpace:
+    case GDK_KP_Subtract:
+      candidate_prev(candidate);
+      break;
+    case GDK_Down:
+    case GDK_j:
+    case GDK_space:
+    case GDK_KP_Add:
+    case GDK_KP_Tab:
+      candidate_next(candidate);
+      break;
+    case GDK_Escape:
+      candidate_delete(candidate);
+      candidate = NULL;
+      break;
+    case GDK_0:
+      ch = candidate_get_nth(candidate, 9);
+      break;
+    case GDK_1:
+    case GDK_2:
+    case GDK_3:
+    case GDK_4:
+    case GDK_5:
+    case GDK_6:
+    case GDK_7:
+    case GDK_8:
+    case GDK_9:
+      ch = candidate_get_nth(candidate, event->keyval - GDK_1);
+      break;
+    default:
+      return FALSE;
+  }
+
+  if (ch != 0)
+    im_hangul_candidate_commit(candidate->hangul_context, ch);
+  return TRUE;
+}
+
 static void
 candidate_on_expose (GtkWidget *widget,
 		     GdkEventExpose *event,
@@ -2832,6 +2899,8 @@ candidate_create_window(Candidate *candidate)
 		   G_CALLBACK(candidate_on_row_activated), candidate);
   g_signal_connect(G_OBJECT(treeview), "cursor-changed",
 		   G_CALLBACK(candidate_on_cursor_changed), candidate);
+  g_signal_connect(G_OBJECT(candidate->window), "key-press-event",
+		   G_CALLBACK(candidate_on_key_press), candidate);
   g_signal_connect_after(G_OBJECT(candidate->window), "expose-event",
 			 G_CALLBACK(candidate_on_expose), candidate);
   g_signal_connect_swapped(G_OBJECT(candidate->window), "realize",
@@ -2839,6 +2908,7 @@ candidate_create_window(Candidate *candidate)
 			   candidate);
 
   gtk_widget_show_all(candidate->window);
+  gtk_grab_add(candidate->window);
 }
 
 static Candidate*
@@ -2975,6 +3045,7 @@ candidate_delete(Candidate *candidate)
   if (candidate == NULL)
     return;
 
+  gtk_grab_remove(candidate->window);
   gtk_widget_destroy(candidate->window);
   g_free(candidate->label);
   g_free(candidate);

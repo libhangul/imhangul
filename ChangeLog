@@ -1,3 +1,6 @@
+2004-07-19  Choe Hwanjin <krisna@kldp.org>
+	* 한자 선택창이 뜨면 마우스와 키보드를 grab 함
+
 2004-07-18  Choe Hwanjin <krisna@kldp.org>
 	* string commit하기 전에 preedit_changed 시그널을 발생시킴
 	  evolution 1.5에서 편지 편집창에서 생기던 문제 해결(#300276 참고)
