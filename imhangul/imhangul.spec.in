@@ -2,6 +2,7 @@
 %define ver		@VERSION@
 %define rel		1
 %define gtk_prefix	@GTK_PREFIX@
+%define gtk_binver	@GTK_BINARY_VERSION@
 
 Summary:	Hangul input module for GTK+ 2.0
 Summary(ko):	GTK+ 2.0에서 사용할수 있는 한글 입력모듈
@@ -15,7 +16,6 @@ Requires:	gtk2
 BuildRoot:	/%{_tmppath}/%{name}-%{version}-root
 BuildRequires:	gtk2-devel
 Source0:	http://download.kldp.net/%{name}/%{name}-%{ver}.tar.gz
-Packager:	Kwan-hong Lee <sorcerer@jerimo.org>
 
 %description
 Hangul input module for GTK+ 2.0
@@ -39,18 +39,23 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr( 0755, root, root )
-%{gtk_prefix}/lib/gtk-2.0/immodules/*.la
-%{gtk_prefix}/lib/gtk-2.0/immodules/*.so
+%{gtk_prefix}/lib/gtk-2.0/%{gtk_binver}/immodules/*.la
+%{gtk_prefix}/lib/gtk-2.0/%{gtk_binver}/immodules/*.so
 
 %doc COPYING ChangeLog INSTALL TODO
 
 %post
+test -x /usr/bin/gtk-query-immodules-2.0 && \
 /usr/bin/gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %postun
+test -x /usr/bin/gtk-query-immodules-2.0 && \
 /usr/bin/gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %changelog
+* Mon Oct 20 2003 Choe Hwanjin <krisna@people.kldp.org>
+- add gtk_binver
+
 * Wed Jan 15 2003 Choe Hwanjin <krisna@kldp.org>
 - remove gtk binary version
 
