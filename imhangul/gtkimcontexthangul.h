@@ -53,7 +53,7 @@ struct _GtkIMContextHangul
   const IMHangulCombination *compose_table;
 
   /* hangul buffer */
-  int state;
+  int input_mode;
   int index;			/* stack index */
   gunichar stack[12];
 
@@ -91,6 +91,8 @@ void gtk_im_context_hangul_set_keyboard_table (GtkIMContextHangul        *hconte
 void gtk_im_context_hangul_set_compose_table  (GtkIMContextHangul        *hcontext,
 		                               const IMHangulCombination *compose_table,
 		                               int                        compose_table_size);
+void gtk_im_context_hangul_set_use_jamo       (GtkIMContextHangul        *hcontext,
+    				               gboolean		          use_jamo);
 
 #endif /* __GTK_IM_CONTEXT_HANGUL_H__ */
 

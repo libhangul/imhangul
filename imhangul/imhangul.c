@@ -130,6 +130,7 @@ im_module_create (const gchar *context_id)
     return im_hangul_new_3yet ();
   }
 
+  g_warning("imhangul:unknown context id: %s", context_id); 
   g_assert_not_reached ();
 
   return NULL;
@@ -991,6 +992,7 @@ im_hangul_new_3yet (void)
   gtk_im_context_hangul_set_compose_table (hcontext,
 					   compose_table_yet,
 					   G_N_ELEMENTS (compose_table_yet));
+  gtk_im_context_hangul_set_use_jamo (hcontext, TRUE);
 
   return context;
 }

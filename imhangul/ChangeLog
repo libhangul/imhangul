@@ -1,15 +1,19 @@
-2003-01-12 (Sun) 16:00 Choe Hwanjin <krisna@kldp.org>
+2003-02-05 (Wed) 22:43 Choe Hwanjin <krisna@kldp.org>
+	* pref_use_jamo를 없애고 output_mode로 통일
+	* hcontext->state를 hcontext->input_mode로 변경
+
+2003-02-04 (Tue) 23:46 Choe Hwanjin <krisna@kldp.org>
 	* imhangul2,32,39,3f,3s,3y.c를 모두 합쳐 imhangul.c 로 만들고
 	  공통 부분을 모두 gtkimcontexthangul.c,h 에 모아서 모듈 파일을 하나의
 	  object 파일로 만들어 버림
 	* 각부분에 const 키워드를 사용할 곳에 사용함
 
-2003-02-04 (Tue) 23:46 Choe Hwanjin <krisna@kldp.org>
+2003-01-15 (Wed) 20:57 Choe Hwanjin <krisna@kldp.org>
 	* gen.py 를 hanjatable.py로 이름 바꿈
 	* imhangul.h,hanjatable.h,chartable.h: unicode_t를 사용하지 않고
 	  직접 gunichar를 사용
 
-2003-01-15 (Wed) 20:57 Choe Hwanjin <krisna@kldp.org>
+2003-01-12 (Sun) 16:00 Choe Hwanjin <krisna@kldp.org>
 	* 소스를 깨끗이 (탭, 빈칸 정리)
 	* imhangul.h: trigger 키를 처리하는 부분을 automata에서 filter
 	  함수로 옮김, STATE 상수를 enum으로 선언, 글자를 골라서 넣을수 있는
