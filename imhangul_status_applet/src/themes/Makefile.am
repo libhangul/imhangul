@@ -3,7 +3,8 @@ THEMES = \
 	MSWindows \
 	Mac \
 	keyboard \
-	Onion
+	Onion \
+	KingSejong
 
 THEMES_DIR = @IMHANGUL_STATUS_THEMES_DIR@
 
