@@ -33,8 +33,8 @@ extern GType gtk_type_im_context_hangul;
 
 typedef struct _GtkIMContextHangul	GtkIMContextHangul;
 typedef struct _GtkIMContextHangulClass	GtkIMContextHangulClass;
-
 typedef struct _Candidate               Candidate;
+
 typedef struct _IMHangulCombination	IMHangulCombination;
 typedef gboolean (*IMHangulComposer)   (GtkIMContextHangul *, GdkEventKey *);
 
@@ -81,21 +81,6 @@ struct _GtkIMContextHangul
 struct _GtkIMContextHangulClass
 {
   GtkIMContextClass parent_class;
-};
-
-/* Candidate window */
-struct _Candidate {
-    GtkWidget *window;
-    GdkWindow *parent;
-    GdkRectangle cursor;
-    gchar *label;
-    GtkWidget **children;
-    const gunichar *data;
-    int first;
-    int n_per_window;
-    int n_per_row;
-    int n;
-    int current;
 };
 
 struct _IMHangulCombination 
