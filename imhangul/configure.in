@@ -27,6 +27,22 @@ if test x$CC == xgcc; then
 	CFLAGS="$CFLAGS -Wall"
 fi
 
+dnl use "STRIP_" macros
+AC_MSG_CHECKING(whether make is GNU Make)
+STRIP_BEGIN=
+STRIP_END=
+if $ac_make --version 2>/dev/null | grep '^GNU Make ' >/dev/null ; then
+	STRIP_BEGIN='$(strip $(STRIP_DUMMY)'
+	STRIP_END=')'
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+STRIP_DUMMY=
+AC_SUBST(STRIP_DUMMY)
+AC_SUBST(STRIP_BEGIN)
+AC_SUBST(STRIP_END)
+
 dnl check for gtk binary version
 GTK_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
 GTK_PREFIX=`$PKG_CONFIG --variable=prefix gtk+-2.0`

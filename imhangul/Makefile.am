@@ -3,7 +3,16 @@
 
 EXTRA_DIST = test.sh gtkrc hanjatable.py
 
-INCLUDES = -DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"
+INCLUDES = @STRIP_BEGIN@ \
+	-Wall -g 					\
+	@GTK_CFLAGS@					\
+	-DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"	\
+        -DG_DISABLE_DEPRECATED                          \
+	-DGDK_PIXBUF_DISABLE_DEPRECATED                 \
+	-DGDK_DISABLE_DEPRECATED                        \
+	-DGTK_DISABLE_DEPRECATED                        \
+@STRIP_END@
+
 LDADDS = @GTK_LIBS@
 
 # now we do not use @GTK_BINARY_VERSION@ string
@@ -20,8 +29,6 @@ im_hangul_la_SOURCES = \
 	hanjatable.h		\
 	chartable.h		\
 	imhangul.c
-
-CFLAGS = @GTK_CFLAGS@ -g -Wall
 
 module_LTLIBRARIES = im-hangul.la
 
