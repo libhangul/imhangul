@@ -433,7 +433,7 @@ im_hangul3_automata(GtkIMContextHangul *hcontext,
     im_hangul_commit(hcontext);
     g_signal_emit_by_name(hcontext, "preedit_changed");
     im_hangul_mode_direct(hcontext);
-    return TRUE;
+    return FALSE;
   }
 
   if (hcontext->index >= 0) {

@@ -817,7 +817,7 @@ im_hangul2_automata(GtkIMContextHangul *hcontext,
     if (im_hangul_commit(hcontext))
       g_signal_emit_by_name (hcontext, "preedit_changed");
     im_hangul_mode_direct(hcontext);
-    return TRUE;
+    return FALSE;
   }
 
   if (hcontext->state != 0) {
