@@ -49,7 +49,7 @@ static const GtkIMContextInfo *info_list[] = {
 
 /* Hangul keyboard map table:
  * 3set keyboard final (sebulsik choejong) */
-static const gunichar keyboard_table_final[] = {
+static const gunichar keyboard_table_3final[] = {
   0x11a9,	/* GDK_exclam:		jongseong ssangkiyeok		*/
   0x00b7,	/* GDK_quotedbl:	middle dot 			*/
   0x11bd,	/* GDK_numbersign:	jognseong cieuc 		*/
@@ -96,8 +96,8 @@ static const gunichar keyboard_table_final[] = {
   0x0033,	/* GDK_L:		3				*/
   0x0022,	/* GDK_M:		double quotation mark		*/
   0x002d,	/* GDK_N:		minus sign			*/
-  0x110e,	/* GDK_O:		choseong  chieuch		*/
-  0x1111,	/* GDK_P:		choseong  phieuph		*/
+  0x0038,	/* GDK_O:		8				*/
+  0x0039,	/* GDK_P:		9				*/
   0x11c1,	/* GDK_Q:		jongseong phieuph		*/
   0x11b6,	/* GDK_R:		jongseong rieul-hieuh		*/
   0x11ad,	/* GDK_S:		jongseong nieun-hieuh		*/
@@ -146,135 +146,6 @@ static const gunichar keyboard_table_final[] = {
   0x203b,	/* GDK_asciitilde:	reference mark			*/
 };
 
-/* return unicode jamo choseong value(U+1100 ~ U+1112) in 3bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul3_comp_choseong_final(gunichar ch, gunichar next) {
-  switch (ch) {
-    case 0x1100:		/* choseong kiyeok */
-      switch (next) {
-	case 0x1100:
-          return 0x1101;	/* choseong ssangkiyeok */
-      }
-      break;
-    case 0x1103:		/* choseong tikeut */
-      switch (next) {
-	case 0x1103:
-          return 0x1104;	/* choseong ssangtikeut */
-      }
-      break;
-    case 0x1107:		/* choseong pieup */
-      switch (next) {
-	case 0x1107:
-          return 0x1108;	/* choseong ssangpieup */
-      }
-      break;
-    case 0x1109:		/* choseong sios */
-      switch (next) {
-	case 0x1109:
-          return 0x110a;	/* choseong ssangsios */
-      }
-      break;
-    case 0x110c:		/* choseong cieuc */
-      switch (next) {
-	case 0x110c:
-          return 0x110d;	/* choseong ssangcieuc */
-      }
-      break;
-  }
-  return 0;
-}
-
-
-/* return unicode jamo jungseong value(U+1161 ~ U+1173) in 3bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul3_comp_jungseong_final(gunichar ch, gunichar next) {
-  switch (ch) {
-    case 0x1169:		/* jungseong o */
-      switch (next) {
-        case 0x1161:		/* jungseong a */
-          return 0x116a;	/* jungseong wa */
-        case 0x1162:	        /* jungseong ae */
-          return 0x116b;        /* jungseong wae */
-        case 0x1175:	        /* jungseong i */
-          return 0x116c;        /* jungseong oe */
-      }
-      break;
-    case 0x116e:		/* jungseong u */
-      switch (next) {
-        case 0x1165:		/* jungseong eo */
-          return 0x116f;	/* jungseong weo */
-        case 0x1166:	        /* jugnseong e */
-          return 0x1170;        /* jungseong we */
-        case 0x1175:	        /* jungseong i */
-          return 0x1171;        /* jungseong wi */  
-      }
-      break;
-    case 0x1173:		/* jungseong eu */
-      switch (next) {
-        case 0x1175:	        /* jungseong i */
-          return 0x1174;	/* jungseong yi */
-      }
-  }
-  return 0;
-}
-
-/* return unicode jamo jongseong value(U+11a8 ~ U+11c2) in 3bul keyboard
- * if it is not hangul key, return 0 */
-static gunichar
-im_hangul3_comp_jongseong_final(gunichar ch, gunichar next)
-{
-  switch (ch) {
-    case 0x11a8:		/* jongseong kiyeok */
-      switch (next) {
-        case 0x11a8:		/* jongseong kiyeok */
-          return 0x11a9;	/* jongseong ssangkiyeok */
-	case 0x11ba:		/* jongseong sois */
-          return 0x11aa;	/* jongseong kiyeok-sios */
-      }
-      break;
-    case 0x11ab:		/* jongseong nieun */
-      switch (next) {
-        case 0x11bd:		/* jongseong cieuc */
-          return 0x11ac;	/* jongseong nieun-cieuc */
-        case 0x11c2:		/* jongseong hieuh */
-          return 0x11ad;	/* jongseong nieun-hieuh */
-      }
-      break;
-    case 0x11af:		/* jongseong rieul */
-      switch (next) {
-        case 0x11a8:		/* jongseong kiyeok */
-          return 0x11b0;	/* jongseong rieul-kiyeok */
-	case 0x11b7:		/* jongseong mieum */
-          return 0x11b1;	/* jongseong rieul-mieum */
-        case 0x11b8:		/* jongseong pieup */
-          return 0x11b2;	/* jongseong rieul-pieup */
-	case 0x11ba:		/* jongseong sois */
-          return 0x11b3;	/* jongseong rieul-sios */
-        case 0x11c0:		/* jongseong thieuth */
-          return 0x11b4;	/* jongseong rieul-thieuth */
-        case 0x11c1:		/* jongseong phieuph */
-          return 0x11b5;	/* jongseong rieul-phieuph */
-        case 0x11c2:		/* jongseong hieuh */
-          return 0x11b6;	/* jongseong rieul-hieuh */
-      }
-      break;
-    case 0x11b8:		/* jongseong pieup */
-      switch (next) {
-	case 0x11ba:		/* jongseong sois */
-          return 0x11b9;	/* jongseong pieup-sios */
-      }
-      break;
-    case 0x11ba:		/* jongseong sios */
-      switch (next) {
-	case 0x11ba:		/* jongseong sois */
-          return 0x11bb;	/* jongseong ssangsios */
-      }
-  }
-  return 0;
-}
-
 void
 im_module_init(GTypeModule *type_module)
 {
@@ -304,15 +175,15 @@ im_module_create (const gchar *context_id)
       GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(context);
       im_hangul_set_automata(context_hangul, im_hangul3_automata);
 
-      keyboard_table = keyboard_table_final;
+      keyboard_table = keyboard_table_3final;
 
 //      im_hangul3_choseong = im_hangul3_choseong_final;
 //      im_hangul3_jungseong = im_hangul3_jungseong_final;
 //      im_hangul3_jongseong = im_hangul3_jongseong_final;
 //      im_hangul3_punct = im_hangul3_punct_final;
-      im_hangul3_comp_choseong = im_hangul3_comp_choseong_final;
-      im_hangul3_comp_jungseong = im_hangul3_comp_jungseong_final;
-      im_hangul3_comp_jongseong = im_hangul3_comp_jongseong_final;
+//      im_hangul3_comp_choseong = im_hangul3_comp_choseong_final;
+//      im_hangul3_comp_jungseong = im_hangul3_comp_jungseong_final;
+//      im_hangul3_comp_jongseong = im_hangul3_comp_jongseong_final;
 
       return context;
     }
