@@ -236,6 +236,12 @@ im_hangul_class_init (GtkIMContextHangulClass *class)
 						       "Whether to show status window or not",
 						       TRUE,
 						       G_PARAM_READWRITE));
+  gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-dvorak",
+  						       "Dvorak Keyboard",
+						       "Whether to use dvorak keyboard or not",
+						       FALSE,
+						       G_PARAM_READWRITE));
+
 }
 
 static void 
@@ -259,6 +265,15 @@ im_hangul_init (GtkIMContextHangul *context_hangul)
   context_hangul->jongseong = 0;
   context_hangul->automata = NULL;	/* initial value: automata == null */
   context_hangul->toplevel = NULL;
+
+  g_object_get (gtk_settings_get_default(),
+  		"gtk-imhangul-status",
+		&pref_use_status_window,
+		NULL);
+  g_object_get (gtk_settings_get_default(),
+  		"gtk-imhangul-dvorak",
+		&pref_use_dvorak,
+		NULL);
 }
 
 static void
@@ -986,12 +1001,16 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   GtkIMContextHangul *context_hangul = GTK_IM_CONTEXT_HANGUL(context);
 
   /* ignore key release */
-  if (key->type == GDK_KEY_RELEASE) {
+  if (key->type == GDK_KEY_RELEASE)
     return FALSE;
-  }
+
+  /* we silently ignore shift keys */
+  if (key->keyval == GDK_Shift_L || key->keyval == GDK_Shift_R)
+    return FALSE;
+
   /* some keys are ignored */
+  /* we flush out all preedit text */
   if (im_hangul_is_ignore_key(key->keyval)) {
-    /* we flush out all preedit text */
     if (im_hangul_commit(context_hangul))
       g_signal_emit_by_name (context_hangul, "preedit_changed");
     return FALSE;
@@ -1004,12 +1023,8 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
 
   /* handle Escape key: automaticaly change to direct mode */
   if (key->keyval == GDK_Escape) {
-    if (context_hangul->choseong != 0 ||
-	context_hangul->jungseong != 0 ||
-	context_hangul->jongseong != 0) {
-      im_hangul_commit(context_hangul);
+    if (im_hangul_commit(context_hangul))
       g_signal_emit_by_name (context_hangul, "preedit_changed");
-    }
     im_hangul_mode_direct(context_hangul);
     return FALSE;
   }
