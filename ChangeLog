@@ -1,3 +1,7 @@
+2002. 07. 09. (화) 14:39:29 KST
+	* hanja select dialog에서 한자 폰트를 설정한 값을 쓰도록 변경
+	  (현재 설정 값을 바꿀수 있는 방법은 없음)
+
 2002. 06. 06. (목) 12:28:56 KST
 	* im-hangul2.c, im-hangul2.c 를
 	각각 imhangul2.c imhangul3.c 로 이름 변경
