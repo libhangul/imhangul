@@ -8,7 +8,7 @@ LDADDS = @GTK_DEP_LIBS@
 
 moduledir = $(libdir)/gtk-2.0/$(GTK_BINARY_VERSION)/immodules
 
-GTK_IMMODULES= $(sysconfdir)/gtk-2.0/gtk.immodules
+GTK_IMMODULES= $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules
 
 im_hangul2_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version
 im_hangul2_la_SOURCES = imhangul2.c imhangul.h hanjatable.h

@@ -1,3 +1,7 @@
+2002. 07. 22. (월) 14:20:09 KST
+	* imhangul.spec.in: RPM SPEC file 추가
+	  (Thanks to Lee, Kwan-hong <sorcerer@jerimo.org>)
+
 2002. 07. 19. (금) 09:41:00 KST
 	* imhangul2.c: 두벌식에서 "괴짜"가 입력 안되던 문제 해결
 	  state6 에서 초성 체크를 안해서임, 초성체크를 추가하고 state1로 가는

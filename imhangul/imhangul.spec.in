@@ -1,0 +1,56 @@
+%define name	imhangul
+%define ver	@VERSION@
+%define rel	1
+
+Summary:	Hangul input module for GTK+ 2.0
+Summary(ko):	GTK+ 2.0에서 사용할수 있는 한글 입력모듈
+Name:		%{name}
+Version:	%{ver}
+Release:	%{rel}
+Group:		User Interface/X
+URL:		http://kldp.net/project/imhangul
+Copyright:	GPL
+Requires:	gtk2
+BuildRoot:	/%{_tmppath}/%{name}-%{version}-root
+BuildRequires:	gtk2-devel
+Source0:	http://download.kldp.net/%{name}/%{name}-%{ver}.tar.gz
+Packager:	Kwan-hong Lee <sorcerer@jerimo.org>
+
+%description
+Hangul input module for GTK+ 2.0
+
+%description -l ko
+GTK+ 2.0에서 사용할수 있는 한글 입력모듈
+
+%prep
+%setup
+./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%build
+make
+
+%install
+mkdir -p $RPM_BUILD_ROOT/etc/gtk-2.0
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%files
+%defattr( 0755, root, root )
+/usr/lib/gtk-2.0/2.0.0/immodules/*.la
+/usr/lib/gtk-2.0/2.0.0/immodules/*.so
+%defattr( 0644, root, root )
+/usr/lib/gtk-2.0/2.0.0/immodules/*.a
+
+%doc COPYING ChangeLog INSTALL TODO
+
+%post
+/usr/bin/gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
+
+%postun
+/usr/bin/gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
+
+%changelog
+* Mon Jul 22 2002 Lee, Kwan-hong <sorcerer@jerimo.org>
+- Make RPM package
