@@ -1,3 +1,6 @@
+월  9월  9 19:13:06 KST 2002
+	* version up: 0.9.2
+
 월  8월 19 20:35:37 KST 2002
 	* hanjatable.h: 새로 추출해냄 gen.py 추가
 	* imhangul.h: Tab를 처리하지 않음, 바로 어플리케이션에 넘겨버림
