@@ -38,6 +38,11 @@ $(server_in_files): $(server_in_files:.server.in=.server.in.in)
 uidir = $(datadir)/gnome-2.0/ui
 ui_DATA = GNOME_IMHangulStatusApplet.xml
 
+clean-local:
+	rm -f GNOME_IMHangulStatusApplet.server
+	rm -f GNOME_IMHangulStatusApplet.server.in
+	rm -f imhangul_status.schemas
+
 EXTRA_DIST = \
 	GNOME_IMHangulStatusApplet.server.in.in \
 	imhangul_status.schemas.in \
