@@ -2,9 +2,9 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # Choe Hwanjin <krisna@kldp.org>, 2002, 2003.
 #
-msgid "imhangul-status-applet"
+msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: imhangul_status_applet 0.3\n"
 "POT-Creation-Date: 2003-07-24 14:09+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Choe Hwanjin <krisna@kldp.org>\n"
