@@ -88,6 +88,10 @@ im_hangul3_mapping(guint keyval, guint state)
   if (keyboard_table == NULL)
     return 0;
 
+  /*  hangul jamo keysym */
+  if (keyval >= 0x01001100 && keyval <= 0x010011ff)
+    return keyval & 0x0000ffff;
+
   /* treat capslock, as capslock is not on */
   if (state & GDK_LOCK_MASK) {
     if (state & GDK_SHIFT_MASK) {
