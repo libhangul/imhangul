@@ -105,7 +105,7 @@ static void        candidate_next            (Candidate *candidate);
 static void        candidate_prev_page       (Candidate *candidate);
 static void        candidate_next_page       (Candidate *candidate);
 static gunichar    candidate_get_current     (Candidate *candidate);
-static gunichar    candidate_get_nth         (Candidate *candidate, int n);
+static gunichar    candidate_get_nth         (Candidate *candidate, int index);
 static void        candidate_delete          (Candidate *candidate);
 
 static void	im_hangul_class_init	     (GtkIMContextHangulClass *klass);
@@ -2008,7 +2008,7 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
   if (ret)
     {
       hcontext->candidate = candidate_new (buf,
-					   10,
+					   9,
 					   table,
 					   hcontext->client_window,
 					   &hcontext->cursor,
@@ -3085,15 +3085,16 @@ candidate_get_current(Candidate *candidate)
 }
 
 static gunichar
-candidate_get_nth(Candidate *candidate, int n)
+candidate_get_nth(Candidate *candidate, int index)
 {
   if (candidate == NULL)
     return 0;
 
-  if (n < 0 && n >= candidate->n)
+  index += candidate->first;
+  if (index < 0 || index >= candidate->n)
     return 0;
 
-  return candidate->data[candidate->first + n].ch;
+  return candidate->data[index].ch;
 }
 
 void
