@@ -240,7 +240,7 @@ for key in list:
 	print "};"
 
 
-print char_type + " *hanjatable[] = {"
+print char_type + " *hanja_table[] = {"
 i = 0
 for key in list[:-1]:
 	if i == 0:

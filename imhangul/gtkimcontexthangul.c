@@ -1955,21 +1955,21 @@ status_window_set_label (GtkIMContextHangul *hcontext)
  * Hanja selection window
  */
 static gint
-get_index_of_hanjatable (gunichar ch)
+get_index_of_hanja_table (gunichar ch)
 {
   guint first, last, mid;
 
   /* binary search */
   first = 0;
-  last = G_N_ELEMENTS (hanjatable) - 1;
+  last = G_N_ELEMENTS (hanja_table) - 1;
   while (first <= last)
     {
       mid = (first + last) / 2;
 
-      if (ch == hanjatable[mid][0])
+      if (ch == hanja_table[mid][0])
 	return mid;
 
-      if (ch < hanjatable[mid][0])
+      if (ch < hanja_table[mid][0])
 	last = mid - 1;
       else
 	first = mid + 1;
@@ -2054,7 +2054,7 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
       if (ch)
 	{
 	  int index;
-	  index = get_index_of_hanjatable (ch);
+	  index = get_index_of_hanja_table (ch);
 	  if (index != -1)
 	    {
 	      int n;
@@ -2064,7 +2064,7 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
 	      buf[n] = '\0';
 	      hcontext->candidate = candidate_new (buf,
 						   10,
-						   hanjatable[index] + 1,
+						   hanja_table[index] + 1,
 						   hcontext->client_window);
 	    }
 	}
