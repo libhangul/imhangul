@@ -1,4 +1,4 @@
-gunichar symbols[] = {
+static const gunichar symbols[] = {
     0x2600,  /* black sun with rays                                          */
     0x2601,  /* cloud                                                        */
     0x2602,  /* umbrella                                                     */
@@ -135,7 +135,7 @@ gunichar symbols[] = {
     0
 };
 
-gunichar char_symbol[] = {
+static const gunichar char_symbol[] = {
     0x00a2,  /* cent sign                                                    */
     0x00a3,  /* pound sign                                                   */
     0x00a4,  /* currency sign                                                */
@@ -239,7 +239,7 @@ gunichar char_symbol[] = {
     0
 };
 
-gunichar punctuation[] = {
+static const gunichar punctuation[] = {
     0x2018,  /* left single quotation mark                                   */
     0x2019,  /* right single quotation mark                                  */
     0x201a,  /* single low-9 quotation mark                                  */
@@ -291,7 +291,7 @@ gunichar punctuation[] = {
     0
 };
 
-gunichar number_form[] = {
+static const gunichar number_form[] = {
     0x2070,  /* superscript zero                                             */
     0x00b9,  /* superscript one                                              */
     0x00b2,  /* superscript two                                              */
@@ -378,7 +378,7 @@ gunichar number_form[] = {
     0
 };
  
-gunichar parenthesized[] = {
+static const gunichar parenthesized[] = {
     0x2474,  /* parenthesized digit one                                      */
     0x2475,  /* parenthesized digit two                                      */
     0x2476,  /* parenthesized digit three                                    */
@@ -493,7 +493,7 @@ gunichar parenthesized[] = {
     0
 };
 
-gunichar circled[] = {
+static const gunichar circled[] = {
     0x24ea,  /* circled digit zero                                           */
     0x2460,  /* circled digit one                                            */
     0x2461,  /* circled digit two                                            */
@@ -675,9 +675,9 @@ gunichar circled[] = {
     0x32af,  /* circled ideograph alliance                                   */
     0x32b0,  /* circled ideograph night                                      */
     0
-};                                            
+};
 
-gunichar math1[] = {                      
+static const gunichar math1[] = {
     0x00b1,  /* plus-minus sign                                              */
     0x00d7,  /* multiplication sign                                          */
     0x00f7,  /* division sign                                                */
@@ -814,7 +814,7 @@ gunichar math1[] = {
     0
 };
 
-gunichar math2[] = {                      
+static const gunichar math2[] = {
     0x2282,  /* subset of                                                    */
     0x2283,  /* superset of                                                  */
     0x2284,  /* not a subset of                                              */
@@ -944,7 +944,7 @@ gunichar math2[] = {
     0
 };
 
-gunichar greek[] = {                      
+static const gunichar greek[] = {
     0x0391,  /* greek capital letter alpha                                   */
     0x0392,  /* greek capital letter beta                                    */
     0x0393,  /* greek capital letter gamma                                   */
@@ -997,7 +997,7 @@ gunichar greek[] = {
     0
 };
 
-gunichar hangul_cjamo[] = {                      
+static const gunichar hangul_cjamo[] = {
     0x3131,  /* hangul letter kiyeok              */
     0x3132,  /* hangul letter ssangkiyeok         */
     0x3133,  /* hangul letter kiyeok-sios         */
@@ -1094,7 +1094,7 @@ gunichar hangul_cjamo[] = {
     0
 };
 
-gunichar katakana[] = {                      
+static const gunichar katakana[] = {
     0x30a1,  /* katakana small a      */      
     0x30a2,  /* katakana a            */
     0x30a3,  /* katakana small i      */
@@ -1204,7 +1204,7 @@ gunichar katakana[] = {
     0
 };
 
-gunichar hiragana[] = {
+static const gunichar hiragana[] = {
     0x3041,  /* hiragana small a      */
     0x3042,  /* hiragana a            */
     0x3043,  /* hiragana small i      */
@@ -1313,7 +1313,7 @@ gunichar hiragana[] = {
     0
 };
 
-gunichar shapes[] = {
+static const gunichar shapes[] = {
     0x25a0,  /* black square                                                 */
     0x25a1,  /* white square                                                 */
     0x25a2,  /* white square with rounded corners                            */
@@ -1415,10 +1415,10 @@ gunichar shapes[] = {
 
 struct table_item {
     char* name;
-    gunichar* list;
+    const gunichar* list;
 };
 
-struct table_item char_table[] = {
+static const struct table_item char_table[] = {
     { "\353\254\270\354\236\245\353\266\200\355\230\270", punctuation   },
     { "\352\270\200\354\236\220\352\270\260\355\230\270", char_symbol   },
     { "\354\210\253\354\236\220\352\270\260\355\230\270", number_form   },

@@ -19,21 +19,7 @@
  * Author: Choe Hwanjin <krisna@kldp.org>
  */
 
-#include <string.h>
-
 #include <gdk/gdkkeysyms.h>
-
-/*
-#include "gtk/gtkmain.h"
-#include "gtk/gtkbutton.h"
-#include "gtk/gtkeventbox.h"
-#include "gtk/gtklabel.h"
-#include "gtk/gtkhbox.h"
-#include "gtk/gtksignal.h"
-#include "gtk/gtkwindow.h"
-#include "gtk/gtkintl.h"
-#include "gtk/gtkimcontext.h"
-*/
 
 #include <gtk/gtkmain.h>
 #include <gtk/gtksignal.h>
@@ -48,102 +34,8 @@
 #include <gtk/gtkwindow.h>
 #include <gtk/gtkimcontext.h>
 
+#include "gtkimcontexthangul.h"
 #include "hanjatable.h"
-
-GType gtk_type_im_context_hangul = 0;
-
-/* Status window: mostly copied from gtkimcontextxim.c */
-struct _StatusWindow
-{
-  GtkWidget *window;
-  GtkWidget *hangul_label;
-  GtkWidget *toplevel;
-  guint destroy_handler_id;
-  guint configure_handler_id;
-};
-
-typedef struct _StatusWindow StatusWindow;
-
-
-static void     im_hangul_class_init	     (GtkIMContextHangulClass *klass);
-static void     im_hangul_init		     (GtkIMContextHangul *hcontext);
-static void     im_hangul_finalize	     (GObject *obj);
-
-static void     im_hangul_reset		     (GtkIMContext *context);
-static gboolean	im_hangul_filter_keypress    (GtkIMContext *context,
-				              GdkEventKey  *key);
-
-static void     im_hangul_get_preedit_string (GtkIMContext  *ic,
-					      gchar         **str,
-					      PangoAttrList **attrs,
-					      gint          *cursor_pos);
-
-static void     im_hangul_focus_in	     (GtkIMContext *context);
-static void     im_hangul_focus_out	     (GtkIMContext *context);
-static void     im_hangul_set_client_window  (GtkIMContext *context,
-				              GdkWindow    *client_window);
-
-static void     im_hangul_set_composer       (GtkIMContextHangul *hcontext,
-				              IMHangulComposerType type);
-
-/* asistant function for hangul automata */
-#define im_hangul_is_modifier(state)	((state & GDK_CONTROL_MASK) || \
-					 (state & GDK_MOD1_MASK))
-#define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1159)
-#define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x11A2)
-#define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11F9)
-
-#define im_hangul_is_empty(ctx)		((ctx)->choseong[0]  == 0 &&	\
-					 (ctx)->jungseong[0] == 0 &&	\
-					 (ctx)->jongseong[0] == 0 )
-
-static gboolean	im_hangul_is_trigger	     (GdkEventKey *key);
-static gboolean	im_hangul_is_backspace	     (GdkEventKey *key);
-
-static void	im_hangul_mode_hangul        (GtkIMContextHangul *hcontext);
-static void	im_hangul_mode_direct        (GtkIMContextHangul *hcontext);
-
-/* stack functions */
-static gunichar	im_hangul_pop	             (GtkIMContextHangul *hcontext);
-static gunichar	im_hangul_peek	             (GtkIMContextHangul *hcontext);
-static void	im_hangul_push	             (GtkIMContextHangul *hcontext,
-    					      gunichar           ch);
-
-/* commit functions */
-static void     im_hangul_clear_buf          (GtkIMContextHangul *hcontext);
-static gboolean	im_hangul_commit	     (GtkIMContextHangul *hcontext);
-static void	im_hangul_commit_utf8	     (GtkIMContextHangul *hcontext,
-					      gchar *utf8);
-static gboolean im_hangul_process_nonhangul  (GtkIMContextHangul *hcontext,
-					      GdkEventKey *key);
-
-/* for feedback(preedit attribute) */
-static void     im_hangul_preedit_underline  (PangoAttrList **attrs,
-    					      gint start, gint end);
-static void     im_hangul_preedit_foreground (PangoAttrList **attrs,
-    					      gint start, gint end);
-static void     im_hangul_preedit_background (PangoAttrList **attrs,
-    					      gint start, gint end);
-static void     im_hangul_preedit_nothing    (PangoAttrList **attrs,
-    					      gint start, gint end);
-
-static GtkWidget* get_toplevel_window (GdkWindow *window);
-static void status_window_show      (GtkIMContextHangul *hcontext);
-static void status_window_hide      (GtkIMContextHangul *hcontext);
-static void status_window_set_label (GtkIMContextHangul *hcontext);
-
-static void popup_hanja_window	   (GtkIMContextHangul *hcontext);
-static void popup_char_table_window      (GtkIMContextHangul *hcontext);
-
-/*
- * global variables for hangul immodule
- */
-static GObjectClass *parent_class;
-
-static GtkIMContextHangul *current_context = NULL;
-static GSList *status_windows = NULL;
-static GtkWidget *hanja_window = NULL;
-static GtkWidget *char_table_window = NULL;
 
 enum {
   INPUT_MODE_DIRECT,
@@ -158,16 +50,137 @@ enum {
 } IMHangulInputModeInfo;
 
 enum {
-  STATE_DIRECT,
-  STATE_HANGUL
+  IM_HANGUL_STATE_DIRECT,
+  IM_HANGUL_STATE_HANGUL
 };
 
-#define OUTPUT_MODE_AUTOMATIC   0 
-#define OUTPUT_MODE_MANUAL      1
+typedef struct _StatusWindow StatusWindow;
 
-static GdkAtom          input_mode_info_atom;
-static GdkAtom          input_mode_info_type;
-static gboolean         manual_mode = FALSE;
+/* Status window: mostly copied from gtkimcontextxim.c */
+struct _StatusWindow
+{
+  GtkWidget *window;
+  GtkWidget *hangul_label;
+  GtkWidget *toplevel;
+  guint destroy_handler_id;
+  guint configure_handler_id;
+};
+
+static void	im_hangul_class_init	     (GtkIMContextHangulClass *klass);
+static void	im_hangul_init		     (GtkIMContextHangul *hcontext);
+static void	im_hangul_finalize	     (GObject *obj);
+
+static void	im_hangul_reset		     (GtkIMContext *context);
+static gboolean	im_hangul_filter_keypress    (GtkIMContext *context,
+					      GdkEventKey  *key);
+
+static void	im_hangul_get_preedit_string (GtkIMContext  *ic,
+					      gchar	    **str,
+					      PangoAttrList **attrs,
+					      gint	    *cursor_pos);
+
+static void	im_hangul_focus_in	     (GtkIMContext *context);
+static void	im_hangul_focus_out	     (GtkIMContext *context);
+static void	im_hangul_set_client_window  (GtkIMContext *context,
+					      GdkWindow    *client_window);
+
+/* asistant function for hangul composer */
+#define im_hangul_is_modifier(state)	((state & GDK_CONTROL_MASK) || \
+					 (state & GDK_MOD1_MASK))
+#define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1159)
+#define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x11A2)
+#define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11F9)
+
+#define im_hangul_is_empty(ctx)	        ((ctx)->choseong[0]  == 0 &&	\
+					 (ctx)->jungseong[0] == 0 &&	\
+					 (ctx)->jongseong[0] == 0 )
+
+static gboolean	im_hangul_is_trigger	     (GdkEventKey *key);
+static gboolean	im_hangul_is_backspace	     (GdkEventKey *key);
+
+static gboolean im_hangul_composer_2         (GtkIMContextHangul *hcontext,
+					      GdkEventKey *key);
+static gboolean im_hangul_composer_3         (GtkIMContextHangul *hcontext,
+					      GdkEventKey *key);
+
+static void	im_hangul_mode_hangul	     (GtkIMContextHangul *hcontext);
+static void	im_hangul_mode_direct	     (GtkIMContextHangul *hcontext);
+
+/* stack functions */
+static gunichar	im_hangul_pop		     (GtkIMContextHangul *hcontext);
+static gunichar	im_hangul_peek		     (GtkIMContextHangul *hcontext);
+static void	im_hangul_push		     (GtkIMContextHangul *hcontext,
+					      gunichar		 ch);
+
+/* commit functions */
+static void	im_hangul_clear_buf	     (GtkIMContextHangul *hcontext);
+static gboolean	im_hangul_commit	     (GtkIMContextHangul *hcontext);
+static void	im_hangul_commit_utf8	     (GtkIMContextHangul *hcontext,
+					      gchar *utf8);
+static gboolean im_hangul_process_nonhangul  (GtkIMContextHangul *hcontext,
+					      GdkEventKey *key);
+
+/* for feedback (preedit attribute) */
+static void	im_hangul_preedit_underline  (PangoAttrList **attrs,
+					      gint start, gint end);
+static void	im_hangul_preedit_foreground (PangoAttrList **attrs,
+					      gint start, gint end);
+static void	im_hangul_preedit_background (PangoAttrList **attrs,
+					      gint start, gint end);
+static void	im_hangul_preedit_nothing    (PangoAttrList **attrs,
+					      gint start, gint end);
+
+static GtkWidget* get_toplevel_window (GdkWindow *window);
+static void status_window_show	    (GtkIMContextHangul *hcontext);
+static void status_window_hide	    (GtkIMContextHangul *hcontext);
+static void status_window_set_label (GtkIMContextHangul *hcontext);
+
+static void popup_hanja_window	    (GtkIMContextHangul *hcontext);
+static void popup_char_table_window (GtkIMContextHangul *hcontext);
+
+static const IMHangulCombination compose_table_default[] = {
+  { 0x11001100, 0x1101 }, /* choseong  kiyeok + kiyeok	= ssangkiyeok	*/
+  { 0x11031103, 0x1104 }, /* choseong  tikeut + tikeut	= ssangtikeut	*/
+  { 0x11071107, 0x1108 }, /* choseong  pieup  + pieup	= ssangpieup	*/
+  { 0x11091109, 0x110a }, /* choseong  sios   + sios	= ssangsios	*/
+  { 0x110c110c, 0x110d }, /* choseong  cieuc  + cieuc	= ssangcieuc	*/
+  { 0x11691161, 0x116a }, /* jungseong o      + a	= wa		*/
+  { 0x11691162, 0x116b }, /* jungseong o      + ae	= wae		*/
+  { 0x11691175, 0x116c }, /* jungseong o      + i	= oe		*/
+  { 0x116e1165, 0x116f }, /* jungseong u      + eo	= weo		*/
+  { 0x116e1166, 0x1170 }, /* jungseong u      + e	= we		*/
+  { 0x116e1175, 0x1171 }, /* jungseong u      + i	= wi		*/
+  { 0x11731175, 0x1174 }, /* jungseong eu     + i	= yi		*/
+  { 0x11a811a8, 0x11a9 }, /* jongseong kiyeok + kiyeok	= ssangekiyeok	*/
+  { 0x11a811ba, 0x11aa }, /* jongseong kiyeok + sios	= kiyeok-sois	*/
+  { 0x11ab11bd, 0x11ac }, /* jongseong nieun  + cieuc	= nieun-cieuc	*/
+  { 0x11ab11c2, 0x11ad }, /* jongseong nieun  + hieuh	= nieun-hieuh	*/
+  { 0x11af11a8, 0x11b0 }, /* jongseong rieul  + kiyeok	= rieul-kiyeok	*/
+  { 0x11af11b7, 0x11b1 }, /* jongseong rieul  + mieum	= rieul-mieum	*/
+  { 0x11af11b8, 0x11b2 }, /* jongseong rieul  + pieup	= rieul-pieup	*/
+  { 0x11af11ba, 0x11b3 }, /* jongseong rieul  + sios	= rieul-sios	*/
+  { 0x11af11c0, 0x11b4 }, /* jongseong rieul  + thieuth = rieul-thieuth	*/
+  { 0x11af11c1, 0x11b5 }, /* jongseong rieul  + phieuph = rieul-phieuph	*/
+  { 0x11af11c2, 0x11b6 }, /* jongseong rieul  + hieuh	= rieul-hieuh	*/
+  { 0x11b811ba, 0x11b9 }, /* jongseong pieup  + sios	= pieup-sios	*/
+  { 0x11ba11ba, 0x11bb }, /* jongseong sios   + sios	= ssangsios	*/
+};
+
+
+GType gtk_type_im_context_hangul = 0;
+
+/* static variables for hangul immodule */
+static GObjectClass *parent_class;
+
+static GtkIMContextHangul *current_context = NULL;
+static GSList *status_windows = NULL;
+static GtkWidget *hanja_window = NULL;
+static GtkWidget *char_table_window = NULL;
+
+#define OUTPUT_MODE_AUTOMATIC	0 
+#define OUTPUT_MODE_MANUAL	1
+
+static gboolean		manual_mode = FALSE;
 static gint		input_mode = INPUT_MODE_DIRECT;
 /* static gint		output_mode = OUTPUT_MODE_AUTOMATIC; */
 
@@ -177,11 +190,11 @@ static gboolean		pref_use_caps_lock = FALSE;
 static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
-static gchar* 		pref_hanja_font = NULL;
+static gchar*		pref_hanja_font = NULL;
 static gint		pref_preedit_style = 1;
-static void             (*im_hangul_preedit_attr)(PangoAttrList **attrs,
-                                                  gint start,
-                                                  gint end) = NULL;
+static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
+						  gint start,
+						  gint end) = NULL;
 static GdkColor		pref_fg = { 0, 0, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
 
@@ -202,10 +215,8 @@ static guint16 im_hangul_ignore_table[] = {
   0
 };
 
-static const gunichar *keyboard_table;
-
 void
-im_hangul_register_type (GTypeModule *type_module)
+gtk_im_context_hangul_register_type (GTypeModule *type_module)
 {
   static const GTypeInfo im_context_hangul_info = {
     sizeof(GtkIMContextHangulClass),
@@ -252,35 +263,32 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
 
   /* install settings */
   /* check whether installed or not */
-  if (!have_property("gtk-imhangul-status"))
+  if (!have_property ("gtk-imhangul-status"))
     gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-status",
-  						         "Status Window",
-						         "Whether to show status window or not",
-						         FALSE,
-						         G_PARAM_READWRITE));
-  if (!have_property("gtk-imhangul-use-capslock"))
+							 "Status Window",
+							 "Whether to show status window or not",
+							 FALSE,
+							 G_PARAM_READWRITE));
+  if (!have_property ("gtk-imhangul-use-capslock"))
     gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-use-capslock",
-  						         "Use Caps Lock",
-						         "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
-						         FALSE,
-						         G_PARAM_READWRITE));
-  if (!have_property("gtk-imhangul-dvorak"))
+							 "Use Caps Lock",
+							 "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
+							 FALSE,
+							 G_PARAM_READWRITE));
+  if (!have_property ("gtk-imhangul-dvorak"))
     gtk_settings_install_property (g_param_spec_boolean ("gtk-imhangul-dvorak",
-  						         "Dvorak Keyboard",
-						         "Whether to use dvorak keyboard or not",
-						         FALSE,
-						         G_PARAM_READWRITE));
-  if (!have_property("gtk-imhangul-style"))
+							 "Dvorak Keyboard",
+							 "Whether to use dvorak keyboard or not",
+							 FALSE,
+							 G_PARAM_READWRITE));
+  if (!have_property ("gtk-imhangul-style"))
     gtk_settings_install_property (g_param_spec_int ("gtk-imhangul-style",
-  						     "Preedit Style",
+						     "Preedit Style",
 						     "Preedit string style",
 						     0,
 						     4,
 						     0,
 						     G_PARAM_READWRITE));
-  /* initiate input_mode_atom */
-  input_mode_info_atom = gdk_atom_intern("_HANGUL_INPUT_MODE", TRUE);
-  input_mode_info_type = gdk_atom_intern("INTEGER", TRUE);
 }
 
 static void
@@ -322,17 +330,21 @@ im_hangul_clear_buf (GtkIMContextHangul *hcontext)
 static void 
 im_hangul_init (GtkIMContextHangul *hcontext)
 {
-  im_hangul_clear_buf(hcontext);
+  im_hangul_clear_buf (hcontext);
 
-  hcontext->state = STATE_DIRECT;	/* english mode */
-  hcontext->automata = NULL;	        /* initial value: automata == null */
   hcontext->toplevel = NULL;
 
-  g_object_get (gtk_settings_get_default(),
-  		"gtk-imhangul-status", &pref_use_status_window,
-  		"gtk-imhangul-use-capslock", &pref_use_caps_lock,
-  		"gtk-imhangul-dvorak", &pref_use_dvorak,
-  		"gtk-imhangul-style", &pref_preedit_style,
+  hcontext->state = IM_HANGUL_STATE_DIRECT;	/* english mode */
+  hcontext->composer = NULL;		/* initial value: composer == null */
+  hcontext->keyboard_table = NULL;
+  hcontext->compose_table_size = G_N_ELEMENTS(compose_table_default);
+  hcontext->compose_table = compose_table_default;
+
+  g_object_get (gtk_settings_get_default (),
+		"gtk-imhangul-status", &pref_use_status_window,
+		"gtk-imhangul-use-capslock", &pref_use_caps_lock,
+		"gtk-imhangul-dvorak", &pref_use_dvorak,
+		"gtk-imhangul-style", &pref_preedit_style,
 		NULL);
 
   switch (pref_preedit_style) {
@@ -355,7 +367,7 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 }
 
 static void
-im_hangul_finalize(GObject *obj)
+im_hangul_finalize (GObject *obj)
 {
   GtkIMContextHangul* hcontext = GTK_IM_CONTEXT_HANGUL(obj);
 
@@ -365,13 +377,13 @@ im_hangul_finalize(GObject *obj)
 }
 
 static void
-im_hangul_push(GtkIMContextHangul *hcontext, gunichar ch)
+im_hangul_push (GtkIMContextHangul *hcontext, gunichar ch)
 {
   hcontext->stack[++hcontext->index] = ch;
 }
 
 static gunichar
-im_hangul_peek(GtkIMContextHangul *hcontext)
+im_hangul_peek (GtkIMContextHangul *hcontext)
 {
   if (hcontext->index < 0)
     return 0;
@@ -379,7 +391,7 @@ im_hangul_peek(GtkIMContextHangul *hcontext)
 }
 
 static gunichar
-im_hangul_pop(GtkIMContextHangul *hcontext)
+im_hangul_pop (GtkIMContextHangul *hcontext)
 {
   if (hcontext->index < 0)
     return 0;
@@ -387,67 +399,91 @@ im_hangul_pop(GtkIMContextHangul *hcontext)
 }
 
 static void
-im_hangul_set_client_window(GtkIMContext *context,
+im_hangul_set_client_window (GtkIMContext *context,
 			    GdkWindow *client_window)
 {
   GtkStyle *style;
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
-  hcontext->toplevel = get_toplevel_window(client_window);
+  hcontext->toplevel = get_toplevel_window (client_window);
 
   if (hcontext->toplevel) {
     /* set fg, bg colors */
     style = hcontext->toplevel->style;
     switch (pref_preedit_style) {
       case 2:
-        pref_fg.red 	= style->base[GTK_STATE_NORMAL].red;
-        pref_fg.green 	= style->base[GTK_STATE_NORMAL].green;
-        pref_fg.blue 	= style->base[GTK_STATE_NORMAL].blue;
-        pref_bg.red 	= style->text[GTK_STATE_NORMAL].red;
-        pref_bg.green 	= style->text[GTK_STATE_NORMAL].green;
-        pref_bg.blue 	= style->text[GTK_STATE_NORMAL].blue;
+	pref_fg.red	= style->base[GTK_STATE_NORMAL].red;
+	pref_fg.green	= style->base[GTK_STATE_NORMAL].green;
+	pref_fg.blue	= style->base[GTK_STATE_NORMAL].blue;
+	pref_bg.red	= style->text[GTK_STATE_NORMAL].red;
+	pref_bg.green	= style->text[GTK_STATE_NORMAL].green;
+	pref_bg.blue	= style->text[GTK_STATE_NORMAL].blue;
 	break;
       case 3:
-        pref_fg.red 	= style->text[GTK_STATE_NORMAL].red;
-        pref_fg.green 	= style->text[GTK_STATE_NORMAL].green;
-        pref_fg.blue 	= style->text[GTK_STATE_NORMAL].blue;
-        pref_bg.red 	= (style->base[GTK_STATE_NORMAL].red   * 90 + 
-      			   style->text[GTK_STATE_NORMAL].red   * 10) / 100;
-        pref_bg.green 	= (style->base[GTK_STATE_NORMAL].green * 90 + 
-        	           style->text[GTK_STATE_NORMAL].green * 10) / 100;
-        pref_bg.blue 	= (style->base[GTK_STATE_NORMAL].blue  * 90 + 
-        	           style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
+	pref_fg.red	= style->text[GTK_STATE_NORMAL].red;
+	pref_fg.green	= style->text[GTK_STATE_NORMAL].green;
+	pref_fg.blue	= style->text[GTK_STATE_NORMAL].blue;
+	pref_bg.red	= (style->base[GTK_STATE_NORMAL].red   * 90 + 
+			   style->text[GTK_STATE_NORMAL].red   * 10) / 100;
+	pref_bg.green	= (style->base[GTK_STATE_NORMAL].green * 90 + 
+			   style->text[GTK_STATE_NORMAL].green * 10) / 100;
+	pref_bg.blue	= (style->base[GTK_STATE_NORMAL].blue  * 90 + 
+			   style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
 	break;
       default:
-        pref_fg.red 	= style->text[GTK_STATE_NORMAL].red;
-        pref_fg.green 	= style->text[GTK_STATE_NORMAL].green;
-        pref_fg.blue 	= style->text[GTK_STATE_NORMAL].blue;
-        pref_bg.red 	= style->base[GTK_STATE_NORMAL].red;
-        pref_bg.green 	= style->base[GTK_STATE_NORMAL].green;
-        pref_bg.blue 	= style->base[GTK_STATE_NORMAL].blue;
+	pref_fg.red	= style->text[GTK_STATE_NORMAL].red;
+	pref_fg.green	= style->text[GTK_STATE_NORMAL].green;
+	pref_fg.blue	= style->text[GTK_STATE_NORMAL].blue;
+	pref_bg.red	= style->base[GTK_STATE_NORMAL].red;
+	pref_bg.green	= style->base[GTK_STATE_NORMAL].green;
+	pref_bg.blue	= style->base[GTK_STATE_NORMAL].blue;
     }
   }
 }
 
 GtkIMContext *
-im_hangul_new(void)
+gtk_im_context_hangul_new (void)
 {
   return GTK_IM_CONTEXT (g_object_new (GTK_TYPE_IM_CONTEXT_HANGUL, NULL));
 }
 
 void
-im_hangul_set_composer(GtkIMContextHangul *hcontext,
-		       IMHangulComposerType type)
+gtk_im_context_hangul_set_composer (GtkIMContextHangul   *hcontext,
+				    IMHangulComposerType  type)
 {
   switch (type)
     {
     case IM_HANGUL_COMPOSER_2:
       hcontext->composer = im_hangul_composer_2;
+      break;
     case IM_HANGUL_COMPOSER_3:
       hcontext->composer = im_hangul_composer_3;
+      break;
     default:
       hcontext->composer = im_hangul_composer_2;
+      break;
     }
+}
+
+void
+gtk_im_context_hangul_set_keyboard_table (GtkIMContextHangul *hcontext,
+			                  const gunichar     *keyboard_table)
+{
+  g_return_if_fail (hcontext);
+
+  hcontext->keyboard_table = keyboard_table;
+}
+
+void
+gtk_im_context_hangul_set_compose_table (GtkIMContextHangul        *hcontext,
+			                 const IMHangulCombination *compose_table,
+			                 int                        compose_table_size)
+{
+  g_return_if_fail (hcontext);
+  g_return_if_fail (compose_table);
+
+  hcontext->compose_table = compose_table;
+  hcontext->compose_table_size = compose_table_size;
 }
 
 static void
@@ -456,17 +492,17 @@ im_hangul_set_input_mode_info (int state)
   long data = state;
 
   gdk_property_change (GDK_ROOT_PARENT (),
-                       gdk_atom_intern ("_HANGUL_INPUT_MODE", FALSE),
-                       gdk_atom_intern ("INTEGER", FALSE),
-                       32, GDK_PROP_MODE_REPLACE,
-                       (const guchar *)&data, 1);
+		       gdk_atom_intern ("_HANGUL_INPUT_MODE", FALSE),
+		       gdk_atom_intern ("INTEGER", FALSE),
+		       32, GDK_PROP_MODE_REPLACE,
+		       (const guchar *)&data, 1);
 }
 
 static void 
 im_hangul_mode_hangul (GtkIMContextHangul *hcontext)
 {
   input_mode = INPUT_MODE_HANGUL;
-  hcontext->state = STATE_HANGUL;
+  hcontext->state = IM_HANGUL_STATE_HANGUL;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
   status_window_set_label (hcontext);
 }
@@ -475,7 +511,7 @@ static void
 im_hangul_mode_direct (GtkIMContextHangul *hcontext)
 {
   input_mode = INPUT_MODE_DIRECT;
-  hcontext->state = STATE_DIRECT;
+  hcontext->state = IM_HANGUL_STATE_DIRECT;
   im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
   status_window_set_label (hcontext);
 }
@@ -603,7 +639,7 @@ im_hangul_jamo_to_syllable (gunichar choseong,
 
   /* we use 0x11a7 like a Jongseong filler */
   if (jongseong == 0)
-    jongseong = 0x11a7;         /* Jongseong filler */
+    jongseong = 0x11a7;		/* Jongseong filler */
 
   if (!(choseong  >= 0x1100 && choseong  <= 0x1112))
     return 0;
@@ -628,7 +664,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
   int n = 0;
   gunichar ch;
 
-  if (im_hangul_is_empty(hcontext)) {
+  if (im_hangul_is_empty (hcontext)) {
     buf[0] = '\0';
     return 0;
   }
@@ -639,24 +675,24 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
       if (hcontext->choseong[0] == 0)
 	n += g_unichar_to_utf8 (HCF, buf + n);
       else
-        {
+	{
 	  for (i = 0; i <= hcontext->lindex; i++)
 	    n += g_unichar_to_utf8 (hcontext->choseong[i], buf + n);
-        }
+	}
 
       if (hcontext->jungseong[0] == 0)
 	n += g_unichar_to_utf8 (HJF, buf + n);
       else
-        {
+	{
 	  for (i = 0; i <= hcontext->vindex; i++)
 	    n += g_unichar_to_utf8 (hcontext->jungseong[i], buf + n);
-        }
+	}
 
       if (hcontext->jongseong[0] != 0)
-        {
+	{
 	  for (i = 0; i <= hcontext->tindex; i++)
 	    n += g_unichar_to_utf8 (hcontext->jongseong[i], buf + n);
-        }
+	}
       buf[n] = '\0';
     }
   else if (pref_use_hangul_jamo)
@@ -682,7 +718,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
       /* this code is very stupid but pango has some bug in Xft
        * therefore we have to do this */
       if (hcontext->choseong[0])
-        {
+	{
 	  if (hcontext->jungseong[0])
 	    {
 	      /* have cho, jung, jong or no jong */
@@ -696,7 +732,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
 	  else
 	    {
 	      if (hcontext->jongseong[0])
-	        {
+		{
 		  /* have cho, jong */
 		  ch = im_hangul_choseong_to_cjamo (hcontext->choseong[0]);
 		  n = g_unichar_to_utf8 (ch, buf);
@@ -706,7 +742,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
 		  return n;
 		}
 	      else
-	        {
+		{
 		  /* have cho */
 		  ch = im_hangul_choseong_to_cjamo (hcontext->choseong[0]);
 		  n = g_unichar_to_utf8 (ch, buf);
@@ -729,7 +765,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
 		return n;
 	      } else {
 		/* have jung */
-		ch = im_hangul_jungseong_to_unicode (hcontext->jungseong[0]);
+		ch = im_hangul_jungseong_to_cjamo (hcontext->jungseong[0]);
 		n = g_unichar_to_utf8 (ch, buf);
 		buf[n] = '\0';
 		return n;
@@ -740,7 +776,7 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
 	      if (hcontext->jongseong[0])
 		{
 		  /* have jong */
-		  ch = im_hangul_jongseong_to_unicode (hcontext->jongseong[0]);
+		  ch = im_hangul_jongseong_to_cjamo (hcontext->jongseong[0]);
 		  n = g_unichar_to_utf8 (ch, buf);
 		  buf[n] = '\0';
 		  return n;
@@ -842,13 +878,13 @@ im_hangul_focus_in (GtkIMContext *context)
     {
       im_hangul_set_input_mode_info (INPUT_MODE_INFO_ENGLISH);
       if (pref_use_global_state)
-	hcontext->state = STATE_DIRECT;
+	hcontext->state = IM_HANGUL_STATE_DIRECT;
     }
   else
     {
       im_hangul_set_input_mode_info (INPUT_MODE_INFO_HANGUL);
       if (pref_use_global_state)
-	hcontext->state = STATE_HANGUL;
+	hcontext->state = IM_HANGUL_STATE_HANGUL;
     }
 
   current_context = hcontext;
@@ -865,7 +901,7 @@ im_hangul_focus_out (GtkIMContext *context)
       if (im_hangul_commit (hcontext))
 	{
 	  g_signal_emit_by_name (hcontext, "preedit_changed");
-	  hcontext->state = STATE_HANGUL;
+	  hcontext->state = IM_HANGUL_STATE_HANGUL;
 	}
     }
 
@@ -910,7 +946,7 @@ im_hangul_reset (GtkIMContext *context)
 
 static gboolean
 im_hangul_process_nonhangul (GtkIMContextHangul *hcontext,
-		             GdkEventKey *key)
+			     GdkEventKey *key)
 {
   if (!im_hangul_is_modifier (key->state))
     {
@@ -931,7 +967,7 @@ im_hangul_process_nonhangul (GtkIMContextHangul *hcontext,
 
 static gboolean
 im_hangul_handle_direct_mode (GtkIMContextHangul *hcontext,
-		              GdkEventKey *key)
+			      GdkEventKey *key)
 {
   if (im_hangul_is_trigger (key))
     {
@@ -952,7 +988,7 @@ im_hangul_commit (GtkIMContextHangul *hcontext)
  
   buf[0] = '\0';
 
-  if (im_hangul_is_empty(hcontext))
+  if (im_hangul_is_empty (hcontext))
     return FALSE;
 
   if (manual_mode)
@@ -1060,7 +1096,7 @@ im_hangul_commit_utf8 (GtkIMContextHangul *hcontext, gchar *utf8)
 /* this is a very dangerous function:
  * safe only when GDKKEYSYMS's value is enumarated  */
 static guint
-im_hangul_dvorak_to_qwerty(guint code)
+im_hangul_dvorak_to_qwerty (guint code)
 {
   /* maybe safe if we use switch statement */
   static guint table[] = {
@@ -1165,44 +1201,11 @@ im_hangul_dvorak_to_qwerty(guint code)
   return table[code - GDK_exclam];
 }
 
-struct combination {
-  guint32 key;
-  gunichar code;
-};
-
-static const IMHangulCombination compose_table_default[] = {
-  { 0x11001100, 0x1101 }, /* choseong  kiyeok + kiyeok  = ssangkiyeok	*/
-  { 0x11031103, 0x1104 }, /* choseong  tikeut + tikeut  = ssangtikeut	*/
-  { 0x11071107, 0x1108 }, /* choseong  pieup  + pieup   = ssangpieup 	*/
-  { 0x11091109, 0x110a }, /* choseong  sios   + sios    = ssangsios	*/
-  { 0x110c110c, 0x110d }, /* choseong  cieuc  + cieuc   = ssangcieuc	*/
-  { 0x11691161, 0x116a }, /* jungseong o      + a       = wa		*/
-  { 0x11691162, 0x116b }, /* jungseong o      + ae      = wae		*/
-  { 0x11691175, 0x116c }, /* jungseong o      + i       = oe		*/
-  { 0x116e1165, 0x116f }, /* jungseong u      + eo      = weo		*/
-  { 0x116e1166, 0x1170 }, /* jungseong u      + e       = we		*/
-  { 0x116e1175, 0x1171 }, /* jungseong u      + i       = wi		*/
-  { 0x11731175, 0x1174 }, /* jungseong eu     + i       = yi		*/
-  { 0x11a811a8, 0x11a9 }, /* jongseong kiyeok + kiyeok  = ssangekiyeok 	*/
-  { 0x11a811ba, 0x11aa }, /* jongseong kiyeok + sios    = kiyeok-sois	*/
-  { 0x11ab11bd, 0x11ac }, /* jongseong nieun  + cieuc   = nieun-cieuc	*/
-  { 0x11ab11c2, 0x11ad }, /* jongseong nieun  + hieuh   = nieun-hieuh	*/
-  { 0x11af11a8, 0x11b0 }, /* jongseong rieul  + kiyeok  = rieul-kiyeok	*/
-  { 0x11af11b7, 0x11b1 }, /* jongseong rieul  + mieum   = rieul-mieum 	*/
-  { 0x11af11b8, 0x11b2 }, /* jongseong rieul  + pieup   = rieul-pieup	*/
-  { 0x11af11ba, 0x11b3 }, /* jongseong rieul  + sios    = rieul-sios	*/
-  { 0x11af11c0, 0x11b4 }, /* jongseong rieul  + thieuth = rieul-thieuth	*/
-  { 0x11af11c1, 0x11b5 }, /* jongseong rieul  + phieuph = rieul-phieuph	*/
-  { 0x11af11c2, 0x11b6 }, /* jongseong rieul  + hieuh   = rieul-hieuh	*/
-  { 0x11b811ba, 0x11b9 }, /* jongseong pieup  + sios    = pieup-sios	*/
-  { 0x11ba11ba, 0x11bb }, /* jongseong sios   + sios    = ssangsios	*/
-};
-
-static int compose_table_size = G_N_ELEMENTS(compose_table_default);
-static struct combination *compose_table = compose_table_default;
 
 static gunichar
-im_hangul_compose(gunichar first, gunichar last)
+im_hangul_compose (GtkIMContextHangul *hcontext,
+    		   gunichar            first,
+		   gunichar            last)
 {
   int min, max, mid;
   guint32 key;
@@ -1212,30 +1215,33 @@ im_hangul_compose(gunichar first, gunichar last)
 
   /* binary search in table */
   min = 0;
-  max = compose_table_size - 1;
+  max = hcontext->compose_table_size - 1;
 
   while (max >= min)
     {
       mid = (min + max) / 2;
-      if (compose_table[mid].key < key)
+      if (hcontext->compose_table[mid].key < key)
 	min = mid + 1;
-      else if (compose_table[mid].key > key)
+      else if (hcontext->compose_table[mid].key > key)
 	max = mid - 1;
       else
-	return compose_table[mid].code;
+	return hcontext->compose_table[mid].code;
     }
+
   return 0;
 }
 
 static gunichar
-im_hangul_mapping (guint keyval, guint state)
+im_hangul_mapping (GtkIMContextHangul *hcontext,
+		   guint	       keyval,
+		   guint	       state)
 {
-  if (keyboard_table == NULL)
+  if (hcontext->keyboard_table == NULL)
     return 0;
 
   /* treat for dvorak */
   if (pref_use_dvorak)
-    keyval = im_hangul_dvorak_to_qwerty(keyval);
+    keyval = im_hangul_dvorak_to_qwerty (keyval);
 
   /* hangul jamo keysym */
   if (keyval >= 0x01001100 && keyval <= 0x010011ff)
@@ -1257,7 +1263,7 @@ im_hangul_mapping (guint keyval, guint state)
 		keyval += (GDK_a - GDK_A);
 	    }
 	}
-      return keyboard_table[keyval - GDK_exclam];
+      return hcontext->keyboard_table[keyval - GDK_exclam];
     }
 
   return 0;
@@ -1287,16 +1293,16 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 
   /* some keys are ignored: Ctrl, Alt, Meta */
   /* we flush out all preedit text */
-  if (im_hangul_is_ignore_key(key->keyval))
+  if (im_hangul_is_ignore_key (key->keyval))
     {
-      if (im_hangul_commit(hcontext))
+      if (im_hangul_commit (hcontext))
 	g_signal_emit_by_name (hcontext, "preedit_changed");
       return FALSE;
     }
 
   /* handle direct mode */
-  if (hcontext->state == STATE_DIRECT)
-    return im_hangul_handle_direct_mode(hcontext, key);
+  if (hcontext->state == IM_HANGUL_STATE_DIRECT)
+    return im_hangul_handle_direct_mode (hcontext, key);
 
   /* handle Escape key: automaticaly change to direct mode */
   if (key->keyval == GDK_Escape)
@@ -1340,20 +1346,20 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
       return TRUE;
     }
 
-  /* here we must hangul mode, so set STATE_HANGUL
+  /* here we must hangul mode, so set IM_HANGUL_STATE_HANGUL
    * static variable input_mode is not yet applied so we change it
    * below line must not removed */
-  if (hcontext->state == STATE_DIRECT)
+  if (hcontext->state == IM_HANGUL_STATE_DIRECT)
     {
-      hcontext->state = STATE_HANGUL;
-      g_print("This is really a error: our input mode is currupted\n");
+      hcontext->state = IM_HANGUL_STATE_HANGUL;
+      g_print ("This is really a error: our input mode is currupted\n");
     }
 
   if (hcontext->composer)
-    return hcontext->composer(hcontext, key);
+    return hcontext->composer (hcontext, key);
   else
     {
-      g_print("imhangul: null composer\n");
+      g_print ("imhangul: null composer\n");
       return FALSE;
     }
 }
@@ -1363,7 +1369,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
  * status window
  */
 static gboolean
-status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
+status_window_expose_event (GtkWidget *widget, GdkEventExpose *event)
 {
   gdk_draw_rectangle (widget->window,
 		      widget->style->fg_gc[GTK_STATE_NORMAL],
@@ -1375,9 +1381,9 @@ status_window_expose_event(GtkWidget *widget, GdkEventExpose *event)
 }
 
 static void
-status_window_free(StatusWindow *status_window)
+status_window_free (StatusWindow *status_window)
 {
-  status_windows = g_slist_remove(status_windows, status_window);
+  status_windows = g_slist_remove (status_windows, status_window);
   
   g_signal_handler_disconnect (status_window->toplevel,
 			       status_window->destroy_handler_id);
@@ -1385,7 +1391,7 @@ status_window_free(StatusWindow *status_window)
 			       status_window->configure_handler_id);
   gtk_widget_destroy (status_window->window);
   g_object_set_data (G_OBJECT(status_window->toplevel),
-  		     "gtk-imhangul-status-window", NULL);
+		     "gtk-imhangul-status-window", NULL);
   g_free (status_window);
 }
 
@@ -1417,7 +1423,7 @@ on_click_hangul (GtkWidget *widget,
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(data);
 
-  if (hcontext->state == STATE_DIRECT)
+  if (hcontext->state == IM_HANGUL_STATE_DIRECT)
     {
       /* english mode change to hangul mode */
       im_hangul_mode_hangul (hcontext);
@@ -1471,7 +1477,7 @@ status_window_get (GtkIMContextHangul *hcontext)
     return NULL;
 
   return g_object_get_data (G_OBJECT(hcontext->toplevel),
-  			    "gtk-imhangul-status-window");
+			    "gtk-imhangul-status-window");
 }
 
 static GtkWidget*
@@ -1498,72 +1504,72 @@ status_window_get_window (GtkIMContextHangul *hcontext, gboolean create)
   else if (!create)
     return NULL;
 
-  status_window = g_new(StatusWindow, 1);
-  status_window->window = gtk_window_new(GTK_WINDOW_POPUP);
+  status_window = g_new (StatusWindow, 1);
+  status_window->window = gtk_window_new (GTK_WINDOW_POPUP);
   status_window->toplevel = toplevel;
 
-  status_windows = g_slist_prepend(status_windows, status_window);
+  status_windows = g_slist_prepend (status_windows, status_window);
 
   window = status_window->window;
 
-  gtk_container_set_border_width(GTK_CONTAINER(window), 1);
-  /* gtk_window_set_decorated(GTK_WINDOW(window), FALSE); */
-  gtk_widget_set_name(window, "imhangul_status");
-  gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, FALSE);
-  gtk_widget_set_app_paintable(window, TRUE);
+  gtk_container_set_border_width (GTK_CONTAINER(window), 1);
+  /* gtk_window_set_decorated (GTK_WINDOW(window), FALSE); */
+  gtk_widget_set_name (window, "imhangul_status");
+  gtk_window_set_policy (GTK_WINDOW(window), FALSE, FALSE, FALSE);
+  gtk_widget_set_app_paintable (window, TRUE);
 
-  frame = gtk_frame_new(NULL);
-  gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
-  gtk_widget_show(frame);
-  gtk_container_add(GTK_CONTAINER(window), frame);
+  frame = gtk_frame_new (NULL);
+  gtk_frame_set_shadow_type (GTK_FRAME(frame), GTK_SHADOW_OUT);
+  gtk_widget_show (frame);
+  gtk_container_add (GTK_CONTAINER(window), frame);
 
-  hbox = gtk_hbox_new(TRUE, 3);
-  gtk_widget_show(hbox);
-  gtk_container_add(GTK_CONTAINER(frame), hbox);
+  hbox = gtk_hbox_new (TRUE, 3);
+  gtk_widget_show (hbox);
+  gtk_container_add (GTK_CONTAINER(frame), hbox);
 
   /* yeongeo/hangul label */
-  label = gtk_label_new(""); 
+  label = gtk_label_new (""); 
   status_window->hangul_label = label;
-  gtk_widget_show(label);
-  ebox = gtk_event_box_new();
-  gtk_widget_show(ebox);
-  gtk_container_add(GTK_CONTAINER(ebox), label);
-  gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
-  g_signal_connect(G_OBJECT(ebox), "button-press-event",
-  		   G_CALLBACK(on_click_hangul), hcontext);
+  gtk_widget_show (label);
+  ebox = gtk_event_box_new ();
+  gtk_widget_show (ebox);
+  gtk_container_add (GTK_CONTAINER(ebox), label);
+  gtk_box_pack_start (GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT(ebox), "button-press-event",
+		   G_CALLBACK(on_click_hangul), hcontext);
 
   /* hanja label */
-  label = gtk_label_new("[\355\225\234\354\236\220]");
-  gtk_widget_show(label);
-  ebox = gtk_event_box_new();
-  gtk_widget_show(ebox);
-  gtk_container_add(GTK_CONTAINER(ebox), label);
-  gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
-  g_signal_connect(G_OBJECT(ebox), "button-press-event",
-  		   G_CALLBACK(on_click_hanja), hcontext);
+  label = gtk_label_new ("[\355\225\234\354\236\220]");
+  gtk_widget_show (label);
+  ebox = gtk_event_box_new ();
+  gtk_widget_show (ebox);
+  gtk_container_add (GTK_CONTAINER(ebox), label);
+  gtk_box_pack_start (GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT(ebox), "button-press-event",
+		   G_CALLBACK(on_click_hanja), hcontext);
 
   status_window->destroy_handler_id =
-			g_signal_connect_swapped(G_OBJECT(toplevel), "destroy",
+			g_signal_connect_swapped (G_OBJECT(toplevel), "destroy",
 					       G_CALLBACK(status_window_free),
 					       status_window);
   status_window->configure_handler_id = 
-			g_signal_connect(G_OBJECT(toplevel), "configure-event",
+			g_signal_connect (G_OBJECT(toplevel), "configure-event",
 					 G_CALLBACK(status_window_configure),
 					 window);
-  status_window_configure(toplevel, NULL, window);
+  status_window_configure (toplevel, NULL, window);
 
-  g_signal_connect(G_OBJECT(window), "expose-event",
+  g_signal_connect (G_OBJECT(window), "expose-event",
 		   G_CALLBACK(status_window_expose_event), NULL);
 
-  status_window_set_label(hcontext);
-  g_object_set_data(G_OBJECT(toplevel),
-  		    "gtk-imhangul-status-window", status_window);
+  status_window_set_label (hcontext);
+  g_object_set_data (G_OBJECT(toplevel),
+		    "gtk-imhangul-status-window", status_window);
 
   return window;
 }
 
 static void
-status_window_show(GtkIMContextHangul *hcontext)
+status_window_show (GtkIMContextHangul *hcontext)
 {
   GtkWidget *window = status_window_get_window (hcontext, TRUE);
 
@@ -1584,7 +1590,7 @@ status_window_hide (GtkIMContextHangul *hcontext)
 }
 
 static void
-status_window_set_label(GtkIMContextHangul *hcontext)
+status_window_set_label (GtkIMContextHangul *hcontext)
 {
   static const gchar yeongeo[] = { 
 	'[', 0xec, 0x98, 0x81, 0xec, 0x96, 0xb4, ']', 0	/* utf8 string */
@@ -1602,7 +1608,7 @@ status_window_set_label(GtkIMContextHangul *hcontext)
   label = status_window->hangul_label;
   if (label)
     {
-      if (hcontext->state == STATE_DIRECT)
+      if (hcontext->state == IM_HANGUL_STATE_DIRECT)
 	gtk_label_set_text (GTK_LABEL(label), yeongeo);
       else
 	gtk_label_set_text (GTK_LABEL(label), hangul);
@@ -1641,7 +1647,7 @@ on_hanja_window_keypress (GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
   if (event->keyval == GDK_Escape)
     {
-      gtk_widget_destroy(hanja_window);
+      gtk_widget_destroy (hanja_window);
       return TRUE;
     }
   return FALSE;
@@ -1664,17 +1670,17 @@ on_hanja_button_clicked (GtkButton *button, gpointer data)
   if (str)
     {
       im_hangul_commit_utf8 (hcontext, str);
-      hcontext->state = STATE_HANGUL;
+      hcontext->state = IM_HANGUL_STATE_HANGUL;
       hcontext->index = -1;
       g_signal_emit_by_name (hcontext, "preedit_changed");
     }
-  gtk_widget_destroy(hanja_window);
+  gtk_widget_destroy (hanja_window);
 }
 
 static GtkWidget *
 create_hanja_window (GtkIMContextHangul *hcontext, gunichar ch)
 {
-  gunichar *p;
+  const gunichar *p;
   gint x, y, n, index;
   GtkWidget *window, *table, *button, *label, *parent;
   PangoFontDescription *desc = NULL;
@@ -1767,7 +1773,7 @@ popup_hanja_window (GtkIMContextHangul *hcontext)
 
   ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
 				   hcontext->jungseong[0],
-	                           hcontext->jongseong[0]);
+				   hcontext->jongseong[0]);
   if (ch)
     create_hanja_window (hcontext, ch);
 }
@@ -1777,16 +1783,16 @@ on_char_table_keypress (GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
   if (event->keyval == GDK_Escape)
     {
-      gtk_widget_hide(widget);
+      gtk_widget_hide (widget);
       return TRUE;
     }
   return FALSE;
 }
 
 static void
-on_char_table_clicked(GtkWidget *widget, gpointer data)
+on_char_table_clicked (GtkWidget *widget, gpointer data)
 {
-  gchar *str = (gchar *)gtk_button_get_label(GTK_BUTTON(widget));
+  gchar *str = (gchar *)gtk_button_get_label (GTK_BUTTON(widget));
 
   if (current_context != NULL && str != NULL)
     im_hangul_commit_utf8(current_context, str);
@@ -1863,22 +1869,22 @@ popup_char_table_window (GtkIMContextHangul *hcontext)
 {
   if (char_table_window != NULL)
     {
-      gtk_widget_show(char_table_window);
+      gtk_widget_show (char_table_window);
     }
   else
     {
-      char_table_window = create_char_window(hcontext);
-      gtk_widget_show(char_table_window);
+      char_table_window = create_char_window (hcontext);
+      gtk_widget_show (char_table_window);
     }
 }
 
 /*
- * im_hangul_shutdown:
+ * gtk_im_context_hangul_shutdown:
  *
  * Destroys all the status windows that are kept by the hangul contexts.
  */
 void
-im_hangul_shutdown (void)
+gtk_im_context_hangul_shutdown (void)
 {
   /* remove status window */
   while (status_windows)
@@ -1907,25 +1913,25 @@ static gunichar
 im_hangul_choseong_to_jongseong (gunichar ch)
 {
   static const gunichar table[] = {
-    0x11a8,	/* choseong kiyeok	  ->    jongseong kiyeok      */
-    0x11a9,	/* choseong ssangkiyeok	  ->    jongseong ssangkiyeok */
-    0x11ab,	/* choseong nieun	  ->    jongseong nieun       */
-    0x11ae,	/* choseong tikeut	  ->    jongseong tikeut      */
-    0x0,	/* choseong ssangtikeut	  ->    jongseong tikeut      */
-    0x11af,	/* choseong rieul	  ->    jongseong rieul       */
-    0x11b7,	/* choseong mieum 	  ->    jongseong mieum       */
-    0x11b8,	/* choseong pieup	  ->    jongseong pieup       */
-    0x0,	/* choseong ssangpieup	  ->    jongseong pieup       */
-    0x11ba,	/* choseong sios	  ->    jongseong sios        */
-    0x11bb,	/* choseong ssangsios     ->    jongseong ssangsios   */
-    0x11bc,	/* choseong ieung	  ->    jongseong ieung       */
-    0x11bd,	/* choseong cieuc	  ->    jongseong cieuc       */
-    0x0,	/* choseong ssangcieuc	  ->    jongseong cieuc       */
-    0x11be,	/* choseong chieuch	  ->    jongseong chieuch     */
-    0x11bf,	/* choseong khieukh	  ->    jongseong khieukh     */
-    0x11c0,	/* choseong thieuth	  ->    jongseong thieuth     */
-    0x11c1,	/* choseong phieuph	  ->    jongseong phieuph     */
-    0x11c2	/* choseong hieuh	  ->    jongseong hieuh       */
+    0x11a8,	/* choseong kiyeok	  ->	jongseong kiyeok      */
+    0x11a9,	/* choseong ssangkiyeok	  ->	jongseong ssangkiyeok */
+    0x11ab,	/* choseong nieun	  ->	jongseong nieun       */
+    0x11ae,	/* choseong tikeut	  ->	jongseong tikeut      */
+    0x0,	/* choseong ssangtikeut	  ->	jongseong tikeut      */
+    0x11af,	/* choseong rieul	  ->	jongseong rieul       */
+    0x11b7,	/* choseong mieum	  ->	jongseong mieum       */
+    0x11b8,	/* choseong pieup	  ->	jongseong pieup       */
+    0x0,	/* choseong ssangpieup	  ->	jongseong pieup       */
+    0x11ba,	/* choseong sios	  ->	jongseong sios	      */
+    0x11bb,	/* choseong ssangsios	  ->	jongseong ssangsios   */
+    0x11bc,	/* choseong ieung	  ->	jongseong ieung       */
+    0x11bd,	/* choseong cieuc	  ->	jongseong cieuc       */
+    0x0,	/* choseong ssangcieuc	  ->	jongseong cieuc       */
+    0x11be,	/* choseong chieuch	  ->	jongseong chieuch     */
+    0x11bf,	/* choseong khieukh	  ->	jongseong khieukh     */
+    0x11c0,	/* choseong thieuth	  ->	jongseong thieuth     */
+    0x11c1,	/* choseong phieuph	  ->	jongseong phieuph     */
+    0x11c2	/* choseong hieuh	  ->	jongseong hieuh       */
   };
 
   if (ch < 0x1100 || ch > 0x1112)
@@ -1937,33 +1943,33 @@ static gunichar
 im_hangul_jongseong_to_choseong (gunichar ch)
 {
   static const gunichar table[] = {
-    0x1100,	/* jongseong kiyeok	  ->    choseong kiyeok       */
-    0x1101,	/* jongseong ssangkiyeok  ->    choseong ssangkiyeok  */
-    0x1109,	/* jongseong kiyeok-sios  ->    choseong sios         */
-    0x1102,	/* jongseong nieun	  ->    choseong nieun        */
-    0x110c,	/* jongseong nieun-cieuc  ->    choseong cieuc        */
-    0x1112,	/* jongseong nieun-hieuh  ->    choseong hieuh        */
-    0x1103,	/* jongseong tikeut	  ->    choseong tikeut       */
-    0x1105,	/* jongseong rieul	  ->    choseong rieul        */
-    0x1100,	/* jongseong rieul-kiyeok ->    choseong kiyeok       */
-    0x1106,	/* jongseong rieul-mieum  ->    choseong mieum        */
-    0x1107,	/* jongseong rieul-pieup  ->    choseong pieup        */
-    0x1109,	/* jongseong rieul-sios   ->    choseong sios         */
-    0x1110,	/* jongseong rieul-thieuth -    choseong thieuth      */
-    0x1111,	/* jongseong rieul-phieuph -    choseong phieuph      */
-    0x1112,	/* jongseong rieul-hieuh  ->    choseong hieuh        */
-    0x1106,	/* jongseong mieum 	  ->    choseong mieum        */
-    0x1107,	/* jongseong pieup	  ->    choseong pieup        */
-    0x1109,	/* jongseong pieup-sios   ->    choseong sios         */
-    0x1109,	/* jongseong sios	  ->    choseong sios         */
-    0x110a,	/* jongseong ssangsios    ->    choseong ssangsios    */
-    0x110b,	/* jongseong ieung	  ->    choseong ieung        */
-    0x110c,	/* jongseong cieuc	  ->    choseong cieuc        */
-    0x110e,	/* jongseong chieuch	  ->    choseong chieuch      */
-    0x110f,	/* jongseong khieukh	  ->    choseong khieukh      */
-    0x1110,	/* jongseong thieuth	  ->    choseong thieuth      */
-    0x1111,	/* jongseong phieuph	  ->    choseong phieuph      */
-    0x1112	/* jongseong hieuh	  ->    choseong hieuh        */
+    0x1100,	/* jongseong kiyeok	  ->	choseong kiyeok       */
+    0x1101,	/* jongseong ssangkiyeok  ->	choseong ssangkiyeok  */
+    0x1109,	/* jongseong kiyeok-sios  ->	choseong sios	      */
+    0x1102,	/* jongseong nieun	  ->	choseong nieun	      */
+    0x110c,	/* jongseong nieun-cieuc  ->	choseong cieuc	      */
+    0x1112,	/* jongseong nieun-hieuh  ->	choseong hieuh	      */
+    0x1103,	/* jongseong tikeut	  ->	choseong tikeut       */
+    0x1105,	/* jongseong rieul	  ->	choseong rieul	      */
+    0x1100,	/* jongseong rieul-kiyeok ->	choseong kiyeok       */
+    0x1106,	/* jongseong rieul-mieum  ->	choseong mieum	      */
+    0x1107,	/* jongseong rieul-pieup  ->	choseong pieup	      */
+    0x1109,	/* jongseong rieul-sios   ->	choseong sios	      */
+    0x1110,	/* jongseong rieul-thieuth -	choseong thieuth      */
+    0x1111,	/* jongseong rieul-phieuph -	choseong phieuph      */
+    0x1112,	/* jongseong rieul-hieuh  ->	choseong hieuh	      */
+    0x1106,	/* jongseong mieum	  ->	choseong mieum	      */
+    0x1107,	/* jongseong pieup	  ->	choseong pieup	      */
+    0x1109,	/* jongseong pieup-sios   ->	choseong sios	      */
+    0x1109,	/* jongseong sios	  ->	choseong sios	      */
+    0x110a,	/* jongseong ssangsios	  ->	choseong ssangsios    */
+    0x110b,	/* jongseong ieung	  ->	choseong ieung	      */
+    0x110c,	/* jongseong cieuc	  ->	choseong cieuc	      */
+    0x110e,	/* jongseong chieuch	  ->	choseong chieuch      */
+    0x110f,	/* jongseong khieukh	  ->	choseong khieukh      */
+    0x1110,	/* jongseong thieuth	  ->	choseong thieuth      */
+    0x1111,	/* jongseong phieuph	  ->	choseong phieuph      */
+    0x1112	/* jongseong hieuh	  ->	choseong hieuh	      */
   };
 
   if (ch < 0x11a8 || ch > 0x11c2)
@@ -1977,37 +1983,37 @@ im_hangul_jongseong_dicompose (gunichar ch,
 			       gunichar* cho)
 {
   static const gunichar table[][2] = {
-    { 0,      0x1100 }, /* jong kiyeok	      = cho  kiyeok               */
+    { 0,      0x1100 }, /* jong kiyeok	      = cho  kiyeok		  */
     { 0x11a8, 0x1100 }, /* jong ssangkiyeok   = jong kiyeok + cho kiyeok  */
-    { 0x11a8, 0x1109 }, /* jong kiyeok-sios   = jong kiyeok + cho sios    */
-    { 0,      0x1102 }, /* jong nieun	      = cho  nieun                */
+    { 0x11a8, 0x1109 }, /* jong kiyeok-sios   = jong kiyeok + cho sios	  */
+    { 0,      0x1102 }, /* jong nieun	      = cho  nieun		  */
     { 0x11ab, 0x110c }, /* jong nieun-cieuc   = jong nieun  + cho cieuc   */
     { 0x11ab, 0x1112 }, /* jong nieun-hieuh   = jong nieun  + cho hieuh   */
-    { 0,      0x1103 }, /* jong tikeut	      = cho  tikeut               */
-    { 0,      0x1105 }, /* jong rieul         = cho  rieul                */
+    { 0,      0x1103 }, /* jong tikeut	      = cho  tikeut		  */
+    { 0,      0x1105 }, /* jong rieul	      = cho  rieul		  */
     { 0x11af, 0x1100 }, /* jong rieul-kiyeok  = jong rieul  + cho kiyeok  */
     { 0x11af, 0x1106 }, /* jong rieul-mieum   = jong rieul  + cho mieum   */
     { 0x11af, 0x1107 }, /* jong rieul-pieup   = jong rieul  + cho pieup   */
-    { 0x11af, 0x1109 }, /* jong rieul-sios    = jong rieul  + cho sios    */
+    { 0x11af, 0x1109 }, /* jong rieul-sios    = jong rieul  + cho sios	  */
     { 0x11af, 0x1110 }, /* jong rieul-thieuth = jong rieul  + cho thieuth */
     { 0x11af, 0x1111 }, /* jong rieul-phieuph = jong rieul  + cho phieuph */
     { 0x11af, 0x1112 }, /* jong rieul-hieuh   = jong rieul  + cho hieuh   */
-    { 0,      0x1106 }, /* jong mieum         = cho  mieum                */
-    { 0,      0x1107 }, /* jong pieup         = cho  pieup                */
-    { 0x11b8, 0x1109 }, /* jong pieup-sios    = jong pieup  + cho sios    */
-    { 0,      0x1109 }, /* jong sios          = cho  sios                 */
-    { 0x11ba, 0x1109 }, /* jong ssangsios     = jong sios   + cho sios    */
-    { 0,      0x110b }, /* jong ieung         = cho  ieung                */
-    { 0,      0x110c }, /* jong cieuc         = cho  cieuc                */
-    { 0,      0x110e }, /* jong chieuch       = cho  chieuch              */
-    { 0,      0x110f }, /* jong khieukh       = cho  khieukh              */
-    { 0,      0x1110 }, /* jong thieuth       = cho  thieuth              */
-    { 0,      0x1111 }, /* jong phieuph       = cho  phieuph              */
-    { 0,      0x1112 }  /* jong hieuh         = cho  hieuh                */
+    { 0,      0x1106 }, /* jong mieum	      = cho  mieum		  */
+    { 0,      0x1107 }, /* jong pieup	      = cho  pieup		  */
+    { 0x11b8, 0x1109 }, /* jong pieup-sios    = jong pieup  + cho sios	  */
+    { 0,      0x1109 }, /* jong sios	      = cho  sios		  */
+    { 0x11ba, 0x1109 }, /* jong ssangsios     = jong sios   + cho sios	  */
+    { 0,      0x110b }, /* jong ieung	      = cho  ieung		  */
+    { 0,      0x110c }, /* jong cieuc	      = cho  cieuc		  */
+    { 0,      0x110e }, /* jong chieuch       = cho  chieuch		  */
+    { 0,      0x110f }, /* jong khieukh       = cho  khieukh		  */
+    { 0,      0x1110 }, /* jong thieuth       = cho  thieuth		  */
+    { 0,      0x1111 }, /* jong phieuph       = cho  phieuph		  */
+    { 0,      0x1112 }	/* jong hieuh	      = cho  hieuh		  */
   };
 
   *jong = table[ch - 0x11a8][0];
-  *cho  = table[ch - 0x11a8][1];
+  *cho	= table[ch - 0x11a8][1];
 }
 
 static gboolean
@@ -2018,163 +2024,166 @@ im_hangul_composer_2 (GtkIMContextHangul *hcontext,
   gunichar comp_ch;
   gunichar jong_ch;
 
-  ch = im_hangul_mapping (key->keyval, key->state);
+  ch = im_hangul_mapping (hcontext, key->keyval, key->state);
 
   if (hcontext->jongseong[0])
     {
       if (im_hangul_is_choseong (ch))
 	{
-	  jong_ch = im_hangul2_choseong_to_jongseong (ch);
-	  comp_ch = im_hangul_compose (hcontext->jongseong[0], jong_ch);
+	  jong_ch = im_hangul_choseong_to_jongseong (ch);
+	  comp_ch = im_hangul_compose (hcontext, 
+	      			       hcontext->jongseong[0], jong_ch);
 	  if (im_hangul_is_jongseong (comp_ch))
 	    {
 	      hcontext->jongseong[0] = comp_ch;
-	      im_hangul_push(hcontext, comp_ch);
+	      im_hangul_push (hcontext, comp_ch);
 	    }
 	  else
 	    {
-	      im_hangul_commit(hcontext);
+	      im_hangul_commit (hcontext);
 	      hcontext->choseong[0] = ch;
-	      im_hangul_push(hcontext, ch);
+	      im_hangul_push (hcontext, ch);
 	    }
 	  goto done;
 	}
-      if (im_hangul_is_jungseong(ch))
+      if (im_hangul_is_jungseong (ch))
 	{
 	  gunichar pop, peek;
-	  pop = im_hangul_pop(hcontext);
-	  peek = im_hangul_peek(hcontext);
-	  if (im_hangul_is_jungseong(peek))
+	  pop = im_hangul_pop (hcontext);
+	  peek = im_hangul_peek (hcontext);
+	  if (im_hangul_is_jungseong (peek))
 	    {
 	      hcontext->jongseong[0] = 0;
-	      im_hangul_commit(hcontext);
-	      hcontext->choseong[0] = im_hangul2_jongseong_to_choseong(pop);
+	      im_hangul_commit (hcontext);
+	      hcontext->choseong[0] = im_hangul_jongseong_to_choseong (pop);
 	      hcontext->jungseong[0] = ch;
-	      im_hangul_push(hcontext, hcontext->choseong[0]);
-	      im_hangul_push(hcontext, ch);
+	      im_hangul_push (hcontext, hcontext->choseong[0]);
+	      im_hangul_push (hcontext, ch);
 	    }
 	  else
 	    {
 	      gunichar choseong, jongseong; 
-	      im_hangul2_jongseong_dicompose(hcontext->jongseong[0],
-						   &jongseong, &choseong);
+	      im_hangul_jongseong_dicompose (hcontext->jongseong[0],
+					     &jongseong, &choseong);
 	      hcontext->jongseong[0] = jongseong;
-	      im_hangul_commit(hcontext);
+	      im_hangul_commit (hcontext);
 	      hcontext->choseong[0] = choseong;
 	      hcontext->jungseong[0] = ch;
-	      im_hangul_push(hcontext, choseong);
-	      im_hangul_push(hcontext, ch);
+	      im_hangul_push (hcontext, choseong);
+	      im_hangul_push (hcontext, ch);
 	    }
 	  goto done;
 	}
     }
   else if (hcontext->jungseong[0])
     {
-      if (im_hangul_is_choseong(ch))
+      if (im_hangul_is_choseong (ch))
 	{
 	  if (hcontext->choseong[0])
 	    {
-	      jong_ch = im_hangul2_choseong_to_jongseong(ch);
-	      if (im_hangul_is_jongseong(jong_ch))
+	      jong_ch = im_hangul_choseong_to_jongseong (ch);
+	      if (im_hangul_is_jongseong (jong_ch))
 		{
 		  hcontext->jongseong[0] = jong_ch;
-		  im_hangul_push(hcontext, jong_ch);
+		  im_hangul_push (hcontext, jong_ch);
 		}
 	      else
 		{
-		  im_hangul_commit(hcontext);
+		  im_hangul_commit (hcontext);
 		  hcontext->choseong[0] = ch;
-		  im_hangul_push(hcontext, ch);
+		  im_hangul_push (hcontext, ch);
 		}
 	    }
 	  else
 	    {
 	      hcontext->choseong[0] = ch;
-	      im_hangul_push(hcontext, ch);
+	      im_hangul_push (hcontext, ch);
 	    }
 	  goto done;
 	}
-      if (im_hangul_is_jungseong(ch))
+      if (im_hangul_is_jungseong (ch))
 	{
-	  comp_ch = im_hangul_compose(hcontext->jungseong[0], ch);
-	  if (im_hangul_is_jungseong(comp_ch))
+	  comp_ch = im_hangul_compose (hcontext,
+	      			       hcontext->jungseong[0], ch);
+	  if (im_hangul_is_jungseong (comp_ch))
 	    {
 	      hcontext->jungseong[0] = comp_ch;
-	      im_hangul_push(hcontext, comp_ch);
+	      im_hangul_push (hcontext, comp_ch);
 	    }
 	  else
 	    {
-	      im_hangul_commit(hcontext);
+	      im_hangul_commit (hcontext);
 	      hcontext->jungseong[0] = ch;
-	      im_hangul_push(hcontext, ch);
+	      im_hangul_push (hcontext, ch);
 	    }
 	  goto done;
 	}
     }
   else if (hcontext->choseong[0])
     {
-      if (im_hangul_is_choseong(ch))
+      if (im_hangul_is_choseong (ch))
 	{
-	  comp_ch = im_hangul_compose(hcontext->choseong[0], ch);
-	  if (im_hangul_is_choseong(comp_ch))
+	  comp_ch = im_hangul_compose (hcontext,
+	      			       hcontext->choseong[0], ch);
+	  if (im_hangul_is_choseong (comp_ch))
 	    {
 	      hcontext->choseong[0] = comp_ch;
-	      im_hangul_push(hcontext, comp_ch);
+	      im_hangul_push (hcontext, comp_ch);
 	    }
 	  else
 	    {
-	      im_hangul_commit(hcontext);
+	      im_hangul_commit (hcontext);
 	      hcontext->choseong[0] = ch;
-	      im_hangul_push(hcontext, ch);
+	      im_hangul_push (hcontext, ch);
 	    }
 	  goto done;
 	}
-      if (im_hangul_is_jungseong(ch))
+      if (im_hangul_is_jungseong (ch))
 	{
 	  hcontext->jungseong[0] = ch;
-	  im_hangul_push(hcontext, ch);
+	  im_hangul_push (hcontext, ch);
 	  goto done;
 	}
     }
   else
     {
-      if (im_hangul_is_choseong(ch))
+      if (im_hangul_is_choseong (ch))
 	{
 	  hcontext->choseong[0] = ch;
-	  im_hangul_push(hcontext, ch);
+	  im_hangul_push (hcontext, ch);
 	  goto done;
 	}
-      if (im_hangul_is_jungseong(ch))
+      if (im_hangul_is_jungseong (ch))
 	{
 	  hcontext->jungseong[0] = ch;
-	  im_hangul_push(hcontext, ch);
+	  im_hangul_push (hcontext, ch);
 	  goto done;
 	}
     }
 
   /* treat backspace */
-  if (im_hangul_is_backspace(key))
+  if (im_hangul_is_backspace (key))
     {
-      ch = im_hangul_pop(hcontext);
+      ch = im_hangul_pop (hcontext);
       if (ch == 0)
 	return FALSE;
 
-      if (im_hangul_is_choseong(ch))
+      if (im_hangul_is_choseong (ch))
 	{
-	  ch = im_hangul_peek(hcontext);
-	  hcontext->choseong[0] = im_hangul_is_choseong(ch) ? ch : 0;
+	  ch = im_hangul_peek (hcontext);
+	  hcontext->choseong[0] = im_hangul_is_choseong (ch) ? ch : 0;
 	  goto done;
 	}
-      if (im_hangul_is_jungseong(ch))
+      if (im_hangul_is_jungseong (ch))
 	{
-	  ch = im_hangul_peek(hcontext);
-	  hcontext->jungseong[0] = im_hangul_is_jungseong(ch) ? ch : 0;
+	  ch = im_hangul_peek (hcontext);
+	  hcontext->jungseong[0] = im_hangul_is_jungseong (ch) ? ch : 0;
 	  goto done;
 	}
-      if (im_hangul_is_jongseong(ch))
+      if (im_hangul_is_jongseong (ch))
 	{
-	  ch = im_hangul_peek(hcontext);
-	  hcontext->jongseong[0] = im_hangul_is_jongseong(ch) ? ch : 0;
+	  ch = im_hangul_peek (hcontext);
+	  hcontext->jongseong[0] = im_hangul_is_jongseong (ch) ? ch : 0;
 	  goto done;
 	}
       return FALSE;
@@ -2251,7 +2260,7 @@ im_hangul_sub_jongseong (GtkIMContextHangul *hcontext)
 }
 
 static void
-im_hangul_commit_unicode(GtkIMContextHangul *hcontext, gunichar ch)
+im_hangul_commit_unicode (GtkIMContextHangul *hcontext, gunichar ch)
 {
   int n;
   gchar buf[6];
@@ -2270,209 +2279,260 @@ im_hangul_composer_3 (GtkIMContextHangul *hcontext,
 {
   gunichar ch;
 
-  ch = im_hangul_mapping (key->keyval, key->state);
+  ch = im_hangul_mapping (hcontext, key->keyval, key->state);
 
-  if (manual_mode) {
-    if (hcontext->jongseong[0]) {
-      if (im_hangul_is_choseong(ch)) {
-        im_hangul_commit(hcontext);
-        hcontext->choseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jungseong(ch)) {
-        im_hangul_commit(hcontext);
-        hcontext->jungseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jongseong(ch)) {
-        if (!im_hangul_add_jongseong(hcontext, ch)) {
-          im_hangul_commit(hcontext);
-          hcontext->jongseong[0] = ch;
-        }
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-    } else if (hcontext->jungseong[0]) {
-      if (im_hangul_is_choseong(ch)) {
-        im_hangul_commit(hcontext);
-        hcontext->choseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jungseong(ch)) {
-        if (!im_hangul_add_jungseong(hcontext, ch)) {
-          im_hangul_commit(hcontext);
-          hcontext->jungseong[0] = ch;
-        }
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jongseong(ch)) {
-        hcontext->jongseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-    } else if (hcontext->choseong[0]) {
-      if (im_hangul_is_choseong(ch)) {
-        if (!im_hangul_add_choseong(hcontext, ch)) {
-          im_hangul_commit(hcontext);
-          hcontext->choseong[0] = ch;
-        }
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jungseong(ch)) {
-        hcontext->jungseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jongseong(ch)) {
-        im_hangul_commit(hcontext);
-        hcontext->jongseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-    } else {
-      if (im_hangul_is_choseong(ch)) {
-        hcontext->choseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jungseong(ch)) {
-        hcontext->jungseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jongseong(ch)) {
-        hcontext->jongseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-    }
+  if (manual_mode)
+    {
+      if (hcontext->jongseong[0])
+	{
+	  if (im_hangul_is_choseong (ch))
+	    {
+	      im_hangul_commit (hcontext);
+	      hcontext->choseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (ch))
+	    {
+	      im_hangul_commit (hcontext);
+	      hcontext->jungseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (ch))
+	    {
+	      if (!im_hangul_add_jongseong (hcontext, ch))
+		{
+		  im_hangul_commit (hcontext);
+		  hcontext->jongseong[0] = ch;
+		}
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	}
+      else if (hcontext->jungseong[0])
+	{
+	  if (im_hangul_is_choseong (ch))
+	    {
+	      im_hangul_commit (hcontext);
+	      hcontext->choseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (ch))
+	    {
+	      if (!im_hangul_add_jungseong (hcontext, ch))
+		{
+		  im_hangul_commit (hcontext);
+		  hcontext->jungseong[0] = ch;
+		}
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (ch))
+	    {
+	      hcontext->jongseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	}
+      else if (hcontext->choseong[0])
+	{
+	  if (im_hangul_is_choseong (ch))
+	    {
+	      if (!im_hangul_add_choseong (hcontext, ch))
+		{
+		  im_hangul_commit (hcontext);
+		  hcontext->choseong[0] = ch;
+		}
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (ch))
+	    {
+	      hcontext->jungseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (ch))
+	    {
+	      im_hangul_commit (hcontext);
+	      hcontext->jongseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	}
+      else
+	{
+	  if (im_hangul_is_choseong (ch))
+	    {
+	      hcontext->choseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (ch))
+	    {
+	      hcontext->jungseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (ch))
+	    {
+	      hcontext->jongseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	}
 
-    /* treat backspace */
-    if (im_hangul_is_backspace(key)) {
-      ch = im_hangul_pop(hcontext);
-      if (ch == 0)
-        return FALSE;
- 
-      if (im_hangul_is_choseong(ch)) {
-        im_hangul_sub_choseong(hcontext);
-        goto done;
-      }
-      if (im_hangul_is_jungseong(ch)) {
-        im_hangul_sub_jungseong(hcontext);
-        goto done;
-      }
-      if (im_hangul_is_jongseong(ch)) {
-        im_hangul_sub_jongseong(hcontext);
-        goto done;
-      }
-      return FALSE;
+      /* treat backspace */
+      if (im_hangul_is_backspace (key))
+	{
+	  ch = im_hangul_pop (hcontext);
+	  if (ch == 0)
+	    return FALSE;
+     
+	  if (im_hangul_is_choseong (ch))
+	    {
+	      im_hangul_sub_choseong (hcontext);
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (ch))
+	    {
+	      im_hangul_sub_jungseong (hcontext);
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (ch))
+	    {
+	      im_hangul_sub_jongseong (hcontext);
+	      goto done;
+	    }
+	  return FALSE;
+	}
     }
-  } else {
-    /* choseong */
-    if (im_hangul_is_choseong(ch)) {
-      if (hcontext->choseong[0] == 0) {
-        hcontext->choseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_choseong(im_hangul_peek(hcontext))) {
-        gunichar choseong = im_hangul_compose(hcontext->choseong[0], ch);
-        if (choseong) {
-          hcontext->choseong[0] = choseong;
-          im_hangul_push(hcontext, choseong);
-          goto done;
-        }
-      }
-      im_hangul_commit(hcontext);
-      hcontext->choseong[0] = ch;
-      im_hangul_push(hcontext, ch);
-      goto done;
-    }
-    /* junseong */
-    if (im_hangul_is_jungseong(ch)) {
-      if (hcontext->jungseong[0] == 0) {
-        hcontext->jungseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jungseong(im_hangul_peek(hcontext))) {
-        gunichar jungseong = im_hangul_compose(hcontext->jungseong[0], ch);
-        if (jungseong) {
-          hcontext->jungseong[0] = jungseong;
-          im_hangul_push(hcontext, jungseong);
-          goto done;
-        }
-      }
-      im_hangul_commit(hcontext);
-      hcontext->jungseong[0] = ch;
-      im_hangul_push(hcontext, ch);
-      goto done;
-    }
-    /* jongseong */
-    if (im_hangul_is_jongseong(ch)) {
-      if (hcontext->jongseong[0] == 0) {
-        hcontext->jongseong[0] = ch;
-        im_hangul_push(hcontext, ch);
-        goto done;
-      }
-      if (im_hangul_is_jongseong(im_hangul_peek(hcontext))) {
-        gunichar jongseong = im_hangul_compose(hcontext->jongseong[0], ch);
-        if (jongseong) {
-          hcontext->jongseong[0] = jongseong;
-          im_hangul_push(hcontext, jongseong);
-          goto done;
-        }
-      }
-      im_hangul_commit(hcontext);
-      hcontext->jongseong[0] = ch;
-      im_hangul_push(hcontext, ch);
-      goto done;
-    }
-    /* treat backspace */
-    if (im_hangul_is_backspace(key)) {
-      ch = im_hangul_pop(hcontext);
-      if (ch == 0)
-        return FALSE;
+  else
+    {
+      /* choseong */
+      if (im_hangul_is_choseong (ch))
+	{
+	  if (hcontext->choseong[0] == 0)
+	    {
+	      hcontext->choseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_choseong (im_hangul_peek (hcontext)))
+	    {
+	      gunichar choseong = im_hangul_compose (hcontext,
+		  				     hcontext->choseong[0], ch);
+	      if (choseong)
+		{
+		  hcontext->choseong[0] = choseong;
+		  im_hangul_push (hcontext, choseong);
+		  goto done;
+		}
+	    }
+	  im_hangul_commit (hcontext);
+	  hcontext->choseong[0] = ch;
+	  im_hangul_push (hcontext, ch);
+	  goto done;
+	}
+      /* junseong */
+      if (im_hangul_is_jungseong (ch))
+	{
+	  if (hcontext->jungseong[0] == 0)
+	    {
+	      hcontext->jungseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (im_hangul_peek (hcontext)))
+	    {
+	      gunichar jungseong = im_hangul_compose (hcontext,
+		  				      hcontext->jungseong[0],
+						      ch);
+	      if (jungseong)
+		{
+		  hcontext->jungseong[0] = jungseong;
+		  im_hangul_push (hcontext, jungseong);
+		  goto done;
+		}
+	    }
+	  im_hangul_commit (hcontext);
+	  hcontext->jungseong[0] = ch;
+	  im_hangul_push (hcontext, ch);
+	  goto done;
+	}
+      /* jongseong */
+      if (im_hangul_is_jongseong (ch))
+	{
+	  if (hcontext->jongseong[0] == 0)
+	    {
+	      hcontext->jongseong[0] = ch;
+	      im_hangul_push (hcontext, ch);
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (im_hangul_peek (hcontext)))
+	    {
+	      gunichar jongseong = im_hangul_compose (hcontext,
+		  				      hcontext->jongseong[0],
+						      ch);
+	      if (jongseong)
+		{
+		  hcontext->jongseong[0] = jongseong;
+		  im_hangul_push (hcontext, jongseong);
+		  goto done;
+		}
+	    }
+	  im_hangul_commit (hcontext);
+	  hcontext->jongseong[0] = ch;
+	  im_hangul_push (hcontext, ch);
+	  goto done;
+	}
+      /* treat backspace */
+      if (im_hangul_is_backspace (key))
+	{
+	  ch = im_hangul_pop (hcontext);
+	  if (ch == 0)
+	    return FALSE;
 
-      if (im_hangul_is_choseong(ch)) {
-        ch = im_hangul_peek(hcontext);
-        hcontext->choseong[0] = im_hangul_is_choseong(ch) ? ch : 0;
-        goto done;
-      }
-      if (im_hangul_is_jungseong(ch)) {
-        ch = im_hangul_peek(hcontext);
-        hcontext->jungseong[0] = im_hangul_is_jungseong(ch) ? ch : 0;
-        goto done;
-      }
-      if (im_hangul_is_jongseong(ch)) {
-        ch = im_hangul_peek(hcontext);
-        hcontext->jongseong[0] = im_hangul_is_jongseong(ch) ? ch : 0;
-        goto done;
-      }
-      return FALSE;
+	  if (im_hangul_is_choseong (ch))
+	    {
+	      ch = im_hangul_peek (hcontext);
+	      hcontext->choseong[0] = im_hangul_is_choseong (ch) ? ch : 0;
+	      goto done;
+	    }
+	  if (im_hangul_is_jungseong (ch))
+	    {
+	      ch = im_hangul_peek (hcontext);
+	      hcontext->jungseong[0] = im_hangul_is_jungseong (ch) ? ch : 0;
+	      goto done;
+	    }
+	  if (im_hangul_is_jongseong (ch))
+	    {
+	      ch = im_hangul_peek (hcontext);
+	      hcontext->jongseong[0] = im_hangul_is_jongseong (ch) ? ch : 0;
+	      goto done;
+	    }
+	  return FALSE;
+	}
     }
-  }
 
   /* number and puctuation */
-  if (ch > 0) {
-    im_hangul_commit(hcontext);
-    im_hangul_commit_unicode(hcontext, ch);
-    hcontext->state = STATE_HANGUL;
-    goto done;
-  }
+  if (ch > 0)
+    {
+      im_hangul_commit (hcontext);
+      im_hangul_commit_unicode (hcontext, ch);
+      hcontext->state = IM_HANGUL_STATE_HANGUL;
+      goto done;
+    }
 
-  if (im_hangul_commit(hcontext))
-      g_signal_emit_by_name(hcontext, "preedit_changed");
+  if (im_hangul_commit (hcontext))
+      g_signal_emit_by_name (hcontext, "preedit_changed");
 
-  return im_hangul_process_nonhangul(hcontext, key);
+  return im_hangul_process_nonhangul (hcontext, key);
 
 done:
-  g_signal_emit_by_name(hcontext, "preedit_changed");
+  g_signal_emit_by_name (hcontext, "preedit_changed");
   return TRUE;
 }
 
