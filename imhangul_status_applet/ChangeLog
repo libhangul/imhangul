@@ -1,4 +1,7 @@
 2002-11-12 (Tue) 13:54:42  Choe Hwanjin  <krisna@kldp.org>
+	* keyboard 테마 추가: kim Seok-Jin <xzins@yahoo.co.kr>님께 감사드립니다
+
+2002-11-17 (Sun) 19:29:11  Choe Hwanjin  <krisna@kldp.org>
 	* src/Makefile.am: INCLUDE 에서 -I$(includedir)을 빼버림 (gnome1의
 	    헤더가 있을때 문제가 발생함)
 	* src/imhangul_status.c: add license text
