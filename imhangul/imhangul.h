@@ -106,9 +106,9 @@ static void im_hangul_set_automata(GtkIMContextHangul *context_hangul,
 #define is_set(state, mask)		((state & mask) == mask)
 #define im_hangul_is_modifier(state)	(is_set(state, GDK_CONTROL_MASK) || \
 					 is_set(state, GDK_MOD1_MASK))
-#define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1112)
-#define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x1175)
-#define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11C2)
+#define im_hangul_is_choseong(ch)	((ch) >= 0x1100 && (ch) <= 0x1159)
+#define im_hangul_is_jungseong(ch)	((ch) >= 0x1161 && (ch) <= 0x11A2)
+#define im_hangul_is_jongseong(ch)	((ch) >= 0x11A7 && (ch) <= 0x11F9)
 #define im_hangul_is_empty(ctx)		((ctx)->choseong  == 0 &&	\
 					 (ctx)->jungseong == 0 &&	\
 					 (ctx)->jongseong == 0 )
@@ -1183,7 +1183,7 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 
   gtk_container_set_border_width(GTK_CONTAINER(window), 1);
   /* gtk_window_set_decorated(GTK_WINDOW(window), FALSE); */
-  gtk_widget_set_name(window, "imhangul");
+  gtk_widget_set_name(window, "imhangul_status");
   gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, FALSE);
   gtk_widget_set_app_paintable(window, TRUE);
 
@@ -1398,6 +1398,7 @@ create_hanja_window(GtkIMContextHangul *context_hangul, gunichar ch)
     buf[n] = 0;
 
     button = gtk_button_new_with_label(buf);
+    gtk_widget_set_name(button, "imhangul_hanja");
     label = GTK_BIN(button)->child;
     if (desc) {
       gtk_widget_modify_font(label, desc);

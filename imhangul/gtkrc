@@ -1,10 +1,18 @@
 # status 윈도우에서 나타나는 글자의 색과 크기모양
 
-style "imhangul-style"
+style "imhangul-status-style"
 {
 	fg[NORMAL]	= "#990000"	# 글자, 테두리색
 	bg[NORMAL]	= "#EEEEE0"	# 바탕색
-	font_name	= "Sans 20"
+	font_name	= "Sans 16"
 }
 
-widget "*imhangul*" style "imhangul-style"
+style "imhangul-hanja-style"
+{
+	font_name	= "Sans 20"
+#	font_name	= "Andale Sans UI 20"
+}
+
+
+widget "*imhangul_status*" style "imhangul-status-style"
+widget "*imhangul_hanja*" style "imhangul-hanja-style"

@@ -34,7 +34,7 @@
 
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
-  "Hangul 2bul(UTF8)",
+  "Hangul 2bul",
   "gtk+",
   GTK_LOCALEDIR,
   ""
