@@ -18,4 +18,20 @@ install-data-local:
 	done
 
 EXTRA_DIST = \
-	$(THEMES)
+	MSWindows/english.png		\
+	MSWindows/hangul.png		\
+	MSWindows/none.png		\
+	Mac/english.png			\
+	Mac/hangul.png			\
+	Mac/none.png			\
+	SimplyRed/english.png		\
+	SimplyRed/hangul.png		\
+	SimplyRed/none.png		\
+	Onion/english.png		\
+	Onion/README			\
+	Onion/hangul.png		\
+	Onion/none.png			\
+	keyboard/english.png		\
+	keyboard/README			\
+	keyboard/hangul.png		\
+	keyboard/none.png
