@@ -1343,6 +1343,7 @@ im_hangul_commit (GtkIMContextHangul *hcontext)
 
   im_hangul_clear_buf (hcontext);
 
+  im_hangul_emit_preedit_changed (hcontext);
   g_signal_emit_by_name (hcontext, "commit", buf);
   return TRUE;
 }
