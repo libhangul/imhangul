@@ -5,7 +5,7 @@
 void enter_callback( GtkWidget *widget,
                      GtkWidget *entry )
 {
-  gchar *entry_text;
+  const gchar *entry_text;
   entry_text = gtk_entry_get_text(GTK_ENTRY(entry));
   g_print("Entry contents: %s\n", entry_text);
   gtk_entry_set_text(GTK_ENTRY(entry), "");
@@ -35,7 +35,6 @@ int main( int   argc,
     GtkWidget *button;
     GtkWidget *check;
 
-    gtk_set_locale();
     gtk_init (&argc, &argv);
 
     /* create a new window */
