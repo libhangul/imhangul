@@ -217,7 +217,6 @@ static gboolean		pref_use_capslock = FALSE;
 static gboolean		pref_use_status_window = FALSE;
 static gboolean		pref_use_dvorak = FALSE;
 static gboolean		pref_use_manual_mode = FALSE;
-static gchar           *pref_hanja_font = NULL;
 static gint		pref_preedit_style = 0;
 static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
 						  gint start,
@@ -2974,6 +2973,7 @@ candidate_create_window(Candidate *candidate)
 			      buf + len);
       buf[len] = '\0';
       label = gtk_label_new(buf);
+      gtk_widget_set_name(label, "imhangul_candidate");
       gtk_label_set_use_markup(GTK_LABEL(label), FALSE);
       gtk_label_set_use_underline(GTK_LABEL(label), FALSE);
       gtk_label_set_attributes(GTK_LABEL(label), attr_list);
