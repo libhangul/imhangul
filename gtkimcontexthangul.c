@@ -184,6 +184,7 @@ static gint		output_mode = OUTPUT_MODE_SYLLABLE;
 /* preferences */
 static gboolean		pref_use_global_state = TRUE;
 static gboolean		pref_use_caps_lock = FALSE;
+static gboolean		pref_always_use_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
 static gchar*		pref_hanja_font = NULL;
@@ -487,9 +488,17 @@ gtk_im_context_hangul_set_use_jamo (GtkIMContextHangul *hcontext,
     				    gboolean		use_jamo)
 {
   if (use_jamo)
-    output_mode |= OUTPUT_MODE_JAMO;
+    {
+      pref_use_caps_lock = FALSE;
+      pref_always_use_jamo = TRUE;
+      output_mode |= OUTPUT_MODE_JAMO;
+    }
   else
-    output_mode &= ~OUTPUT_MODE_JAMO;
+    {
+      pref_use_caps_lock = TRUE;
+      pref_always_use_jamo = FALSE;
+      output_mode &= ~OUTPUT_MODE_JAMO;
+    }
 }
 
 static void
@@ -1294,8 +1303,13 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     output_mode ^= OUTPUT_MODE_JAMO2;
 
   /* on capslock, we use Hangul Jamo */
-  if (pref_use_caps_lock && key->keyval == GDK_Caps_Lock)
-    output_mode ^= OUTPUT_MODE_JAMO;
+  if (!pref_always_use_jamo)
+    {
+      if (pref_use_caps_lock && key->state & GDK_LOCK_MASK)
+	output_mode |= OUTPUT_MODE_JAMO;
+      else
+	output_mode &= ~OUTPUT_MODE_JAMO;
+    }
 
   /* some keys are ignored: Ctrl, Alt, Meta */
   /* we flush out all preedit text */
