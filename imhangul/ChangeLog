@@ -1,3 +1,7 @@
+2002-12-04 (Wed) 16:20 Choe Hwanjin <krisna@kldp.org>
+	* imhangul2.c: im_hangul2_jongseong_dicompose() 함수 추가
+	  state7, state9 에서 이 함수를 이용해서 복종성을 분리한다.
+
 2002-11-29 (Fri) 20:53 Choe Hwanjin  <krisna@kldp.org>
 	* 0.9.5 버젼 준비
 	* 두벌식 자판의 키값을 테이블에서 가져오도록 수정
