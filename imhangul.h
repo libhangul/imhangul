@@ -125,7 +125,7 @@ static void	im_hangul_mode_hangul(GtkIMContextHangul *context_hangul);
 static void	im_hangul_mode_direct(GtkIMContextHangul *context_hangul);
 
 /* commit function */
-static void	im_hangul_commit	(GtkIMContextHangul *context_hangul);
+static gboolean	im_hangul_commit	(GtkIMContextHangul *context_hangul);
 static void	im_hangul_commit_unicode(GtkIMContextHangul *context_hangul,
 					 gunichar ch);
 static void	im_hangul_commit_utf8	(GtkIMContextHangul *context_hangul,
@@ -758,7 +758,7 @@ im_hangul_handle_direct_mode(GtkIMContextHangul *context_hangul,
   return im_hangul_process_nonhangul(context_hangul, key);
 }
 
-static void
+static gboolean
 im_hangul_commit(GtkIMContextHangul *context_hangul)
 {
   int n = 0;
@@ -768,7 +768,7 @@ im_hangul_commit(GtkIMContextHangul *context_hangul)
 
   if (context_hangul->choseong == 0 && context_hangul->jungseong == 0 &&
       context_hangul->jongseong == 0) {
-    return;
+    return FALSE;
   }
 
   if (pref_use_hangul_jamo) {
@@ -829,6 +829,7 @@ im_hangul_commit(GtkIMContextHangul *context_hangul)
   context_hangul->index = -1;
 
   g_signal_emit_by_name(context_hangul, "commit", buf);
+  return TRUE;
 }
 
 static void
@@ -985,6 +986,9 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   }
   /* some keys are ignored */
   if (im_hangul_is_ignore_key(key->keyval)) {
+    /* we flush out all preedit text */
+    if (im_hangul_commit(context_hangul))
+      g_signal_emit_by_name (context_hangul, "preedit_changed");
     return FALSE;
   }
 
@@ -1007,12 +1011,8 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
 
   /* modifiler key */
   if (im_hangul_is_modifier(key->state)) {
-    if (context_hangul->choseong != 0 ||
-	context_hangul->jungseong != 0 ||
-	context_hangul->jongseong != 0) {
-      im_hangul_commit(context_hangul);
+    if (im_hangul_commit(context_hangul))
       g_signal_emit_by_name (context_hangul, "preedit_changed");
-    }
     return FALSE;
   }
 
