@@ -1,10 +1,10 @@
-GTK+2ÀÇ input module imhangulÀÇ »óÅÂ¸¦ º¸¿©ÁÖ´Â GNOME2ÀÇ ¾ÖÇÃ¸´
+GTK+2ì˜ input module imhangulì˜ ìƒíƒœë¥¼ ë³´ì—¬ì£¼ëŠ” GNOME2ì˜ ì• í”Œë¦¿
 
-* ¼³Ä¡¹æ¹ı
+* ì„¤ì¹˜ë°©ë²•
 
-  ./configure --prefix=<GNOME2°¡ ¼³Ä¡µÈ µğ·ºÅä¸®>
+  ./configure --prefix=<GNOME2ê°€ ì„¤ì¹˜ëœ ë””ë ‰í† ë¦¬>
   make
   make install
 
-* ÁÖÀÇ »çÇ×
-imhangul 0.9.4 ¹öÁ¯ ÀÌ»óÀ» »ç¿ëÇØ¾ß »óÅÂ°¡ Ç¥½ÃµË´Ï´Ù.
+* ì£¼ì˜ ì‚¬í•­
+imhangul 0.9.4 ë²„ì ¼ ì´ìƒì„ ì‚¬ìš©í•´ì•¼ ìƒíƒœê°€ í‘œì‹œë©ë‹ˆë‹¤.

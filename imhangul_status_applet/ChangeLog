@@ -1,32 +1,35 @@
+2003-10-30  Choe Hwanjin <krisna@kldp.org>
+	* 한글이 들어간 파일을 모두 UTF-8 인코딩으로 변환
+
 2003-10-28  Choe Hwanjin <krisna@kldp.org>
-	* ���� ���� (#297)
-	* �׸� ����
-	* autoconf/automake ������Ʈ
+	* 번역 수정 (#297)
+	* 테마 수정
+	* autoconf/automake 업데이트
 
 2003-07-24  Choe Hwanjin <krisna@kldp.org>
-	* �׸� ���� â���� �� �׸��� �������� ���̰� ��
-	* �׸��� �ν��� ��ũ��Ʈ�� ����
+	* 테마 선택 창에서 각 테마의 아이콘이 보이게 함
+	* 테마의 인스톨 스크립트를 수정
 
 2003-07-18  Choe Hwanjin <krisna@kldp.org>
-	* Mac �׸� ������Ʈ
-	  Kim Seok-Jin <xzins@yahoo.co.kr>�Բ� ����帳�ϴ�.
+	* Mac 테마 업데이트
+	  Kim Seok-Jin <xzins@yahoo.co.kr>님께 감사드립니다.
 
 2003-05-04  Choe Hwanjin <krisna@kldp.org>
-	* KingSejong �׸� �߰�
-	  �ż��� <sinsh29a@yahoo.co.kr>�Բ� ����帳�ϴ�.
+	* KingSejong 테마 추가
+	  신성현 <sinsh29a@yahoo.co.kr>님께 감사드립니다.
 
 2002-11-17 (Sun) 19:29:11  Choe Hwanjin  <krisna@kldp.org>
-	* keyboard �׸� �߰�: kim Seok-Jin <xzins@yahoo.co.kr>�Բ� ����帳�ϴ�
-	* �� �ΰ�, Onion �׸� �߰�: Jonghwa Yoo <onion@ucsoft.net>�Բ�
-	  ����帳�ϴ�
+	* keyboard 테마 추가: kim Seok-Jin <xzins@yahoo.co.kr>님께 감사드립니다
+	* 새 로고, Onion 테마 추가: Jonghwa Yoo <onion@ucsoft.net>님께
+	  감사드립니다
 
 2002-11-12 (Tue) 13:54:42  Choe Hwanjin  <krisna@kldp.org>
-	* src/Makefile.am: INCLUDE ���� -I$(includedir)�� ������ (gnome1��
-	    ����� ������ ������ �߻���)
+	* src/Makefile.am: INCLUDE 에서 -I$(includedir)을 빼버림 (gnome1의
+	    헤더가 있을때 문제가 발생함)
 	* src/imhangul_status.c: add license text
-	* src/imhangul_status.c: theme selection window�� default size�� ��
-	* ���ο� �׸� �߰�: MSWindows, Mac
-	* ���� ������Ʈ
+	* src/imhangul_status.c: theme selection window의 default size를 줌
+	* 새로운 테마 추가: MSWindows, Mac
+	* 번역 업데이트
 
-2002. 11. 10. (��) 21:56:59 KST
-	* ó�� �������ϴ�
+2002. 11. 10. (일) 21:56:59 KST
+	* 처음 내놓습니다
