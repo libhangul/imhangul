@@ -1,7 +1,7 @@
 ## Makefile.am for gtk+ hangul modules
 #AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = test.sh gtkrc gen.py
+EXTRA_DIST = test.sh gtkrc hanjatable.py
 
 INCLUDES = -DGTK_LOCALEDIR=\"@GTK_PREFIX@/share/locale\"
 LDADDS = @GTK_LIBS@
