@@ -1,3 +1,8 @@
+2002. 07. 19. (금) 09:41:00 KST
+	* imhangul2.c: 두벌식에서 "괴짜"가 입력 안되던 문제 해결
+	  state6 에서 초성 체크를 안해서임, 초성체크를 추가하고 state1로 가는
+	  부분 추가
+
 2002. 07. 18. (목) 13:46:48 KST
 	* imhangul.h, imhangul2.c, imhangul3.c:
 	  GDK_SHIFT_MASK를 체크하는 부분을 모두 is_set() 매크로로 대체
