@@ -17,7 +17,7 @@ im_hangul_la_LIBADD = $(LDADDS)
 im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
 	gtkimcontexthangul.h 	\
-	hanjatab.h		\
+	hanjatable.h		\
 	chartable.h		\
 	imhangul.c
 
