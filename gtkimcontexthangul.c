@@ -80,6 +80,19 @@ struct _StatusWindow
   guint configure_handler_id;
 };
 
+
+static Candidate*  candidate_new             (char *label_str,
+					      int n_per_window,
+					      const gunichar *data,
+					      GdkWindow *parent);
+static void        candidate_prev            (Candidate *candidate);
+static void        candidate_next            (Candidate *candidate);
+static void        candidate_prev_row        (Candidate *candidate);
+static void        candidate_next_row        (Candidate *candidate);
+static gunichar    candidate_get_current     (Candidate *candidate);
+static gunichar    candidate_get_nth         (Candidate *candidate, int n);
+static void        candidate_delete          (Candidate *candidate);
+
 static void	im_hangul_class_init	     (GtkIMContextHangulClass *klass);
 static void	im_hangul_init		     (GtkIMContextHangul *hcontext);
 static void	im_hangul_finalize	     (GObject *obj);
@@ -130,7 +143,7 @@ static void	im_hangul_push		     (GtkIMContextHangul *hcontext,
 static void	im_hangul_clear_buf	     (GtkIMContextHangul *hcontext);
 static gboolean	im_hangul_commit	     (GtkIMContextHangul *hcontext);
 static void	im_hangul_commit_utf8	     (GtkIMContextHangul *hcontext,
-					      gchar *utf8);
+					      const gchar *utf8);
 static gboolean im_hangul_process_nonhangul  (GtkIMContextHangul *hcontext,
 					      GdkEventKey *key);
 
@@ -149,7 +162,7 @@ static void status_window_show	    (GtkIMContextHangul *hcontext);
 static void status_window_hide	    (GtkIMContextHangul *hcontext);
 static void status_window_set_label (GtkIMContextHangul *hcontext);
 
-static void popup_hanja_window	    (GtkIMContextHangul *hcontext);
+static void popup_candidate_window  (GtkIMContextHangul *hcontext);
 static void popup_char_table_window (GtkIMContextHangul *hcontext);
 
 static const IMHangulCombination compose_table_default[] = {
@@ -317,7 +330,9 @@ im_hangul_init (GtkIMContextHangul *hcontext)
 {
   im_hangul_clear_buf (hcontext);
 
+  hcontext->client_window = NULL;
   hcontext->toplevel = NULL;
+  hcontext->candidate = NULL;
 
   hcontext->input_mode = INPUT_MODE_DIRECT;	/* english mode */
   hcontext->composer = NULL;		/* initial value: composer == null */
@@ -501,6 +516,8 @@ im_hangul_set_client_window (GtkIMContext *context,
     hcontext->toplevel = NULL;
     return;
   }
+
+  hcontext->client_window = client_window;
 
   /* find toplevel window (GtkWidget) */
   hcontext->toplevel = get_toplevel_window (client_window);
@@ -1318,18 +1335,13 @@ im_hangul_commit (GtkIMContextHangul *hcontext)
 }
 
 static void
-im_hangul_commit_utf8 (GtkIMContextHangul *hcontext, gchar *utf8)
+im_hangul_commit_utf8 (GtkIMContextHangul *hcontext, const gchar *utf8)
 {
-  gchar buf[12];
-
   g_return_if_fail (utf8);
-
-  g_strlcpy (buf, utf8, sizeof(buf));
-  buf[8] = '\0';
 
   im_hangul_clear_buf (hcontext);
 
-  g_signal_emit_by_name (hcontext, "commit", buf);
+  g_signal_emit_by_name (hcontext, "commit", utf8);
 }
 
 /* this is a very dangerous function:
@@ -1508,6 +1520,79 @@ im_hangul_mapping (GtkIMContextHangul *hcontext,
   return 0;
 }
 
+static gboolean
+im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
+				    GdkEventKey *key)
+{
+  gunichar ch = 0;
+
+  switch (key->keyval)
+    {
+      case GDK_Return:
+      case GDK_KP_Enter:
+	ch = candidate_get_current(hcontext->candidate);
+	break;
+      case GDK_Left:
+      case GDK_h:
+	candidate_prev(hcontext->candidate);
+	break;
+      case GDK_Right:
+      case GDK_l:
+	candidate_next(hcontext->candidate);
+	break;
+      case GDK_Up:
+      case GDK_k:
+      case GDK_Page_Up:
+      case GDK_BackSpace:
+      case GDK_KP_Subtract:
+	candidate_prev_row(hcontext->candidate);
+	break;
+      case GDK_Down:
+      case GDK_j:
+      case GDK_Page_Down:
+      case GDK_space:
+      case GDK_KP_Add:
+      case GDK_KP_Tab:
+	candidate_next_row(hcontext->candidate);
+	break;
+      case GDK_Escape:
+	candidate_delete(hcontext->candidate);
+	hcontext->candidate = NULL;
+	break;
+      case GDK_0:
+	ch = candidate_get_nth(hcontext->candidate, 9);
+	break;
+      case GDK_1:
+      case GDK_2:
+      case GDK_3:
+      case GDK_4:
+      case GDK_5:
+      case GDK_6:
+      case GDK_7:
+      case GDK_8:
+      case GDK_9:
+	ch = candidate_get_nth(hcontext->candidate, key->keyval - GDK_1);
+	break;
+      default:
+	break;
+    }
+
+  if (ch != 0)
+    {
+      int n;
+      gchar buf[12];
+
+      n = g_unichar_to_utf8(ch, buf);
+      buf[n] = '\0';
+      im_hangul_commit_utf8(hcontext, buf);
+      im_hangul_emit_preedit_changed (hcontext);
+      candidate_delete(hcontext->candidate);
+      hcontext->candidate = NULL;
+    }
+
+  return TRUE;
+}
+
 /* use hangul composer */
 static gboolean
 im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
@@ -1521,6 +1606,10 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   /* we silently ignore shift keys */
   if (key->keyval == GDK_Shift_L || key->keyval == GDK_Shift_R)
     return FALSE;
+
+  /* candidate window mode */
+  if (hcontext->candidate != NULL)
+    return im_hangul_cadidate_filter_keypress (hcontext, key);
 
   /* on Ctrl-Hangul we turn on/off manual_mode */
   if (pref_use_manual_mode &&
@@ -1569,7 +1658,7 @@ im_hangul_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   /* hanja key */
   if (key->keyval == GDK_F9 || key->keyval == GDK_Hangul_Hanja)
     {
-      popup_hanja_window (hcontext);
+      popup_candidate_window (hcontext);
       return TRUE;
     }
 
@@ -1690,7 +1779,7 @@ on_click_hanja (GtkWidget *widget,
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (data);
 
-  popup_hanja_window (hcontext);
+  //popup_hanja_window (hcontext);
   return TRUE;
 }
 
@@ -2009,7 +2098,7 @@ create_hanja_window (GtkIMContextHangul *hcontext, gunichar ch)
 }
 
 static void
-popup_hanja_window (GtkIMContextHangul *hcontext)
+popup_candidate_window (GtkIMContextHangul *hcontext)
 {
   gunichar ch;
 
@@ -2020,7 +2109,24 @@ popup_hanja_window (GtkIMContextHangul *hcontext)
 				   hcontext->jungseong[0],
 				   hcontext->jongseong[0]);
   if (ch)
-    create_hanja_window (hcontext, ch);
+    {
+      int index;
+      index = get_index_of_hanjatable (ch);
+      if (index != -1)
+	{
+	  int n;
+	  gchar buf[12];
+	  if (hcontext->candidate != NULL)
+	    candidate_delete(hcontext->candidate);
+
+	  n = g_unichar_to_utf8(ch, buf);
+	  buf[n] = '\0';
+	  hcontext->candidate = candidate_new (buf,
+					       10,
+					       hanjatable[index] + 1,
+					       hcontext->client_window);
+	}
+    }
 }
 
 static gboolean
@@ -2802,4 +2908,300 @@ done:
   return TRUE;
 }
 
+/* candidate window */
+static void
+candidate_on_expose (GtkWidget *widget,
+		     GdkEventExpose *event,
+		     gpointer data)
+{
+  Candidate *candidate;
+  GtkStyle *style;
+  GtkAllocation alloc;
+  GtkWidget *child;
+  int i;
+
+  candidate = (Candidate *)data;
+  style = gtk_widget_get_style(widget);
+
+  i = candidate->current - candidate->first;
+  if (i >= 0 && i < candidate->n_per_window)
+    {
+      int width, height;
+      child = candidate->children[i];
+      alloc = GTK_WIDGET(child)->allocation;
+      gdk_draw_rectangle (widget->window, style->bg_gc[GTK_STATE_SELECTED],
+			  TRUE,
+			  alloc.x, alloc.y,
+			  alloc.width, alloc.height);
+      pango_layout_get_pixel_size (GTK_LABEL(child)->layout, &width, &height);
+      if (alloc.width > width)
+	alloc.x += (alloc.width - width) / 2;
+      if (alloc.height > height)
+	alloc.y += (alloc.height - height) / 2;
+      gdk_draw_layout (widget->window, style->text_gc[GTK_STATE_SELECTED],
+		       alloc.x, alloc.y,
+		       GTK_LABEL(child)->layout);
+    }
+}
+
+static void
+candidate_update_labels(Candidate *candidate)
+{
+  int i;
+  int len;
+  gchar buf[16];
+
+  for (i = 0;
+       i < candidate->n_per_window &&
+       candidate->first + i < candidate->n;
+       i++)
+    {
+      len = g_snprintf (buf, sizeof(buf), "%d.", (i + 1) % 10);
+      len += g_unichar_to_utf8 (candidate->data[candidate->first + i],
+				buf + len);
+      buf[len] = '\0';
+      gtk_label_set_text (GTK_LABEL(candidate->children[i]), buf);
+    }
+  for (; i < candidate->n_per_window; i++)
+    gtk_label_set_text (GTK_LABEL(candidate->children[i]), "");
+}
+
+static void
+candidate_on_realize (GtkWidget *widget, Candidate *candidate)
+{
+    gint width = 0, height = 0;
+    gint absx = 0, absy = 0;
+    gint root_w, root_h, cand_w, cand_h;
+    GtkRequisition requisition;
+
+    if (candidate->parent == NULL)
+      return;
+
+    gdk_window_get_origin (GDK_WINDOW(candidate->parent), &absx, &absy);
+    gdk_drawable_get_size (GDK_DRAWABLE(candidate->parent), &width, &height);
+
+    root_w = gdk_screen_width();
+    root_h = gdk_screen_height();
+
+    gtk_widget_size_request(GTK_WIDGET(widget), &requisition);
+    cand_w = requisition.width;
+    cand_h = requisition.height;
+
+    absy += height;
+    if (absy + cand_h > root_h)
+      absy = root_h - cand_h;
+    if (absx + cand_w > root_w)
+      absx = root_w - cand_w;
+    gtk_window_move(GTK_WINDOW(candidate->window), absx, absy);
+}
+
+static void
+candidate_create_window(Candidate *candidate)
+{
+  GtkWidget *frame;
+  GtkWidget *table;
+  GtkWidget *label;
+  PangoAttrList *attr_list;
+  PangoAttribute *attr;
+  int i, row, col, n_per_row, n_per_window;
+  int len;
+  gchar buf[16];
+
+  n_per_window = candidate->n_per_window;
+  n_per_row = candidate->n_per_row;
+
+  candidate->window = gtk_window_new(GTK_WINDOW_POPUP);
+  candidate->children = (GtkWidget**)g_malloc(
+			  sizeof (GtkWidget*) * n_per_window);
+
+  frame = gtk_frame_new(candidate->label);
+  gtk_container_add(GTK_CONTAINER(candidate->window), frame);
+
+  table = gtk_table_new((n_per_window  - 1)/ n_per_row + 1, n_per_row, TRUE);
+  gtk_table_set_col_spacings(GTK_TABLE(table), 5);
+  gtk_container_add(GTK_CONTAINER(frame), table);
+
+  attr_list = pango_attr_list_new();
+  attr = pango_attr_scale_new(PANGO_SCALE_X_LARGE);
+  attr->start_index = 0;
+  attr->end_index = G_MAXINT;
+  pango_attr_list_insert(attr_list, attr);
+  for (i = 0; i < n_per_window && candidate->first + i < candidate->n; i++)
+    {
+      len = g_snprintf(buf, sizeof(buf), "%d.", (i + 1) % 10);
+      len += g_unichar_to_utf8(candidate->data[candidate->first + i],
+			      buf + len);
+      buf[len] = '\0';
+      label = gtk_label_new(buf);
+      gtk_label_set_use_markup(GTK_LABEL(label), FALSE);
+      gtk_label_set_use_underline(GTK_LABEL(label), FALSE);
+      gtk_label_set_attributes(GTK_LABEL(label), attr_list);
+
+      row = i / n_per_row;
+      col = i - row * n_per_row;
+      gtk_table_attach_defaults(GTK_TABLE(table), label,
+				col, col + 1, row, row + 1);
+      candidate->children[i] = label;
+    }
+  pango_attr_list_unref(attr_list);
+  for (; i < n_per_window; i++)
+    {
+      label = gtk_label_new("");
+      row = i / n_per_row;
+      col = i - row * n_per_row;
+      gtk_table_attach_defaults(GTK_TABLE(table), label,
+				col, col + 1, row, row + 1);
+      candidate->children[i] = label;
+    }
+  g_signal_connect_after(G_OBJECT(candidate->window), "expose-event",
+			 G_CALLBACK(candidate_on_expose), candidate);
+  g_signal_connect_after(G_OBJECT(frame), "realize",
+			 G_CALLBACK(candidate_on_realize), candidate);
+
+  gtk_widget_show_all(candidate->window);
+}
+
+static Candidate*
+candidate_new(char *label_str,
+	      int n_per_window,
+	      const gunichar *data,
+	      GdkWindow *parent)
+{
+  int n;
+  Candidate *candidate;
+
+  candidate = (Candidate*)g_malloc(sizeof(Candidate));
+  candidate->first = 0;
+  candidate->current = 0;
+  candidate->n_per_window = n_per_window;
+  candidate->n_per_row = 10;
+  candidate->n = 0;
+  candidate->data = NULL;
+  candidate->parent = parent;
+  candidate->label = g_strdup(label_str);
+
+  for (n = 0; data[n] != 0; n++)
+    ;
+
+  candidate->data = data;
+  candidate->n = n;
+
+  if (n_per_window == 0)
+    candidate->n_per_window = candidate->n;
+  else
+    candidate->n_per_row = n_per_window;
+
+  candidate_create_window(candidate);
+
+  return candidate;
+}
+
+static void
+candidate_prev(Candidate *candidate)
+{
+  if (candidate == NULL)
+    return;
+
+  if (candidate->current > 0)
+    candidate->current--;
+
+  if (candidate->current < candidate->first)
+    {
+      candidate->first -= candidate->n_per_window;
+      candidate_update_labels(candidate);
+      return;
+    }
+
+  gtk_widget_queue_draw(candidate->window);
+}
+
+static void
+candidate_next(Candidate *candidate)
+{
+  if (candidate == NULL)
+    return;
+
+  if (candidate->current < candidate->n - 1)
+    candidate->current++;
+
+  if (candidate->current >= candidate->first + candidate->n_per_window)
+    {
+      candidate->first += candidate->n_per_window;
+      candidate_update_labels(candidate);
+      return;
+    }
+
+  gtk_widget_queue_draw(candidate->window);
+}
+
+static void
+candidate_prev_row(Candidate *candidate)
+{
+  if (candidate == NULL)
+    return;
+
+  if (candidate->current - candidate->n_per_row >= 0)
+    candidate->current -= candidate->n_per_row;
+
+  if (candidate->current < candidate->first)
+    {
+      candidate->first -= candidate->n_per_window;
+      candidate_update_labels(candidate);
+      return;
+    }
+
+  gtk_widget_queue_draw(candidate->window);
+}
+
+static void
+candidate_next_row(Candidate *candidate)
+{
+  if (candidate == NULL)
+    return;
+
+  if (candidate->current + candidate->n_per_row < candidate->n)
+    candidate->current += candidate->n_per_row;
+
+  if (candidate->current >= candidate->first + candidate->n_per_window)
+    {
+      candidate->first += candidate->n_per_window;
+      candidate_update_labels(candidate);
+      return;
+    }
+
+  gtk_widget_queue_draw(candidate->window);
+}
+
+static gunichar
+candidate_get_current(Candidate *candidate)
+{
+  if (candidate == NULL)
+    return 0;
+
+  return candidate->data[candidate->current];
+}
+
+static gunichar
+candidate_get_nth(Candidate *candidate, int n)
+{
+  if (candidate == NULL)
+    return 0;
+
+  if (n < 0 && n >= candidate->n)
+    return 0;
+
+  return candidate->data[candidate->first + n];
+}
+
+static void
+candidate_delete(Candidate *candidate)
+{
+  if (candidate == NULL)
+    return;
+
+  gtk_widget_destroy(candidate->window);
+  g_free(candidate->children);
+  g_free(candidate->label);
+  g_free(candidate);
+}
 /* vim: set cindent sw=2 sts=2 ts=8 : */
