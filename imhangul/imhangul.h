@@ -1128,6 +1128,7 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
   g_object_set_data(G_OBJECT(toplevel), "im-hangul-status-window",
 		    status_window);
 
+  gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(toplevel));
   status_window_set_mode(context_hangul);
 
   return window;

@@ -1,3 +1,8 @@
+2002. 08. 08. (목) 10:40:02 KST
+	* imhangul.h: status_window_get()함수에서 gtk_window_set_transient_for()
+	  를 호출하여 상태창을 toplevel의 transient로 설정, 이걸로 status
+	  window가 남는 문제가 해결될지는 미지수
+
 2002. 07. 26. (금) 16:40:58 KST
 	* imhangul.h: Esc 키를 눌렀을때 자동으로 영문 모드로 바뀌게
 
