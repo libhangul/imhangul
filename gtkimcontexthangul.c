@@ -36,6 +36,7 @@
 
 #include "gtkimcontexthangul.h"
 #include "hanjatable.h"
+#include "chartable.h"
 
 enum {
   INPUT_MODE_DIRECT,
@@ -1779,7 +1780,7 @@ on_click_hanja (GtkWidget *widget,
 {
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (data);
 
-  //popup_hanja_window (hcontext);
+  popup_candidate_window (hcontext);
   return TRUE;
 }
 
@@ -1976,155 +1977,96 @@ get_index_of_hanjatable (gunichar ch)
   return -1;
 }
 
-static gboolean
-on_hanja_window_keypress (GtkWidget *widget, GdkEventKey *event, gpointer data)
-{
-  if (event->keyval == GDK_Escape)
-    {
-      gtk_widget_destroy (hanja_window);
-      return TRUE;
-    }
-  return FALSE;
-}
-
-static void
-on_hanja_window_destroy (GtkWidget *widget, gpointer data)
-{
-  gtk_grab_remove (widget);
-  hanja_window = NULL;
-  input_mode = INPUT_MODE_HANGUL;
-}
-
-static void
-on_hanja_button_clicked (GtkButton *button, gpointer data)
-{
-  GtkIMContextHangul* hcontext = GTK_IM_CONTEXT_HANGUL(data);
-  gchar *str = (gchar *)gtk_button_get_label (GTK_BUTTON(button));
-
-  if (str)
-    {
-      im_hangul_commit_utf8 (hcontext, str);
-      hcontext->input_mode = INPUT_MODE_HANGUL;
-      hcontext->index = -1;
-      im_hangul_emit_preedit_changed (hcontext);
-    }
-  gtk_widget_destroy (hanja_window);
-}
-
-static GtkWidget *
-create_hanja_window (GtkIMContextHangul *hcontext, gunichar ch)
-{
-  const gunichar *p;
-  gint x, y, n, index;
-  GtkWidget *window, *table, *button, *label, *parent;
-  PangoFontDescription *desc = NULL;
-  PangoAttrList *attrs = NULL;
-  PangoAttribute *attr = NULL;
-  gchar buf[6];
-  gulong id;
-
-  index = get_index_of_hanjatable (ch);
-
-  if (index < 0) /* there is no such hanja */
-    return NULL;
-
-  if (hanja_window != NULL)
-    return NULL;
-
-  hanja_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  window = hanja_window;
-  table = gtk_table_new (1, 10, TRUE);
-
-  if (pref_hanja_font)
-    desc = pango_font_description_from_string (pref_hanja_font);
-
-  x = 0;
-  y = 0;
-  p = hanjatable[index] + 1;
-  while (*p != 0)
-    {
-      n = g_unichar_to_utf8 (*p, buf);
-      buf[n] = 0;
-
-      button = gtk_button_new_with_label (buf);
-      gtk_widget_set_name (button, "imhangul_hanja");
-      label = GTK_BIN(button)->child;
-      if (desc)
-	{
-	  gtk_widget_modify_font (label, desc);
-	}
-      else
-	{
-	  attrs = pango_attr_list_new ();
-	  attr = pango_attr_scale_new (PANGO_SCALE_XX_LARGE);
-	  attr->start_index = 0;
-	  attr->end_index = n;
-	  pango_attr_list_insert (attrs, attr);
-	  gtk_label_set_attributes (GTK_LABEL(label), attrs);
-	}
-
-      gtk_table_attach (GTK_TABLE(table), button, x, x + 1, y, y + 1,
-	      (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
-	      (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
-	      0, 0);
-      id = g_signal_connect (G_OBJECT(button), "clicked",
-			     G_CALLBACK (on_hanja_button_clicked), hcontext);
-
-      x++;
-      if (x > 9)
-	{
-	  y++;
-	  x = 0;
-	}
-      p++;
-    }
-  gtk_container_add (GTK_CONTAINER(window), table);
-
-  g_signal_connect (G_OBJECT(window), "key-press-event",
-		    G_CALLBACK (on_hanja_window_keypress), NULL);
-  g_signal_connect (G_OBJECT(window), "destroy",
-		    G_CALLBACK (on_hanja_window_destroy), NULL);
-
-  parent = hcontext->toplevel;
-  if (parent)
-    gtk_window_set_transient_for (GTK_WINDOW(window), GTK_WINDOW(parent));
-
-  gtk_grab_add (window);
-  gtk_widget_show_all (window);
-
-  pango_font_description_free (desc);
-
-  return window;
-}
-
 static void
 popup_candidate_window (GtkIMContextHangul *hcontext)
 {
   gunichar ch;
 
-  if (hcontext->choseong[0] == 0 || hcontext->jungseong[0] == 0)
-    return; 
+  if (hcontext->candidate != NULL)
+    candidate_delete(hcontext->candidate);
 
-  ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
-				   hcontext->jungseong[0],
-				   hcontext->jongseong[0]);
-  if (ch)
+  if ((hcontext->choseong[0] != 0 &&
+       hcontext->jungseong[0] == 0 &&
+       hcontext->jongseong[0] == 0) ||
+      (hcontext->choseong[0] == 0 &&
+       hcontext->jungseong[0] != 0 &&
+       hcontext->jongseong[0] == 0))
     {
       int index;
-      index = get_index_of_hanjatable (ch);
-      if (index != -1)
-	{
-	  int n;
-	  gchar buf[12];
-	  if (hcontext->candidate != NULL)
-	    candidate_delete(hcontext->candidate);
+      int key = hcontext->choseong[0] + hcontext->jungseong[0];
 
-	  n = g_unichar_to_utf8(ch, buf);
-	  buf[n] = '\0';
-	  hcontext->candidate = candidate_new (buf,
-					       10,
-					       hanjatable[index] + 1,
-					       hcontext->client_window);
+      switch (key)
+	{
+	  case 0x1100:
+	    index = 0;
+	    break;
+	  case 0x1102:
+	    index = 1;
+	    break;
+	  case 0x1103:
+	    index = 2;
+	    break;
+	  case 0x1105:
+	    index = 3;
+	    break;
+	  case 0x1106:
+	    index = 4;
+	    break;
+	  case 0x1107:
+	    index = 5;
+	    break;
+	  case 0x1109:
+	    index = 6;
+	    break;
+	  case 0x110b:
+	    index = 7;
+	    break;
+	  case 0x110c:
+	    index = 8;
+	    break;
+	  case 0x110e:
+	    index = 9;
+	    break;
+	  case 0x110f:
+	    index = 10;
+	    break;
+	  case 0x1110:
+	    index = 11;
+	    break;
+	  case 0x1111:
+	    index = 12;
+	    break;
+	  default:
+	    index = -1;
+	    break;
+	}
+      if (index >= 0)
+	hcontext->candidate = candidate_new (char_table[index].name,
+					     10,
+					     char_table[index].list,
+					     hcontext->client_window);
+    }
+  else if (hcontext->choseong[0] != 0 && hcontext->jungseong[0] != 0)
+    {
+      ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
+				       hcontext->jungseong[0],
+				       hcontext->jongseong[0]);
+      if (ch)
+	{
+	  int index;
+	  index = get_index_of_hanjatable (ch);
+	  if (index != -1)
+	    {
+	      int n;
+	      gchar buf[12];
+
+	      n = g_unichar_to_utf8(ch, buf);
+	      buf[n] = '\0';
+	      hcontext->candidate = candidate_new (buf,
+						   10,
+						   hanjatable[index] + 1,
+						   hcontext->client_window);
+	    }
 	}
     }
 }
@@ -2149,7 +2091,6 @@ on_char_table_clicked (GtkWidget *widget, gpointer data)
     im_hangul_commit_utf8(current_context, str);
 }
 
-#include "chartable.h"
 
 static GtkWidget*
 create_char_window (GtkIMContextHangul *hcontext)
