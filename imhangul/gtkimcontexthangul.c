@@ -176,9 +176,9 @@ static int      im_hangul_get_toplevel_input_mode(GtkIMContextHangul *hcontext);
 static void     im_hangul_set_toplevel_input_mode(GtkIMContextHangul *hcontext,
 						  int mode);
 
-static Toplevel*  toplevel_new(GdkWindow *window);
+static Toplevel*  toplevel_new(GtkWidget *toplevel_widget);
+static Toplevel*  toplevel_get(GdkWindow *window);
 static void       toplevel_delete(Toplevel *toplevel);
-static void       toplevel_unref(Toplevel *toplevel);
 static GtkWidget* status_window_new(GtkWidget *parent);
 
 static void popup_candidate_window  (GtkIMContextHangul *hcontext);
@@ -509,12 +509,8 @@ im_hangul_set_client_window (GtkIMContext *context,
   if (hcontext->client_window == client_window)
     return;
 
-  if (hcontext->toplevel != NULL) {
-    toplevel_unref(hcontext->toplevel);
-  }
-
   hcontext->client_window = client_window;
-  hcontext->toplevel = toplevel_new (client_window);
+  hcontext->toplevel = toplevel_get (client_window);
   if (client_window == NULL)
     return;
 
@@ -1804,7 +1800,33 @@ get_toplevel_widget (GdkWindow *window)
 }
 
 static Toplevel *
-toplevel_new(GdkWindow *window)
+toplevel_new(GtkWidget *toplevel_widget)
+{
+  Toplevel *toplevel = NULL;
+
+  toplevel = g_new(Toplevel, 1);
+  toplevel->ref_count = 1;
+  toplevel->input_mode = INPUT_MODE_DIRECT;
+  toplevel->widget = toplevel_widget;
+  toplevel->status = status_window_new(toplevel->widget);
+  toplevel->destroy_handler_id = 
+	    g_signal_connect_swapped (G_OBJECT(toplevel->widget), "destroy",
+			     G_CALLBACK(toplevel_delete), toplevel);
+  toplevel->configure_handler_id = 
+	    g_signal_connect (G_OBJECT(toplevel->widget), "configure-event",
+			     G_CALLBACK(status_window_configure),
+			     toplevel->status);
+  status_window_configure (toplevel->widget, NULL, toplevel->status);
+
+  g_object_set_data(G_OBJECT(toplevel_widget),
+		     "gtk-imhangul-toplevel-info", toplevel);
+  toplevels = g_slist_prepend(toplevels, toplevel);
+
+  return toplevel;
+}
+
+static Toplevel *
+toplevel_get(GdkWindow *window)
 {
   Toplevel *toplevel = NULL;
   GtkWidget *toplevel_widget;
@@ -1817,20 +1839,7 @@ toplevel_new(GdkWindow *window)
   toplevel = g_object_get_data(G_OBJECT(toplevel_widget),
 			       "gtk-imhangul-toplevel-info");
   if (toplevel == NULL) {
-    toplevel = g_new(Toplevel, 1);
-    toplevel->ref_count = 1;
-    toplevel->input_mode = INPUT_MODE_DIRECT;
-    toplevel->widget = toplevel_widget;
-    toplevel->status = status_window_new(toplevel->widget);
-    toplevel->configure_handler_id = 
-	      g_signal_connect (G_OBJECT(toplevel->widget), "configure-event",
-			       G_CALLBACK(status_window_configure),
-			       toplevel->status);
-    status_window_configure (toplevel->widget, NULL, toplevel->status);
-
-    g_object_set_data(G_OBJECT(toplevel_widget),
-		       "gtk-imhangul-toplevel-info", toplevel);
-    toplevels = g_slist_prepend(toplevels, toplevel);
+    toplevel = toplevel_new(toplevel_widget);
   }
 
   return toplevel;
@@ -1843,19 +1852,13 @@ toplevel_delete(Toplevel *toplevel)
   if (toplevel->status != NULL) {
     gtk_widget_destroy(toplevel->status);
     g_signal_handler_disconnect (toplevel->widget,
+				 toplevel->destroy_handler_id);
+    g_signal_handler_disconnect (toplevel->widget,
 				 toplevel->configure_handler_id);
   }
   g_object_set_data (G_OBJECT(toplevel->widget),
 		     "gtk-imhangul-toplevel-info", NULL);
   g_free(toplevel);
-}
-
-static void
-toplevel_unref(Toplevel *toplevel)
-{
-  toplevel->ref_count --;
-  if (toplevel->ref_count <= 0)
-    toplevel_delete(toplevel);
 }
 
 static int
@@ -1982,16 +1985,13 @@ gtk_im_context_hangul_shutdown (void)
   GSList *item;
 
   /* remove toplevel info */
-  for (item = toplevels; item != NULL; item = item->next) {
-    Toplevel *toplevel = (Toplevel*)item->data;
-    if (toplevel->ref_count > 0) {
-      toplevel_delete(toplevel);
-    }
+  for (item = toplevels; item != NULL; item = g_slist_next(item)) {
+    toplevel_delete((Toplevel*)item->data);
   }
   g_slist_free(toplevels);
 
   /* remove desktop info */
-  for (item = desktops; item != NULL; item = item->next) {
+  for (item = desktops; item != NULL; item = g_slist_next(item)) {
     DesktopInfo *info = (DesktopInfo*)(item->data);
     im_hangul_set_input_mode_info_for_screen (info->screen,
 					      INPUT_MODE_INFO_NONE);
