@@ -167,6 +167,8 @@ static GtkWidget* get_toplevel_window (GdkWindow *window);
 static void status_window_show	    (GtkIMContextHangul *hcontext);
 static void status_window_hide	    (GtkIMContextHangul *hcontext);
 static void status_window_set_label (GtkIMContextHangul *hcontext);
+static StatusWindow* status_window_get (GtkIMContextHangul *hcontext);
+static void status_window_free      (StatusWindow *status_window);
 
 static void popup_candidate_window  (GtkIMContextHangul *hcontext);
 static void popup_char_table_window (GtkIMContextHangul *hcontext);
@@ -523,10 +525,18 @@ im_hangul_set_client_window (GtkIMContext *context,
 
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
-  if (client_window == NULL) {
-    hcontext->toplevel = NULL;
-    return;
-  }
+  if (client_window == NULL)
+    {
+      hcontext->toplevel = NULL;
+      return;
+    }
+
+  if (hcontext->client_window != NULL)
+    {
+      StatusWindow *status_window = status_window_get (hcontext);
+      if (status_window != NULL)
+	status_window_free (status_window);
+    }
 
   hcontext->client_window = client_window;
 
@@ -1814,10 +1824,15 @@ get_toplevel_window (GdkWindow *window)
     return NULL;
 
   gdk_toplevel = gdk_window_get_toplevel(window);
+  if (gdk_toplevel == NULL)
+    gdk_toplevel = window;
   gdk_window_get_user_data (gdk_toplevel, &ptr);
   memcpy(&gtk_toplevel, &ptr, sizeof(gtk_toplevel));
   if (gtk_toplevel != NULL)
     gtk_toplevel = gtk_widget_get_toplevel(GTK_WIDGET(gtk_toplevel));
+
+  if (!GTK_WIDGET_TOPLEVEL (gtk_toplevel))
+    return NULL;
 
   return gtk_toplevel;
 }
