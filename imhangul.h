@@ -1765,7 +1765,6 @@ create_char_window(GtkIMContextHangul *hcontext)
   gint i, j, x, y, n;
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_widget_show(window);
 
   notebook = gtk_notebook_new();
   gtk_container_add(GTK_CONTAINER(window), notebook);
@@ -1822,6 +1821,7 @@ popup_char_table_window(GtkIMContextHangul *hcontext)
     gtk_widget_show(char_table_window);
   } else {
     char_table_window = create_char_window(hcontext);
+    gtk_widget_show(char_table_window);
   }
 }
 
