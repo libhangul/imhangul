@@ -1,6 +1,6 @@
 AC_INIT(imhangul.c)
 
-AM_INIT_AUTOMAKE(imhangul, 0.9.6)
+AM_INIT_AUTOMAKE(imhangul, 0.9.7)
 AM_MAINTAINER_MODE
 
 dnl Checks for programs
@@ -21,11 +21,6 @@ dnl Checks for header files.
 dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
-
-dnl add -Wall to CFLAGS if GCC=yes
-if test x$CC == xgcc; then
-	CFLAGS="$CFLAGS -Wall"
-fi
 
 dnl use "STRIP_" macros
 AC_MSG_CHECKING(whether make is GNU Make)
