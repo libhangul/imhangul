@@ -9,8 +9,6 @@ EXTRA_DIST = test.sh gtkrc hanjatable.py
 # moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
 moduledir = @GTK_PREFIX@/lib/gtk-2.0/immodules
 
-GTK_IMMODULES = $(sysconfdir)/gtk-2.0/gtk.immodules
-
 im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
 	gtkimcontexthangul.h 	\
@@ -38,11 +36,15 @@ entry_LDADD = @GTK_LIBS@
 
 install-data-hook:
 	if test -z "$(DESTDIR)" ; then \
-		$(mkinstalldirs) $(sysconfdir)/gtk-2.0; \
-		gtk-query-immodules-2.0 > $(DESTDIR)$(GTK_IMMODULES); \
+		if test ! -d `dirname $(IM_HANGUL_GTK_IMMODULE_FILE)`; then \
+			$(mkinstalldirs) `dirname $(IM_HANGUL_GTK_IMMODULE_FILE)`; \
+		fi;\
+		gtk-query-immodules-2.0 > $(DESTDIR)$(IM_HANGUL_GTK_IMMODULE_FILE); \
 	fi
 
 uninstall:
 	if test -z "$(DESTDIR)" ; then \
-		gtk-query-immodules-2.0 > $(DESTDIR)$(GTK_IMMODULES); \
+		if test -f "$(IM_HANGUL_GTK_IMMODULE_FILE)"; then \
+			gtk-query-immodules-2.0 > $(DESTDIR)$(IM_HANGUL_GTK_IMMODULE_FILE); \
+		fi \
 	fi
