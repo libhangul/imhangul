@@ -1040,9 +1040,29 @@ status_window_configure	(GtkWidget *toplevel,
 }
 
 static GtkWidget *
+get_toplevel_window(GdkWindow *window)
+{
+  GtkWidget *toplevel;
+  GdkWindow *parent;
+
+  if (window == NULL)
+    return NULL;
+
+  while (TRUE) {
+    parent = gdk_window_get_parent(window);
+    if (parent == gdk_get_default_root_window())
+      break;
+    else
+      window = parent;
+  }
+
+  gdk_window_get_user_data(window, (gpointer *)&toplevel);
+  return toplevel;
+}
+
+static GtkWidget *
 status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
 {
-  GdkWindow *toplevel_gdk;
   GtkWidget *toplevel;
   GtkWidget *window;
   GtkWidget *label;
@@ -1050,16 +1070,7 @@ status_window_get(GtkIMContextHangul *context_hangul, gboolean create)
   if (!pref_use_status_window)
     return NULL;
 
-  toplevel_gdk = context_hangul->client_window;
-  while (TRUE) {
-    GdkWindow *parent = gdk_window_get_parent(toplevel_gdk);
-    if (parent == gdk_get_default_root_window())
-      break;
-    else
-      toplevel_gdk = parent;
-  }
-
-  gdk_window_get_user_data(toplevel_gdk, (gpointer *)&toplevel);
+  toplevel = get_toplevel_window(context_hangul->client_window);
   if (toplevel == NULL)
     return NULL;
 
@@ -1204,31 +1215,36 @@ on_hanja_button_clicked(GtkButton *button, gpointer data)
 }
 
 static GtkWidget *
-create_hanja_window(GtkIMContextHangul *context_hangul,
-			       gunichar ch)
+create_hanja_window(GtkIMContextHangul *context_hangul, gunichar ch)
 {
   gunichar *p;
   gint x, y, n, index;
-  GtkWidget *window, *table, *button, *label;
+  GtkWidget *window, *table, *button, *label, *parent;
   PangoFontDescription *desc = NULL;
   PangoAttrList *attrs = NULL;
   PangoAttribute *attr = NULL;
   gchar buf[6];
   gulong id;
 
-  if (pref_hanja_font)
-    desc = pango_font_description_from_string(pref_hanja_font);
-
   index = get_index_of_hanjatable(ch);
-  g_print("index: %d\n", index);
-  if (index < 0)
+
+  /* g_print("index: %d\n", index); */
+  if (index < 0) /* there is no such hanja */
     return NULL;
 
   if (hanja_window != NULL)
     return NULL;
+
   hanja_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   window = hanja_window;
+  parent = get_toplevel_window(context_hangul->client_window);
+  if (parent)
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent));
+
   table = gtk_table_new(10, 1, TRUE);
+
+  if (pref_hanja_font)
+    desc = pango_font_description_from_string(pref_hanja_font);
 
   x = 0;
   y = 0;
@@ -1239,15 +1255,16 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
 
     button = gtk_button_new_with_label(buf);
     label = GTK_BIN(button)->child;
-    attrs = pango_attr_list_new();
-    if (desc)
-      attr = pango_attr_font_desc_new(desc);
-    else
+    if (desc) {
+      gtk_widget_modify_font(label, desc);
+    } else {
+      attrs = pango_attr_list_new();
       attr = pango_attr_scale_new(PANGO_SCALE_XX_LARGE);
-    attr->start_index = 0;
-    attr->end_index = n;
-    pango_attr_list_insert(attrs, attr);
-    gtk_label_set_attributes(GTK_LABEL(label), attrs);
+      attr->start_index = 0;
+      attr->end_index = n;
+      pango_attr_list_insert(attrs, attr);
+      gtk_label_set_attributes(GTK_LABEL(label), attrs);
+    }
 
     gtk_table_attach(GTK_TABLE(table), button, x, x + 1, y, y + 1,
             (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
@@ -1269,6 +1286,7 @@ create_hanja_window(GtkIMContextHangul *context_hangul,
 		    G_CALLBACK (on_keypress), NULL);
   g_signal_connect (G_OBJECT(window), "destroy",
 		    G_CALLBACK (on_destroy), NULL);
+
   gtk_widget_show_all(window);
 
   pango_font_description_free(desc);
