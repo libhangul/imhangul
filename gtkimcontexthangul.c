@@ -358,17 +358,17 @@ status_window_change (GtkSettings *settings, gpointer data)
     }
 }
 
-/* FIXME: we need more reasonable way to set preedit style,
- * How to get style without client widget ptr? */
 static void
 preedit_style_change (GtkSettings *settings, GtkWidget *widget)
 {
-  GtkStyle *style = NULL;
+  GtkStyle *style;
 
   g_return_if_fail (GTK_IS_SETTINGS (settings));
 
   if (GTK_IS_WIDGET(widget))
     style = widget->style;
+  else
+    style = gtk_widget_get_default_style ();
 
   /* set preedit style attributes */
   g_object_get (settings,
@@ -384,48 +384,24 @@ preedit_style_change (GtkSettings *settings, GtkWidget *widget)
       im_hangul_preedit_attr = im_hangul_preedit_foreground;
       break;
     case 2:
-      if (style == NULL)
-	{
-	  pref_fg.red   = 0xFFFF;
-	  pref_fg.green = 0xFFFF;
-	  pref_fg.blue  = 0xFFFF;
-	  pref_bg.red   = 0;
-	  pref_bg.green = 0;
-	  pref_bg.blue  = 0;
-	}
-      else
-        {
-	  pref_fg.red   = style->base[GTK_STATE_NORMAL].red;
-	  pref_fg.green = style->base[GTK_STATE_NORMAL].green;
-	  pref_fg.blue  = style->base[GTK_STATE_NORMAL].blue;
-	  pref_bg.red   = style->text[GTK_STATE_NORMAL].red;
-	  pref_bg.green = style->text[GTK_STATE_NORMAL].green;
-	  pref_bg.blue  = style->text[GTK_STATE_NORMAL].blue;
-	}
+      pref_fg.red   = style->base[GTK_STATE_NORMAL].red;
+      pref_fg.green = style->base[GTK_STATE_NORMAL].green;
+      pref_fg.blue  = style->base[GTK_STATE_NORMAL].blue;
+      pref_bg.red   = style->text[GTK_STATE_NORMAL].red;
+      pref_bg.green = style->text[GTK_STATE_NORMAL].green;
+      pref_bg.blue  = style->text[GTK_STATE_NORMAL].blue;
       im_hangul_preedit_attr = im_hangul_preedit_background;
       break;
     case 3:
-      if (style == NULL)
-	{
-	  pref_fg.red   = 0;
-	  pref_fg.green = 0;
-	  pref_fg.blue  = 0;
-	  pref_bg.red   = (0xFFFF * 80) / 100;
-	  pref_bg.green = (0xFFFF * 80) / 100;
-	  pref_bg.blue  = (0xFFFF * 80) / 100;
-	}
-      else
-        {
-	  pref_fg.red   = style->text[GTK_STATE_NORMAL].red;
-	  pref_fg.green = style->text[GTK_STATE_NORMAL].green;
-	  pref_fg.blue  = style->text[GTK_STATE_NORMAL].blue;
-	  pref_bg.red   = (style->base[GTK_STATE_NORMAL].red   * 80 + 
-			   style->text[GTK_STATE_NORMAL].red   * 20) / 100;
-	  pref_bg.green = (style->base[GTK_STATE_NORMAL].green * 80 + 
-			   style->text[GTK_STATE_NORMAL].green * 20) / 100;
-	  pref_bg.blue  = (style->base[GTK_STATE_NORMAL].blue  * 80 + 
-			   style->text[GTK_STATE_NORMAL].blue  * 20) / 100;
-	}
+      pref_fg.red   = style->text[GTK_STATE_NORMAL].red;
+      pref_fg.green = style->text[GTK_STATE_NORMAL].green;
+      pref_fg.blue  = style->text[GTK_STATE_NORMAL].blue;
+      pref_bg.red   = (style->base[GTK_STATE_NORMAL].red   * 80 + 
+		       style->text[GTK_STATE_NORMAL].red   * 20) / 100;
+      pref_bg.green = (style->base[GTK_STATE_NORMAL].green * 80 + 
+		       style->text[GTK_STATE_NORMAL].green * 20) / 100;
+      pref_bg.blue  = (style->base[GTK_STATE_NORMAL].blue  * 80 + 
+		       style->text[GTK_STATE_NORMAL].blue  * 20) / 100;
       im_hangul_preedit_attr = im_hangul_preedit_background;
       break;
     case 4:
@@ -563,6 +539,7 @@ im_hangul_set_client_window (GtkIMContext *context,
     }
   if (!have_property (settings, "gtk-im-hangul-preedit-style"))
     {
+      GtkWidget *widget = NULL;
       gtk_settings_install_property (g_param_spec_int ("gtk-im-hangul-preedit-style",
 						       "Preedit Style",
 						       "Preedit string style",
@@ -570,12 +547,13 @@ im_hangul_set_client_window (GtkIMContext *context,
 						       4,
 						       0,
 						       G_PARAM_READWRITE));
+      gdk_window_get_user_data (client_window, (gpointer *)&widget);
       desktop_info->preedit_style_cb =
 	g_signal_connect (G_OBJECT(settings),
 			  "notify::gtk-im-hangul-preedit-style",
 			  G_CALLBACK(preedit_style_change),
-			  hcontext->toplevel);
-      preedit_style_change (settings, hcontext->toplevel);
+			  widget);
+      preedit_style_change (settings, widget);
     }
 
   current_root_window = gdk_screen_get_root_window(screen);
