@@ -162,6 +162,7 @@ static GtkWidget *hanja_window = NULL;
 static gint		input_mode = MODE_DIRECT;
 
 /* preferences */
+static gboolean		pref_use_hangul_jamo = FALSE;
 static gboolean		pref_use_status_window = TRUE;
 static gboolean		pref_use_dvorak = FALSE;
 static gchar* 		pref_hanja_font = NULL;
@@ -509,8 +510,7 @@ im_hangul_jamo_to_unicode(gunichar choseong,
 #define HJF	0x1160
 
 static int
-im_hangul_preedit_string(GtkIMContextHangul *context_hangul,
-				     gchar *buf)
+im_hangul_preedit_string(GtkIMContextHangul *context_hangul, gchar *buf)
 {
   int n = 0;
   gunichar ch;
@@ -521,91 +521,93 @@ im_hangul_preedit_string(GtkIMContextHangul *context_hangul,
     return 0;
   }
 
-  /* this code is very stupid but pango has some bug in Xft
-   * therefore we have to do this */
-  if (context_hangul->choseong) {
-    if (context_hangul->jungseong) {
-      if (context_hangul->jongseong) {
-	/* have cho, jung, jong */
-	ch = im_hangul_jamo_to_unicode(context_hangul->choseong,
-				       context_hangul->jungseong,
-				       context_hangul->jongseong);
-	n = g_unichar_to_utf8(ch, buf);
-        buf[n] = '\0';
-        return n;
-      } else {
-	/* have cho, jung */
-	ch = im_hangul_jamo_to_unicode(context_hangul->choseong,
-				       context_hangul->jungseong,
-				       0x11A7);
-        n = g_unichar_to_utf8(ch, buf);
-        buf[n] = '\0';
-        return n;
-      }
-    } else {
-      if (context_hangul->jongseong) {
-	/* have cho, jong */
-        ch = im_hangul_choseong_to_unicode(context_hangul->choseong);
-        n = g_unichar_to_utf8(ch, buf);
-        ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
-        n += g_unichar_to_utf8(ch, buf + n);
-        buf[n] = '\0';
-        return n;
-      } else {
-	/* have cho */
-        ch = im_hangul_choseong_to_unicode(context_hangul->choseong);
-        n = g_unichar_to_utf8(ch, buf);
-        buf[n] = '\0';
-        return n;
-      }
+  if (pref_use_hangul_jamo) {
+    /* we use conjoining jamo, U+1100 - U+11FF */
+    if (context_hangul->choseong == 0)
+      n = g_unichar_to_utf8(HCF, buf);
+    else
+      n = g_unichar_to_utf8(context_hangul->choseong, buf);
+    buf[n] = '\0';
+ 
+    if (context_hangul->jungseong == 0)
+      n += g_unichar_to_utf8(HJF, buf + n);
+    else
+      n += g_unichar_to_utf8(context_hangul->jungseong, buf + n);
+    buf[n] = '\0';
+ 
+    if (context_hangul->jongseong != 0) {
+      n += g_unichar_to_utf8(context_hangul->jongseong, buf + n);
+      buf[n] = '\0';
     }
   } else {
-    if (context_hangul->jungseong) {
-      if (context_hangul->jongseong) {
-	/* have jung, jong */
-        ch = im_hangul_jungseong_to_unicode(context_hangul->jungseong);
-        n = g_unichar_to_utf8(ch, buf);
-        ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
-        n += g_unichar_to_utf8(ch, buf + n);
-        buf[n] = '\0';
-        return n;
+    /* this code is very stupid but pango has some bug in Xft
+     * therefore we have to do this */
+    if (context_hangul->choseong) {
+      if (context_hangul->jungseong) {
+        if (context_hangul->jongseong) {
+          /* have cho, jung, jong */
+          ch = im_hangul_jamo_to_unicode(context_hangul->choseong,
+          			       context_hangul->jungseong,
+          			       context_hangul->jongseong);
+          n = g_unichar_to_utf8(ch, buf);
+          buf[n] = '\0';
+          return n;
+        } else {
+          /* have cho, jung */
+          ch = im_hangul_jamo_to_unicode(context_hangul->choseong,
+          			       context_hangul->jungseong,
+          			       0x11A7);
+          n = g_unichar_to_utf8(ch, buf);
+          buf[n] = '\0';
+          return n;
+        }
       } else {
-	/* have jung */
-        ch = im_hangul_jungseong_to_unicode(context_hangul->jungseong);
-        n = g_unichar_to_utf8(ch, buf);
-        buf[n] = '\0';
-        return n;
+        if (context_hangul->jongseong) {
+          /* have cho, jong */
+          ch = im_hangul_choseong_to_unicode(context_hangul->choseong);
+          n = g_unichar_to_utf8(ch, buf);
+          ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
+          n += g_unichar_to_utf8(ch, buf + n);
+          buf[n] = '\0';
+          return n;
+        } else {
+          /* have cho */
+          ch = im_hangul_choseong_to_unicode(context_hangul->choseong);
+          n = g_unichar_to_utf8(ch, buf);
+          buf[n] = '\0';
+          return n;
+        }
       }
     } else {
-      if (context_hangul->jongseong) {
-	/* have jong */
-        ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
-        n = g_unichar_to_utf8(ch, buf);
-        buf[n] = '\0';
-        return n;
+      if (context_hangul->jungseong) {
+        if (context_hangul->jongseong) {
+          /* have jung, jong */
+          ch = im_hangul_jungseong_to_unicode(context_hangul->jungseong);
+          n = g_unichar_to_utf8(ch, buf);
+          ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
+          n += g_unichar_to_utf8(ch, buf + n);
+          buf[n] = '\0';
+          return n;
+        } else {
+          /* have jung */
+          ch = im_hangul_jungseong_to_unicode(context_hangul->jungseong);
+          n = g_unichar_to_utf8(ch, buf);
+          buf[n] = '\0';
+          return n;
+        }
       } else {
-	/* have nothing */
-	;
+        if (context_hangul->jongseong) {
+          /* have jong */
+          ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
+          n = g_unichar_to_utf8(ch, buf);
+          buf[n] = '\0';
+          return n;
+        } else {
+          /* have nothing */
+          ;
+        }
       }
     }
-  }
-
-  /* we use conjoining jamo, U+1100 - U+11FF */
-  if (context_hangul->choseong == 0)
-    n = g_unichar_to_utf8(HCF, buf);
-  else
-    n = g_unichar_to_utf8(context_hangul->choseong, buf);
-  buf[n] = '\0';
-
-  if (context_hangul->jungseong == 0)
-    n += g_unichar_to_utf8(HJF, buf + n);
-  else
-    n += g_unichar_to_utf8(context_hangul->jungseong, buf + n);
-  buf[n] = '\0';
-
-  if (context_hangul->jongseong != 0) {
-    n += g_unichar_to_utf8(context_hangul->jongseong, buf + n);
-    buf[n] = '\0';
   }
 
 /*
@@ -749,35 +751,63 @@ im_hangul_commit(GtkIMContextHangul *context_hangul)
 {
   int n = 0;
   gchar buf[12];
-  gunichar ch;
  
-  ch = im_hangul_jamo_to_unicode(context_hangul->choseong,
-				 context_hangul->jungseong,
-	(context_hangul->jongseong)? context_hangul->jongseong : 0x11a7);
-
   buf[0] = '\0';
-  if (ch) {
-    n = g_unichar_to_utf8(ch, buf);
+
+  if (context_hangul->choseong == 0 && context_hangul->jungseong == 0 &&
+      context_hangul->jongseong == 0) {
+    return;
+  }
+
+  if (pref_use_hangul_jamo) {
+    /* we use conjoining jamo, U+1100 - U+11FF */
+    if (context_hangul->choseong == 0)
+      n = g_unichar_to_utf8(HCF, buf);
+    else
+      n = g_unichar_to_utf8(context_hangul->choseong, buf);
     buf[n] = '\0';
-    /* g_print("commit char: %s(U+%04x)\n", buf, ch); */
+ 
+    if (context_hangul->jungseong == 0)
+      n += g_unichar_to_utf8(HJF, buf + n);
+    else
+      n += g_unichar_to_utf8(context_hangul->jungseong, buf + n);
+    buf[n] = '\0';
+ 
+    if (context_hangul->jongseong != 0) {
+      n += g_unichar_to_utf8(context_hangul->jongseong, buf + n);
+      buf[n] = '\0';
+    }
   } else {
-    if (context_hangul->choseong) {
-      ch = im_hangul_choseong_to_unicode(context_hangul->choseong);
+    /* use hangul syllables (U+AC00 - U+D7AF)
+     * and compatibility jamo (U+3130 - U+318F) */
+    gunichar ch;
+    ch = im_hangul_jamo_to_unicode(context_hangul->choseong,
+          			 context_hangul->jungseong,
+          (context_hangul->jongseong)? context_hangul->jongseong : 0x11a7);
+ 
+    if (ch) {
       n = g_unichar_to_utf8(ch, buf);
       buf[n] = '\0';
-      /* g_print("commit char: %s(U+%x)\n", buf, ch); */
-    }
-    if (context_hangul->jungseong) {
-      ch = im_hangul_jungseong_to_unicode(context_hangul->jungseong);
-      n += g_unichar_to_utf8(ch, buf + n);
-      buf[n] = '\0';
-      /* g_print("commit char: %s(U+%x)\n", buf, ch); */
-    }
-    if (context_hangul->jongseong) {
-      ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
-      n += g_unichar_to_utf8(ch, buf + n);
-      buf[n] = '\0';
-      /* g_print("commit char: %s(U+%x)\n", buf, ch); */
+      /* g_print("commit char: %s(U+%04x)\n", buf, ch); */
+    } else {
+      if (context_hangul->choseong) {
+        ch = im_hangul_choseong_to_unicode(context_hangul->choseong);
+        n = g_unichar_to_utf8(ch, buf);
+        buf[n] = '\0';
+        /* g_print("commit char: %s(U+%x)\n", buf, ch); */
+      }
+      if (context_hangul->jungseong) {
+        ch = im_hangul_jungseong_to_unicode(context_hangul->jungseong);
+        n += g_unichar_to_utf8(ch, buf + n);
+        buf[n] = '\0';
+        /* g_print("commit char: %s(U+%x)\n", buf, ch); */
+      }
+      if (context_hangul->jongseong) {
+        ch = im_hangul_jongseong_to_unicode(context_hangul->jongseong);
+        n += g_unichar_to_utf8(ch, buf + n);
+        buf[n] = '\0';
+        /* g_print("commit char: %s(U+%x)\n", buf, ch); */
+      }
     }
   }
 
