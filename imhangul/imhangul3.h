@@ -114,7 +114,7 @@ struct combination {
   gunichar code;
 };
 
-static struct combination compose_table[] = {
+static struct combination compose_table_default[] = {
   { 0x11001100, 0x1101 }, /* choseong  kiyeok + kiyeok  = ssangkiyeok	*/
   { 0x11031103, 0x1104 }, /* choseong  tikeut + tikeut  = ssangtikeut	*/
   { 0x11071107, 0x1108 }, /* choseong  pieup  + pieup   = ssangpieup 	*/
@@ -142,7 +142,10 @@ static struct combination compose_table[] = {
   { 0x11ba11ba, 0x11bb }, /* jongseong sios   + sios    = ssangsios	*/
 };
 
-gunichar
+static int compose_table_size = G_N_ELEMENTS(compose_table_default);
+static struct combination *compose_table = compose_table_default;
+
+static gunichar
 im_hangul_compose(gunichar first, gunichar last)
 {
   int min, max, mid;
@@ -153,7 +156,7 @@ im_hangul_compose(gunichar first, gunichar last)
 
   /* binary search in table */
   min = 0;
-  max = G_N_ELEMENTS(compose_table) - 1;
+  max = compose_table_size - 1;
 
   while (max >= min) {
     mid = (min + max) / 2;

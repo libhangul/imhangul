@@ -108,7 +108,7 @@ static const gunichar keyboard_table_3final[] = {
   0x11b9,	/* GDK_X:		jongseong pieup-sios		*/
   0x0035,	/* GDK_Y:		5				*/
   0x11be,	/* GDK_Z:		jongseong chieuch		*/
-  0x0029,	/* GDK_bracketleft:	left parenthesis		*/
+  0x0028,	/* GDK_bracketleft:	left parenthesis		*/
   0x003a,	/* GDK_backslash:	colon				*/
   0x003c,	/* GDK_bracketright:	less-than sign			*/
   0x003d,	/* GDK_asciicircum:	equals sign			*/
@@ -176,14 +176,6 @@ im_module_create (const gchar *context_id)
       im_hangul_set_automata(context_hangul, im_hangul3_automata);
 
       keyboard_table = keyboard_table_3final;
-
-//      im_hangul3_choseong = im_hangul3_choseong_final;
-//      im_hangul3_jungseong = im_hangul3_jungseong_final;
-//      im_hangul3_jongseong = im_hangul3_jongseong_final;
-//      im_hangul3_punct = im_hangul3_punct_final;
-//      im_hangul3_comp_choseong = im_hangul3_comp_choseong_final;
-//      im_hangul3_comp_jungseong = im_hangul3_comp_jungseong_final;
-//      im_hangul3_comp_jongseong = im_hangul3_comp_jongseong_final;
 
       return context;
     }
