@@ -4,8 +4,8 @@
 EXTRA_DIST = test.sh gtkrc hanjatable.py
 
 # now we use @GTK_BINARY_VERSION@ string
-# moduledir = @GTK_PREFIX@/lib/gtk-2.0/immodules
-moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
+# moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
+moduledir = @GTK_PREFIX@/lib/gtk-2.0/immodules
 
 GTK_IMMODULES = $(sysconfdir)/gtk-2.0/gtk.immodules
 

@@ -39,8 +39,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr( 0755, root, root )
-%{gtk_prefix}/lib/gtk-2.0/%{gtk_binver}/immodules/*.la
-%{gtk_prefix}/lib/gtk-2.0/%{gtk_binver}/immodules/*.so
+%{gtk_prefix}/lib/gtk-2.0/immodules/*.so
+%{gtk_prefix}/lib/gtk-2.0/immodules/*.la
 
 %doc COPYING ChangeLog INSTALL TODO
 
