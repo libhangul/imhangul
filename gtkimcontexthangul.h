@@ -29,6 +29,7 @@ extern GType gtk_type_im_context_hangul;
 
 #define GTK_TYPE_IM_CONTEXT_HANGUL	gtk_type_im_context_hangul
 #define GTK_IM_CONTEXT_HANGUL(obj)	(GTK_CHECK_CAST ((obj), GTK_TYPE_IM_CONTEXT_HANGUL, GtkIMContextHangul))
+#define GTK_IS_IM_CONTEXT_HANGUL(obj)   (GTK_CHECK_TYPE ((obj), GTK_TYPE_IM_CONTEXT_HANGUL))
 
 typedef struct _GtkIMContextHangul	GtkIMContextHangul;
 typedef struct _GtkIMContextHangulClass	GtkIMContextHangulClass;

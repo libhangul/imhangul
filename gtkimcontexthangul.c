@@ -325,6 +325,8 @@ status_window_change (GtkSettings *settings, gpointer data)
   GSList *list;
   StatusWindow *status_window;
 
+  g_return_if_fail (GTK_IS_SETTINGS (settings));
+
   g_object_get (settings,
 		"gtk-im-hangul-status-window", &pref_use_status_window,
 		NULL);
@@ -346,6 +348,8 @@ preedit_style_change (GtkSettings *settings, GtkWidget *widget)
 {
   static GtkWidget *window = NULL;
   GtkStyle *style;
+
+  g_return_if_fail (GTK_IS_SETTINGS (settings));
 
   if (window == NULL)
     window = widget;
@@ -407,6 +411,8 @@ preedit_style_change (GtkSettings *settings, GtkWidget *widget)
 static void
 use_capslock_change (GtkSettings *settings, gpointer data)
 {
+  g_return_if_fail (GTK_IS_SETTINGS (settings));
+
   g_object_get (settings,
 		"gtk-im-hangul-use-capslock", &pref_use_capslock,
 		NULL);
@@ -415,6 +421,8 @@ use_capslock_change (GtkSettings *settings, gpointer data)
 static void
 use_dvorak_change (GtkSettings *settings, gpointer data)
 {
+  g_return_if_fail (GTK_IS_SETTINGS (settings));
+
   g_object_get (settings,
 		"gtk-im-hangul-use-dvorak", &pref_use_dvorak,
 		NULL);
@@ -422,19 +430,26 @@ use_dvorak_change (GtkSettings *settings, gpointer data)
 
 static void
 im_hangul_set_client_window (GtkIMContext *context,
-			    GdkWindow *client_window)
+			     GdkWindow *client_window)
 {
   GdkScreen *screen;
   GtkSettings *settings;
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  GtkIMContextHangul *hcontext;
+
+  g_return_if_fail (GTK_IS_IM_CONTEXT_HANGUL (context));
+  g_return_if_fail (GDK_IS_WINDOW (client_window));
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
   /* find toplevel window (GtkWidget) */
   hcontext->toplevel = get_toplevel_window (client_window);
 
   /* install settings */
   /* check whether installed or not */
-  screen = gdk_drawable_get_screen (client_window);
+  screen = gdk_drawable_get_screen (GDK_DRAWABLE (client_window));
   settings = gtk_settings_get_for_screen (screen);
+  g_return_if_fail (GTK_IS_SETTINGS (settings));
+
   if (!have_property (settings, "gtk-im-hangul-status-window"))
     {
       gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-status-window",
