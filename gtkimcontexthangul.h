@@ -1,5 +1,5 @@
-/* GTK - The GIMP Toolkit
- * Copyright (C) 2002 Choe Hwanjin
+/* ImHangul - Gtk+ 2.0 Input Method Module for Hangul
+ * Copyright (C) 2002,2003,2004 Choe Hwanjin
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -15,8 +15,6 @@
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * Author: Choe Hwanjin <krisna@kldp.org>
  */
 
 #ifndef __GTK_IM_CONTEXT_HANGUL_H__
