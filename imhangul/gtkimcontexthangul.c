@@ -347,18 +347,11 @@ status_window_change (GtkSettings *settings, gpointer data)
 static void
 preedit_style_change (GtkSettings *settings, GtkWidget *widget)
 {
-  static GtkWidget *window = NULL;
   GtkStyle *style;
 
   g_return_if_fail (GTK_IS_SETTINGS (settings));
 
-  if (window == NULL)
-    window = widget;
-
-  if (window == NULL)
-    return;
-
-  if (window->style == NULL)
+  if (!GTK_IS_WINDOW(widget))
     return;
 
   /* set preedit style attributes */
@@ -366,7 +359,7 @@ preedit_style_change (GtkSettings *settings, GtkWidget *widget)
 		"gtk-im-hangul-preedit-style", &pref_preedit_style,
 		NULL);
 
-  style = window->style;
+  style = widget->style;
   pref_fg.red   = style->text[GTK_STATE_NORMAL].red;
   pref_fg.green = style->text[GTK_STATE_NORMAL].green;
   pref_fg.blue  = style->text[GTK_STATE_NORMAL].blue;
