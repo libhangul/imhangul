@@ -1,4 +1,10 @@
 2003-01-12 (Sun) 16:00 Choe Hwanjin <krisna@kldp.org>
+	* imhangul2,32,39,3f,3s,3y.c를 모두 합쳐 imhangul.c 로 만들고
+	  공통 부분을 모두 gtkimcontexthangul.c,h 에 모아서 모듈 파일을 하나의
+	  object 파일로 만들어 버림
+	* 각부분에 const 키워드를 사용할 곳에 사용함
+
+2003-02-04 (Tue) 23:46 Choe Hwanjin <krisna@kldp.org>
 	* gen.py 를 hanjatable.py로 이름 바꿈
 	* imhangul.h,hanjatable.h,chartable.h: unicode_t를 사용하지 않고
 	  직접 gunichar를 사용
