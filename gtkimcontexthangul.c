@@ -1799,6 +1799,16 @@ get_toplevel_widget (GdkWindow *window)
   return gtk_toplevel;
 }
 
+static void
+on_toplevel_destroy(gpointer data)
+{
+  if (data != NULL) {
+    Toplevel *toplevel = (Toplevel*)data;
+    toplevel_delete(toplevel);
+    toplevels = g_slist_remove(toplevels, toplevel);
+  }
+}
+
 static Toplevel *
 toplevel_new(GtkWidget *toplevel_widget)
 {
@@ -1811,7 +1821,7 @@ toplevel_new(GtkWidget *toplevel_widget)
   toplevel->status = status_window_new(toplevel->widget);
   toplevel->destroy_handler_id = 
 	    g_signal_connect_swapped (G_OBJECT(toplevel->widget), "destroy",
-			     G_CALLBACK(toplevel_delete), toplevel);
+			     G_CALLBACK(on_toplevel_destroy), toplevel);
   toplevel->configure_handler_id = 
 	    g_signal_connect (G_OBJECT(toplevel->widget), "configure-event",
 			     G_CALLBACK(status_window_configure),
@@ -1820,8 +1830,6 @@ toplevel_new(GtkWidget *toplevel_widget)
 
   g_object_set_data(G_OBJECT(toplevel_widget),
 		     "gtk-imhangul-toplevel-info", toplevel);
-  toplevels = g_slist_prepend(toplevels, toplevel);
-
   return toplevel;
 }
 
@@ -1840,6 +1848,7 @@ toplevel_get(GdkWindow *window)
 			       "gtk-imhangul-toplevel-info");
   if (toplevel == NULL) {
     toplevel = toplevel_new(toplevel_widget);
+    toplevels = g_slist_prepend(toplevels, toplevel);
   }
 
   return toplevel;
@@ -1848,17 +1857,18 @@ toplevel_get(GdkWindow *window)
 static void
 toplevel_delete(Toplevel *toplevel)
 {
-  toplevels = g_slist_remove(toplevels, toplevel);
-  if (toplevel->status != NULL) {
-    gtk_widget_destroy(toplevel->status);
-    g_signal_handler_disconnect (toplevel->widget,
-				 toplevel->destroy_handler_id);
-    g_signal_handler_disconnect (toplevel->widget,
-				 toplevel->configure_handler_id);
+  if (toplevel != NULL) {
+    if (toplevel->status != NULL) {
+      gtk_widget_destroy(toplevel->status);
+      g_signal_handler_disconnect (toplevel->widget,
+				   toplevel->destroy_handler_id);
+      g_signal_handler_disconnect (toplevel->widget,
+				   toplevel->configure_handler_id);
+    }
+    g_object_set_data (G_OBJECT(toplevel->widget),
+		       "gtk-imhangul-toplevel-info", NULL);
+    g_free(toplevel);
   }
-  g_object_set_data (G_OBJECT(toplevel->widget),
-		     "gtk-imhangul-toplevel-info", NULL);
-  g_free(toplevel);
 }
 
 static int
