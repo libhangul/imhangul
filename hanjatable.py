@@ -2,7 +2,7 @@
 
 import sys, string
 
-char_type = 'gunichar'
+char_type = 'static const gunichar'
 copyright = ''
 
 def print_help():
