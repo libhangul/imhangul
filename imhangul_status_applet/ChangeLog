@@ -1,2 +1,9 @@
+2002-11-12 (Tue) 13:54:42  Choe Hwanjin  <krisna@kldp.org>
+	* src/Makefile.am: INCLUDE 에서 -I$(includedir)을 빼버림 (gnome1의
+	    헤더가 있을때 문제가 발생함)
+	* src/imhangul_status.c: add license text
+	* src/imhangul_status.c: theme selection window의 default size를 줌
+	* 새로운 테마 추가: MSWindows, Mac
+
 2002. 11. 10. (일) 21:56:59 KST
 	* 처음 내놓습니다
