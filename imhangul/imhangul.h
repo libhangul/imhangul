@@ -1294,8 +1294,7 @@ im_hangul_filter_keypress(GtkIMContext *context, GdkEventKey *key)
   }
 
   /* char table */
-  if (key->keyval == GDK_F3 || (
-      key->keyval == GDK_Hangul_Hanja && (key->state & GDK_CONTROL_MASK))) {
+  if (key->keyval == GDK_F3) {
     if (im_hangul_commit(hcontext))
       g_signal_emit_by_name (hcontext, "preedit_changed");
     popup_char_table_window(hcontext);
