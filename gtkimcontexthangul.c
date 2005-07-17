@@ -113,6 +113,8 @@ static void	im_hangul_ic_init		     (GtkIMContextHangul *hcontext);
 static void	im_hangul_ic_finalize	     (GObject *obj);
 
 static void	im_hangul_ic_reset           (GtkIMContext *context);
+static gboolean	im_hangul_ic_slave_filter_keypress (GtkIMContext *context,
+					      GdkEventKey  *key);
 static gboolean	im_hangul_ic_filter_keypress (GtkIMContext *context,
 					      GdkEventKey  *key);
 
@@ -157,6 +159,8 @@ static void	im_hangul_ic_clear_buf       (GtkIMContextHangul *hcontext);
 static gboolean	im_hangul_ic_commit	     (GtkIMContextHangul *hcontext);
 static void	im_hangul_ic_commit_unicode  (GtkIMContextHangul *hcontext,
 					      gunichar ch);
+static void     im_hangul_ic_commit_by_slave (GtkIMContext *context,
+					      gchar *str, gpointer data);
 static gboolean im_hangul_ic_process_nonhangul(GtkIMContextHangul *hcontext,
 					      GdkEventKey *key);
 
@@ -224,6 +228,9 @@ static GObjectClass *parent_class;
 static GSList	       *desktops = NULL;
 static GSList          *toplevels = NULL;
 
+static guint		snooper_handler_id = 0;
+static GtkIMContext    *current_focused_ic = NULL;
+
 static gint		output_mode = OUTPUT_MODE_SYLLABLE;
 
 /* preferences */
@@ -276,7 +283,7 @@ im_hangul_class_init (GtkIMContextHangulClass *klass)
   parent_class = g_type_class_peek_parent (klass);
 
   im_context_class->set_client_window = im_hangul_ic_set_client_window;
-  im_context_class->filter_keypress = im_hangul_ic_filter_keypress;
+  im_context_class->filter_keypress = im_hangul_ic_slave_filter_keypress;
   im_context_class->reset = im_hangul_ic_reset;
   im_context_class->focus_in = im_hangul_ic_focus_in;
   im_context_class->focus_out = im_hangul_ic_focus_out;
@@ -328,6 +335,10 @@ im_hangul_ic_init (GtkIMContextHangul *hcontext)
 {
   im_hangul_ic_clear_buf (hcontext);
 
+  hcontext->slave = gtk_im_context_simple_new();
+  g_signal_connect(G_OBJECT(hcontext->slave), "commit",
+		   G_CALLBACK(im_hangul_ic_commit_by_slave), hcontext);
+
   hcontext->client_window = NULL;
   hcontext->toplevel = NULL;
   hcontext->candidate = NULL;
@@ -351,6 +362,8 @@ static void
 im_hangul_ic_finalize (GObject *object)
 {
   G_OBJECT_CLASS(parent_class)->finalize (object);
+  if ((GObject*)current_focused_ic == object)
+    current_focused_ic = NULL;
 }
 
 static void
@@ -1110,6 +1123,8 @@ im_hangul_ic_focus_in (GtkIMContext *context)
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
   input_mode = im_hangul_ic_get_toplevel_input_mode(hcontext);
   im_hangul_set_input_mode(hcontext, input_mode);
+
+  current_focused_ic = context;
 }
 
 static inline void
@@ -1135,6 +1150,8 @@ im_hangul_ic_focus_out (GtkIMContext *context)
 
   im_hangul_ic_hide_status_window (hcontext);
   im_hangul_set_input_mode_info (hcontext->client_window, INPUT_MODE_INFO_NONE);
+  if (current_focused_ic == context)
+    current_focused_ic = NULL;
 }
 
 static void
@@ -1226,6 +1243,7 @@ static gboolean
 im_hangul_ic_process_nonhangul (GtkIMContextHangul *hcontext,
 			     GdkEventKey *key)
 {
+  return FALSE;
   if (!im_hangul_is_modifier (key->state))
     {
       gunichar ch = gdk_keyval_to_unicode (key->keyval);
@@ -1255,6 +1273,12 @@ im_hangul_handle_direct_mode (GtkIMContextHangul *hcontext,
       return TRUE;
     }
   return im_hangul_ic_process_nonhangul (hcontext, key);
+}
+
+static void
+im_hangul_ic_commit_by_slave (GtkIMContext *context, gchar *str, gpointer data)
+{
+  g_signal_emit_by_name (GTK_IM_CONTEXT_HANGUL(data), "commit", str);
 }
 
 static gboolean
@@ -1611,6 +1635,18 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
     im_hangul_candidate_commit(hcontext, ch);
 
   return TRUE;
+}
+
+static gboolean
+im_hangul_ic_slave_filter_keypress (GtkIMContext *context, GdkEventKey *key)
+{
+  GtkIMContextHangul *hcontext;
+
+  g_return_val_if_fail (context != NULL, FALSE);
+  g_return_val_if_fail (key != NULL, FALSE);
+
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
+  return gtk_im_context_filter_keypress(hcontext->slave, key);
 }
 
 /* use hangul composer */
@@ -2016,10 +2052,42 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
     }
 }
 
+static gint
+im_hangul_key_snooper(GtkWidget *widget, GdkEventKey *event, gpointer data)
+{
+  if (current_focused_ic != NULL) {
+    /* Some keys like return, tab, ':' is usually used for auto completion or
+     * commiting some changes. Some application programmers make the program
+     * catch the key before the im module getting the key and check that it is 
+     * return or tab or so. Then the program get the string from the text entry
+     * or textview, so there is no chance for im module to commit the current
+     * string. So in this case, we catch it first and process the filter
+     * function of the input context. Then mostly imhangul will work fine,
+     * I think :) */
+    return im_hangul_ic_filter_keypress(current_focused_ic, event);
+  }
+
+  return FALSE;
+}
+
+void
+im_hangul_init(void)
+{
+  /* install gtk key snooper
+   * this is work around code for the problem:
+   *   http://bugzilla.gnome.org/show_bug.cgi?id=62948
+   * I finally decided to install key snooper and catch the keys before the
+   * widget getting it. */
+  snooper_handler_id = gtk_key_snooper_install(im_hangul_key_snooper, NULL);
+}
+
 void
 im_hangul_finalize (void)
 {
   GSList *item;
+
+  /* remove gtk key snooper */
+  gtk_key_snooper_remove(snooper_handler_id);
 
   /* remove toplevel info */
   for (item = toplevels; item != NULL; item = g_slist_next(item)) {

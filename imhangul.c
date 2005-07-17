@@ -98,6 +98,7 @@ void
 im_module_init (GTypeModule *type_module)
 {
   gtk_im_context_hangul_register_type (type_module);
+  im_hangul_init();
 }
 
 void

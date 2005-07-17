@@ -47,6 +47,9 @@ struct _GtkIMContextHangul
 {
   GtkIMContext object;
 
+  /* default input module: simple */
+  GtkIMContext *slave;
+
   /* hangul keyboard information */
   IMHangulComposer composer;
   const gunichar *keyboard_table;
@@ -88,6 +91,7 @@ struct _IMHangulCombination
 };
 
 void          gtk_im_context_hangul_register_type (GTypeModule *type_module);
+void          im_hangul_init (void);
 void          im_hangul_finalize (void);
 
 GtkIMContext *gtk_im_context_hangul_new      (void);

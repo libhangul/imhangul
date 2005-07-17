@@ -1,3 +1,12 @@
+2005-07-17  Choe Hwanjin <choe.hwanjin@gmail.com>
+	* imhangul.c, gtkimcontext.{h,c}: GtkIMContextHangul을 인자로 받는
+	  함수는 모두 im_hangul_ic prefix를 붙임, 그외의 함수는 im_hangul을
+	  prefix로 사용함
+	* imhangul.{h,c}, gtkimcontext.{h,c}: GtkKeySnooperFunc을 등록하여 그
+	  안에서 먼저 filter_keypress 함수를 실행
+	  Slave를 도입하여 simple immodule을 slave로 생성하고 실제
+	  filter_keypress 함수에서는 slave의 filter 함수를 호출
+
 2004-08-26  Choe Hwanjin <krisna@kldp.org>
 	* gtkimcontexthangul.c: candidate window에서 한페이지에 9개 표시
 
@@ -52,13 +61,13 @@
 	* gtkimcontexthangul.c: get_toplevel_window 함수를 다시 구현
 
 2003-11-27  Choe Hwanjin  <krisna@people.kldp.org>
-        * gtkimcontexthangul.c, gtkimcontexthangul.h:
-          set_cursor_location method 구현,
+	* gtkimcontexthangul.c, gtkimcontexthangul.h:
+	  set_cursor_location method 구현,
 	  candidate window를 커서 위치 근처에 표 현
-        * gtkimcontexthangul.c: remove period in hanja candidate window
- 
+	* gtkimcontexthangul.c: remove period in hanja candidate window
+
 2003-11-23  Choe Hwanjin  <krisna@people.kldp.org>
-        * NEWS, TODO: 문서 업데이트
+	* NEWS, TODO: 문서 업데이트
 
 2003-11-20  Choe Hwanjin  <krisna@people.kldp.org>
 	* release 0.9.8
