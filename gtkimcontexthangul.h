@@ -88,9 +88,9 @@ struct _IMHangulCombination
 };
 
 void          gtk_im_context_hangul_register_type (GTypeModule *type_module);
+void          im_hangul_finalize (void);
 
 GtkIMContext *gtk_im_context_hangul_new      (void);
-void          gtk_im_context_hangul_shutdown (void);
 
 /* configuration */
 void gtk_im_context_hangul_set_composer       (GtkIMContextHangul        *hcontext,

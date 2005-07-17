@@ -103,7 +103,7 @@ im_module_init (GTypeModule *type_module)
 void
 im_module_exit (void)
 {
-  gtk_im_context_hangul_shutdown ();
+  im_hangul_finalize ();
 }
 
 void
