@@ -361,6 +361,18 @@ im_hangul_ic_init (GtkIMContextHangul *hcontext)
 static void
 im_hangul_ic_finalize (GObject *object)
 {
+  GtkIMContextHangul *hic = GTK_IM_CONTEXT_HANGUL(object);
+
+  if (hic->toplevel != NULL)
+    toplevel_remove_context(hic->toplevel, hic);
+
+  gtk_im_context_reset(hic->slave);
+  g_signal_handlers_disconnect_by_func(hic->slave,
+				       im_hangul_ic_commit_by_slave,
+				       object);
+  g_object_unref(G_OBJECT(hic->slave));
+  hic->slave = NULL;
+
   G_OBJECT_CLASS(parent_class)->finalize (object);
   if ((GObject*)current_focused_ic == object)
     current_focused_ic = NULL;
@@ -1243,7 +1255,8 @@ static gboolean
 im_hangul_ic_process_nonhangul (GtkIMContextHangul *hcontext,
 			     GdkEventKey *key)
 {
-  return FALSE;
+  /* Now, we do not process other keys. We just return this key event to
+   * the default input module, simple. so do not use the routine below:
   if (!im_hangul_is_modifier (key->state))
     {
       gunichar ch = gdk_keyval_to_unicode (key->keyval);
@@ -1258,6 +1271,7 @@ im_hangul_ic_process_nonhangul (GtkIMContextHangul *hcontext,
 	  return TRUE;
 	} 
     }
+  */
   return FALSE;
 }
 
@@ -2064,6 +2078,7 @@ im_hangul_key_snooper(GtkWidget *widget, GdkEventKey *event, gpointer data)
      * string. So in this case, we catch it first and process the filter
      * function of the input context. Then mostly imhangul will work fine,
      * I think :) */
+    //printf("%s: \n", __func__);
     return im_hangul_ic_filter_keypress(current_focused_ic, event);
   }
 
@@ -2087,13 +2102,17 @@ im_hangul_finalize (void)
   GSList *item;
 
   /* remove gtk key snooper */
-  gtk_key_snooper_remove(snooper_handler_id);
+  if (snooper_handler_id > 0) {
+    gtk_key_snooper_remove(snooper_handler_id);
+    snooper_handler_id = 0;
+  }
 
   /* remove toplevel info */
   for (item = toplevels; item != NULL; item = g_slist_next(item)) {
     toplevel_delete((Toplevel*)item->data);
   }
   g_slist_free(toplevels);
+  toplevels = NULL;
 
   /* remove desktop info */
   for (item = desktops; item != NULL; item = g_slist_next(item)) {
@@ -2113,6 +2132,7 @@ im_hangul_finalize (void)
     g_free(info);
   }
   g_slist_free(desktops);
+  desktops = NULL;
 }
 
 /* composer functions (automata) */
