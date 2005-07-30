@@ -1,3 +1,6 @@
+2005-07-30  Choe Hwanjin <choe.hwanjin@gmail.com>
+	* im_hangul_ic_finalize 함수에서 toplevel 데이터 정리
+
 2005-07-17  Choe Hwanjin <choe.hwanjin@gmail.com>
 	* imhangul.c, gtkimcontext.{h,c}: GtkIMContextHangul을 인자로 받는
 	  함수는 모두 im_hangul_ic prefix를 붙임, 그외의 함수는 im_hangul을

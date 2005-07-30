@@ -1,3 +1,24 @@
+0.9.12
+ * gaim등에서 마지막 글자를 잃어버리는 문제 해결
+
+0.9.11
+ * Epiphany등 여러 프로그램에서 창을 닫을 때 죽던 문제 해결
+
+0.9.10
+ * 입력기 메뉴를 한글로 번역
+ * 기존에는 한 애플리케이션에서 한영 상태는 하나만 있었지만, 이제는 toplevel
+   윈도우마다 한영 상태를 따로 저장
+ * 한자 입력시 설명이 보임
+   나비에서 작업한 한자 파일을 이용한 것입니다.
+ * configure 스크립트에서 ${sysconfdir}을 지정하지 않으면 기본 gtk library의
+   파일을 찾아서 업데이트 해줌
+ * gtk의 기본 입력기 설정을 imhangul로 하는 부분 추가함
+   configure 할때 옵션 --with-default-keyboard=2/39/3f을 지정하면
+   ${sysconfdir}/gtk-2.0/gtk.immodules 파일에 locale  ko 일때 기본 모듈을
+   설정할수 있습니다. 이렇게 되면  GTK_IM_MODULE 환경 변수가 없을때에도
+   imhangul이 기본으로 로딩되게 됩니다.
+ * evolution 1.5 메일 편집기 부분에서 입력 문제 해결
+
 0.9.9
   - evolution에서 발생하는 버그 해결
   - 한자 기호 입력 창 위치를 커서 위치에 둠
