@@ -1,3 +1,8 @@
+2005-08-31  Choe Hwanjin <choe.hwanjin@gmail.com>
+	* gtkimcontexthangul.c(im_hangul_get_preedit_string):
+	  여기서 리턴하는 cursor_pos 값은 byte단위가 아니라 character 단위이므로
+	  cursor_pos에 g_utf8_strlen()을 이용해서 대입함
+
 2005-07-30  Choe Hwanjin <choe.hwanjin@gmail.com>
 	* im_hangul_ic_finalize 함수에서 toplevel 데이터 정리
 	* Release 0.9.12

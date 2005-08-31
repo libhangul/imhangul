@@ -1115,7 +1115,7 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
 
   if (cursor_pos)
     {
-      *cursor_pos = len;
+      *cursor_pos = g_utf8_strlen(buf, -1);
     }
 
   if (str)
