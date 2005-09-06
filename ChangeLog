@@ -1,3 +1,7 @@
+2005-09-06  Choe Hwanjin <choe.hwanjin@gmail.com>
+	* imhangul.spec.in: License 항목 추가, mo 파일 목록에 추가.
+	  SungHyun Nam 님에게 감사드립니다.
+
 2005-08-31  Choe Hwanjin <choe.hwanjin@gmail.com>
 	* gtkimcontexthangul.c(im_hangul_get_preedit_string):
 	  여기서 리턴하는 cursor_pos 값은 byte단위가 아니라 character 단위이므로
