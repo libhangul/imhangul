@@ -1,3 +1,9 @@
+2005-09-08  Choe Hwanjin <choe.hwanjin@gmail.com>
+	* gtkimcontexthangul.c: 더이상 gtkrc를 설정파일로 사용하지 않고
+	  $HOME/.imhangul.conf 파일을 로딩하는 루틴을 만들어 넣음
+	  새로운 설정파일에 맞게 preedit style을 처리하는 루틴을 개선
+	* imhangul.conf: 새로운 설정 파일 예시 추가
+
 2005-09-06  Choe Hwanjin <choe.hwanjin@gmail.com>
 	* imhangul.spec.in: License 항목 추가, mo 파일 목록에 추가.
 	  SungHyun Nam 님에게 감사드립니다.

@@ -165,13 +165,26 @@ static gboolean im_hangul_ic_process_nonhangul(GtkIMContextHangul *hcontext,
 					      GdkEventKey *key);
 
 /* for feedback (preedit attribute) */
-static void	im_hangul_preedit_underline  (PangoAttrList **attrs,
+static void	im_hangul_preedit_underline  (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
 					      gint start, gint end);
-static void	im_hangul_preedit_foreground (PangoAttrList **attrs,
+static void	im_hangul_preedit_reverse    (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
 					      gint start, gint end);
-static void	im_hangul_preedit_background (PangoAttrList **attrs,
+static void	im_hangul_preedit_shade      (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
 					      gint start, gint end);
-static void	im_hangul_preedit_nothing    (PangoAttrList **attrs,
+static void	im_hangul_preedit_foreground (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
+					      gint start, gint end);
+static void	im_hangul_preedit_background (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
+					      gint start, gint end);
+static void	im_hangul_preedit_color      (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
+					      gint start, gint end);
+static void	im_hangul_preedit_normal     (GtkIMContextHangul *hic,
+					      PangoAttrList **attrs,
 					      gint start, gint end);
 
 static void     im_hangul_ic_show_status_window     (GtkIMContextHangul *hcontext);
@@ -225,7 +238,6 @@ GType gtk_type_im_context_hangul = 0;
 /* static variables for hangul immodule */
 static GObjectClass *parent_class;
 
-static GSList	       *desktops = NULL;
 static GSList          *toplevels = NULL;
 
 static guint		snooper_handler_id = 0;
@@ -238,13 +250,225 @@ static gboolean		pref_use_capslock = FALSE;
 static gboolean		pref_use_status_window = FALSE;
 static gboolean		pref_use_dvorak = FALSE;
 static gboolean		pref_use_manual_mode = FALSE;
-static gint		pref_preedit_style = 0;
-static void		(*im_hangul_preedit_attr)(PangoAttrList **attrs,
+static gboolean		pref_use_preedit_string = TRUE;
+static void		(*im_hangul_preedit_attr)(GtkIMContextHangul *hic,
+						  PangoAttrList **attrs,
 						  gint start,
 						  gint end) =
 						im_hangul_preedit_foreground;
-static GdkColor		pref_fg = { 0, 0, 0, 0 };
+static GdkColor		pref_fg = { 0, 0xeeee, 0, 0 };
 static GdkColor		pref_bg = { 0, 0xFFFF, 0xFFFF, 0xFFFF };
+
+/* scanner */
+static const GScannerConfig im_hangul_scanner_config = {
+    (
+     " \t\r\n"
+    )                    /* cset_skip_characters */,
+    (
+     G_CSET_a_2_z
+     "_"
+     G_CSET_A_2_Z
+    )                    /* cset_identifier_first */,
+    (
+     G_CSET_a_2_z
+     "_"
+     G_CSET_A_2_Z
+     G_CSET_DIGITS
+     G_CSET_LATINS
+     G_CSET_LATINC
+    )                    /* cset_identifier_nth */,
+    ( "#\n" )             /* cpair_comment_single */,
+
+    FALSE                 /* case_sensitive */,
+
+    TRUE                  /* skip_comment_multi */,
+    TRUE                  /* skip_comment_single */,
+    TRUE                  /* scan_comment_multi */,
+    TRUE                  /* scan_identifier */,
+    FALSE                 /* scan_identifier_1char */,
+    FALSE                 /* scan_identifier_NULL */,
+    TRUE                  /* scan_symbols */,
+    FALSE                 /* scan_binary */,
+    TRUE                  /* scan_octal */,
+    TRUE                  /* scan_float */,
+    TRUE                  /* scan_hex */,
+    FALSE                 /* scan_hex_dollar */,
+    TRUE                  /* scan_string_sq */,
+    TRUE                  /* scan_string_dq */,
+    TRUE                  /* numbers_2_int */,
+    FALSE                 /* int_2_float */,
+    FALSE                 /* identifier_2_string */,
+    TRUE                  /* char_2_token */,
+    TRUE                  /* symbol_2_token */,
+    FALSE                 /* scope_0_fallback */,
+    FALSE                 /* store_int64 */,
+};
+
+enum {
+    TOKEN_FALSE = G_TOKEN_LAST,
+    TOKEN_TRUE,
+    TOKEN_ENABLE_STATUS_WINDOW,
+    TOKEN_ENABLE_PREEDIT,
+    TOKEN_ENABLE_CAPSLOCK,
+    TOKEN_PREEDIT_STYLE,
+    TOKEN_PREEDIT_STYLE_FG,
+    TOKEN_PREEDIT_STYLE_BG
+};
+
+static const struct {
+    char *name;
+    guint token;
+} symbols[] = {
+    { "false", TOKEN_FALSE },
+    { "true", TOKEN_TRUE },
+    { "off", TOKEN_FALSE },
+    { "on", TOKEN_TRUE },
+    { "enable_status_window", TOKEN_ENABLE_STATUS_WINDOW },
+    { "enable_preedit", TOKEN_ENABLE_PREEDIT },
+    { "enable_capslock", TOKEN_ENABLE_CAPSLOCK },
+    { "preedit_style", TOKEN_PREEDIT_STYLE },
+    { "preedit_style_fg", TOKEN_PREEDIT_STYLE_FG },
+    { "preedit_style_bg", TOKEN_PREEDIT_STYLE_BG }
+};
+
+static void
+set_preedit_style (const char *style)
+{
+    if (style == NULL) {
+	im_hangul_preedit_attr = im_hangul_preedit_foreground;
+	return;
+    }
+
+    if (g_ascii_strcasecmp(style, "underline") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_underline;
+    } else if (g_ascii_strcasecmp(style, "reverse") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_reverse;
+    } else if (g_ascii_strcasecmp(style, "shade") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_shade;
+    } else if (g_ascii_strcasecmp(style, "foreground") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_foreground;
+    } else if (g_ascii_strcasecmp(style, "background") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_background;
+    } else if (g_ascii_strcasecmp(style, "color") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_color;
+    } else if (g_ascii_strcasecmp(style, "normal") == 0) {
+	im_hangul_preedit_attr = im_hangul_preedit_normal;
+    } else {
+	im_hangul_preedit_attr = im_hangul_preedit_foreground;
+    }
+}
+
+void im_hangul_config_parser(void)
+{
+    int i;
+    int fd;
+    FILE *file;
+    GScanner *scanner;
+    const gchar *env_conf_file;
+    gchar *conf_file = NULL; 
+    guint type;
+    GTokenValue value;
+    char *str;
+
+    env_conf_file = g_getenv("IM_HANGUL_CONF_FILE");
+    if (env_conf_file == NULL) {
+	const gchar *homedir = g_get_home_dir();
+	if (homedir == NULL)
+	    return;
+
+	conf_file = g_build_filename(homedir, ".imhangul.conf", NULL);
+    } else {
+	conf_file = g_strdup(env_conf_file);
+    }
+
+    file = fopen(conf_file, "r");
+    g_free(conf_file);
+    if (file == NULL)
+	return;
+
+    fd = fileno(file);
+    scanner = g_scanner_new(&im_hangul_scanner_config);
+    g_scanner_input_file(scanner, fd);
+
+    for (i = 0; i < G_N_ELEMENTS (symbols); i++) {
+	g_scanner_scope_add_symbol(scanner, 0,
+			   symbols[i].name, GINT_TO_POINTER(symbols[i].token));
+    }
+
+    do {
+	type = g_scanner_get_next_token(scanner);
+	if (type == TOKEN_ENABLE_PREEDIT) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == TOKEN_TRUE) {
+		    pref_use_preedit_string = TRUE;
+		} else {
+		    pref_use_preedit_string = FALSE;
+		}
+	    }
+	} else if (type == TOKEN_ENABLE_STATUS_WINDOW) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == TOKEN_TRUE) {
+		    pref_use_status_window = TRUE;
+		} else {
+		    pref_use_status_window = FALSE;
+		}
+	    }
+	} else if (type == TOKEN_ENABLE_CAPSLOCK) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == TOKEN_TRUE) {
+		    pref_use_capslock = TRUE;
+		} else {
+		    pref_use_capslock = FALSE;
+		}
+	    }
+	} else if (type == TOKEN_PREEDIT_STYLE) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == G_TOKEN_IDENTIFIER) {
+		    value = g_scanner_cur_value(scanner);
+		    str = value.v_identifier;
+		    set_preedit_style(str);
+		}
+	    }
+	} else if (type == TOKEN_PREEDIT_STYLE_FG) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == G_TOKEN_STRING) {
+		    value = g_scanner_cur_value(scanner);
+		    str = value.v_identifier;
+		    gdk_color_parse(str, &pref_fg);
+		}
+	    }
+	} else if (type == TOKEN_PREEDIT_STYLE_BG) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == G_TOKEN_STRING) {
+		    value = g_scanner_cur_value(scanner);
+		    str = value.v_identifier;
+		    gdk_color_parse(str, &pref_bg);
+		}
+	    }
+	} else {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+	    }
+	}
+    } while (!g_scanner_eof(scanner));
+
+    g_scanner_destroy(scanner);
+
+    fclose(file);
+}
 
 void
 gtk_im_context_hangul_register_type (GTypeModule *type_module)
@@ -266,12 +490,6 @@ gtk_im_context_hangul_register_type (GTypeModule *type_module)
 				   GTK_TYPE_IM_CONTEXT,
 				   "GtkIMContextHangul",
 				   &im_context_hangul_info, 0);
-}
-
-static gboolean
-have_property (GtkSettings *settings, const gchar* str)
-{
-  return (g_object_class_find_property (G_OBJECT_GET_CLASS (settings), str) != NULL);
 }
 
 static void 
@@ -379,156 +597,9 @@ im_hangul_ic_finalize (GObject *object)
 }
 
 static void
-status_window_change (GtkSettings *settings, gpointer data)
-{
-  GSList *list;
-  Toplevel *toplevel;
-
-  g_return_if_fail (GTK_IS_SETTINGS (settings));
-
-  g_object_get (settings,
-		"gtk-im-hangul-status-window", &pref_use_status_window,
-		NULL);
-
-  list = toplevels;
-  if (!pref_use_status_window) {
-    while (list != NULL) {
-      toplevel = (Toplevel*)(list->data);
-      if (toplevel->status != NULL)
-	gtk_widget_hide (toplevel->status);
-      list = list->next;
-    }
-  }
-}
-
-static void
-preedit_style_change (GtkSettings *settings, GtkWidget *widget)
-{
-  GtkStyle *style;
-
-  g_return_if_fail (GTK_IS_SETTINGS (settings));
-
-  if (GTK_IS_WIDGET(widget))
-    style = widget->style;
-  else
-    style = gtk_widget_get_default_style ();
-
-  /* set preedit style attributes */
-  g_object_get (settings,
-		"gtk-im-hangul-preedit-style", &pref_preedit_style,
-		NULL);
-
-  switch (pref_preedit_style)
-    {
-    case 0:
-      im_hangul_preedit_attr = im_hangul_preedit_underline;
-      break;
-    case 1:
-      im_hangul_preedit_attr = im_hangul_preedit_foreground;
-      break;
-    case 2:
-      pref_fg.red   = style->base[GTK_STATE_NORMAL].red;
-      pref_fg.green = style->base[GTK_STATE_NORMAL].green;
-      pref_fg.blue  = style->base[GTK_STATE_NORMAL].blue;
-      pref_bg.red   = style->text[GTK_STATE_NORMAL].red;
-      pref_bg.green = style->text[GTK_STATE_NORMAL].green;
-      pref_bg.blue  = style->text[GTK_STATE_NORMAL].blue;
-      im_hangul_preedit_attr = im_hangul_preedit_background;
-      break;
-    case 3:
-      pref_fg.red   = style->text[GTK_STATE_NORMAL].red;
-      pref_fg.green = style->text[GTK_STATE_NORMAL].green;
-      pref_fg.blue  = style->text[GTK_STATE_NORMAL].blue;
-      pref_bg.red   = (style->base[GTK_STATE_NORMAL].red   * 80 + 
-		       style->text[GTK_STATE_NORMAL].red   * 20) / 100;
-      pref_bg.green = (style->base[GTK_STATE_NORMAL].green * 80 + 
-		       style->text[GTK_STATE_NORMAL].green * 20) / 100;
-      pref_bg.blue  = (style->base[GTK_STATE_NORMAL].blue  * 80 + 
-		       style->text[GTK_STATE_NORMAL].blue  * 20) / 100;
-      im_hangul_preedit_attr = im_hangul_preedit_background;
-      break;
-    case 4:
-      im_hangul_preedit_attr = im_hangul_preedit_nothing;
-      break;
-    default:
-      im_hangul_preedit_attr = im_hangul_preedit_foreground;
-      break;
-    }
-}
-
-static void
-use_capslock_change (GtkSettings *settings, gpointer data)
-{
-  g_return_if_fail (GTK_IS_SETTINGS (settings));
-
-  g_object_get (settings,
-		"gtk-im-hangul-use-capslock", &pref_use_capslock,
-		NULL);
-}
-
-static void
-use_manual_mode_change (GtkSettings *settings, gpointer data)
-{
-  g_return_if_fail (GTK_IS_SETTINGS (settings));
-
-  g_object_get (settings,
-		"gtk-im-hangul-use-manual-mode", &pref_use_manual_mode,
-		NULL);
-}
-
-
-static void
-use_dvorak_change (GtkSettings *settings, gpointer data)
-{
-  g_return_if_fail (GTK_IS_SETTINGS (settings));
-
-  g_object_get (settings,
-		"gtk-im-hangul-use-dvorak", &pref_use_dvorak,
-		NULL);
-}
-
-static DesktopInfo*
-find_desktop (GdkScreen *screen)
-{
-  GSList *item;
-  DesktopInfo *desktop_info;
-
-  item = desktops;
-  while (item != NULL)
-    {
-      desktop_info = (DesktopInfo*)(item->data);
-      if (desktop_info->screen == screen)
-	return desktop_info;
-      item = item->next;
-    }
-  return NULL;
-}
-
-static DesktopInfo*
-add_desktop (GdkScreen *screen)
-{
-  DesktopInfo *desktop_info = find_desktop (screen);
-
-  if (desktop_info == NULL)
-    {
-      desktop_info = g_new0 (DesktopInfo, 1);
-      desktop_info->screen = screen;
-      desktop_info->settings = gtk_settings_get_for_screen (screen);
-      desktops = g_slist_prepend (desktops, desktop_info);
-    }
-
-  return desktop_info;
-}
-
-static void
 im_hangul_ic_set_client_window (GtkIMContext *context,
 			     GdkWindow *client_window)
 {
-  GdkScreen *screen;
-  GtkSettings *settings;
-  GtkWidget *widget = NULL;
-  gpointer ptr;
-  DesktopInfo *desktop_info;
   GtkIMContextHangul *hcontext;
 
   g_return_if_fail (context != NULL);
@@ -551,90 +622,6 @@ im_hangul_ic_set_client_window (GtkIMContext *context,
   hcontext->client_window = client_window;
   hcontext->toplevel = toplevel_get (client_window);
   toplevel_append_context(hcontext->toplevel, hcontext);
-
-  gdk_window_get_user_data (client_window, &ptr);
-  memcpy(&widget, &ptr, sizeof(widget));
-
-  /* install settings */
-  /* check whether installed or not */
-  screen = gdk_drawable_get_screen (GDK_DRAWABLE (client_window));
-  desktop_info = add_desktop (screen);
-  settings = desktop_info->settings;
-  g_return_if_fail (GTK_IS_SETTINGS (settings));
-
-  if (!have_property (settings, "gtk-im-hangul-status-window"))
-    {
-      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-status-window",
-							   "Status Window",
-							   "Whether to show status window or not",
-							   FALSE,
-							   G_PARAM_READWRITE));
-      desktop_info->status_window_cb =
-	g_signal_connect (G_OBJECT(settings),
-			  "notify::gtk-im-hangul-status-window",
-			  G_CALLBACK(status_window_change),
-			  NULL);
-      status_window_change (settings, NULL);
-    }
-  if (!have_property (settings, "gtk-im-hangul-use-capslock"))
-    {
-      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-capslock",
-							   "Use Caps Lock",
-							   "Whether to use Caps Lock key for changing hangul output mode to Jamo or not",
-							   FALSE,
-							   G_PARAM_READWRITE));
-      desktop_info->use_capslock_cb =
-	g_signal_connect (G_OBJECT(settings),
-			  "notify::gtk-im-hangul-use-capslock",
-			  G_CALLBACK(use_capslock_change),
-			  NULL);
-      use_capslock_change (settings, NULL);
-    }
-  if (!have_property (settings, "gtk-im-hangul-use-dvorak"))
-    {
-      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-dvorak",
-							   "Dvorak Keyboard",
-							   "Whether to use dvorak keyboard or not",
-							   FALSE,
-							   G_PARAM_READWRITE));
-
-      desktop_info->use_dvorak_cb =
-	g_signal_connect (G_OBJECT(settings),
-			  "notify::gtk-im-hangul-use-dvorak",
-			  G_CALLBACK(use_dvorak_change),
-			  NULL);
-      use_dvorak_change (settings, NULL);
-    }
-  if (!have_property (settings, "gtk-im-hangul-preedit-style"))
-    {
-      gtk_settings_install_property (g_param_spec_int ("gtk-im-hangul-preedit-style",
-						       "Preedit Style",
-						       "Preedit string style",
-						       0,
-						       4,
-						       1,
-						       G_PARAM_READWRITE));
-      desktop_info->preedit_style_cb =
-	g_signal_connect (G_OBJECT(settings),
-			  "notify::gtk-im-hangul-preedit-style",
-			  G_CALLBACK(preedit_style_change),
-			  widget);
-      preedit_style_change (settings, widget);
-    }
-  if (!have_property (settings, "gtk-im-hangul-use-manual-mode"))
-    {
-      gtk_settings_install_property (g_param_spec_boolean ("gtk-im-hangul-use-manual-mode",
-						           "Use manual mode",
-						           "Whether use manual mode or not",
-						           FALSE,
-						           G_PARAM_READWRITE));
-      desktop_info->use_manual_mode_cb =
-	g_signal_connect (G_OBJECT(settings),
-			  "notify::gtk-im-hangul-use-manual-mode",
-			  G_CALLBACK(use_manual_mode_change),
-			  NULL);
-      use_manual_mode_change (settings, NULL);
-    }
 }
 
 GtkIMContext *
@@ -1045,31 +1032,120 @@ im_hangul_make_preedit_string (GtkIMContextHangul *hcontext, gchar *buf)
 }
 
 static void
-im_hangul_preedit_underline (PangoAttrList **attrs, gint start, gint end)
+im_hangul_preedit_underline (GtkIMContextHangul *hic,
+			     PangoAttrList **attrs, gint start, gint end)
+{
+    PangoAttribute *attr;
+
+    *attrs = pango_attr_list_new ();
+    attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+    attr->start_index = start;
+    attr->end_index = end;
+    pango_attr_list_insert (*attrs, attr);
+}
+
+static void
+im_hangul_preedit_reverse (GtkIMContextHangul *hic,
+			   PangoAttrList **attrs, gint start, gint end)
+{
+    static GdkColor default_base = { 0, 0xffff, 0xffff, 0xffff };
+    static GdkColor default_text = { 0, 0, 0, 0 };
+
+    PangoAttribute *attr;
+    GtkWidget *widget = NULL;
+    GdkColor *fg = &default_base;
+    GdkColor *bg = &default_text;
+
+    gdk_window_get_user_data(hic->client_window, (gpointer)&widget);
+    if (widget != NULL) {
+	GtkStyle *style = gtk_widget_get_style(widget);
+	fg = &style->base[GTK_STATE_NORMAL];
+	bg = &style->text[GTK_STATE_NORMAL];
+    }
+
+    *attrs = pango_attr_list_new ();
+    attr = pango_attr_foreground_new (fg->red, fg->green, fg->blue);
+    attr->start_index = start;
+    attr->end_index = end;
+    pango_attr_list_insert (*attrs, attr);
+
+    attr = pango_attr_background_new (bg->red, bg->green, bg->blue);
+    attr->start_index = start;
+    attr->end_index = end;
+    pango_attr_list_insert (*attrs, attr);
+}
+
+static void
+im_hangul_preedit_shade (GtkIMContextHangul *hic,
+			   PangoAttrList **attrs, gint start, gint end)
+{
+    static const GdkColor default_text = { 0, 0, 0, 0 };
+    static const GdkColor default_base = { 0, 0xffff * 90 / 100,
+					      0xffff * 90 / 100,
+					      0xffff * 90 / 100 };
+
+    PangoAttribute *attr;
+    GtkWidget *widget = NULL;
+    GdkColor fg = default_text;
+    GdkColor bg = default_base;
+
+    gdk_window_get_user_data(hic->client_window, (gpointer)&widget);
+    if (widget != NULL) {
+	GtkStyle *style = gtk_widget_get_style(widget);
+	if (style != NULL) {
+	    fg.red   = style->text[GTK_STATE_NORMAL].red;
+	    fg.green = style->text[GTK_STATE_NORMAL].green;
+	    fg.blue  = style->text[GTK_STATE_NORMAL].blue;
+	    bg.red   = (style->base[GTK_STATE_NORMAL].red   * 90 +
+			style->text[GTK_STATE_NORMAL].red   * 10) / 100;
+	    bg.green = (style->base[GTK_STATE_NORMAL].green * 90 +
+			style->text[GTK_STATE_NORMAL].green * 10) / 100;
+	    bg.blue  = (style->base[GTK_STATE_NORMAL].blue  * 90 +
+			style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
+	}
+    }
+
+    *attrs = pango_attr_list_new ();
+    attr = pango_attr_foreground_new (fg.red, fg.green, fg.blue);
+    attr->start_index = start;
+    attr->end_index = end;
+    pango_attr_list_insert (*attrs, attr);
+
+    attr = pango_attr_background_new (bg.red, bg.green, bg.blue);
+    attr->start_index = start;
+    attr->end_index = end;
+    pango_attr_list_insert (*attrs, attr);
+}
+
+static void
+im_hangul_preedit_foreground (GtkIMContextHangul *hic,
+			      PangoAttrList **attrs, gint start, gint end)
 {
   PangoAttribute *attr;
 
   *attrs = pango_attr_list_new ();
-  attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+  attr = pango_attr_foreground_new (pref_fg.red, pref_fg.green, pref_fg.blue);
   attr->start_index = start;
   attr->end_index = end;
   pango_attr_list_insert (*attrs, attr);
 }
 
 static void
-im_hangul_preedit_foreground (PangoAttrList **attrs, gint start, gint end)
+im_hangul_preedit_background (GtkIMContextHangul *hic,
+			      PangoAttrList **attrs, gint start, gint end)
 {
   PangoAttribute *attr;
 
   *attrs = pango_attr_list_new ();
-  attr = pango_attr_foreground_new (0xeeee, 0x0, 0x0);
+  attr = pango_attr_background_new (pref_bg.red, pref_bg.green, pref_bg.blue);
   attr->start_index = start;
   attr->end_index = end;
   pango_attr_list_insert (*attrs, attr);
 }
 
 static void
-im_hangul_preedit_background (PangoAttrList **attrs, gint start, gint end)
+im_hangul_preedit_color (GtkIMContextHangul *hic,
+		         PangoAttrList **attrs, gint start, gint end)
 {
   PangoAttribute *attr;
 
@@ -1086,7 +1162,8 @@ im_hangul_preedit_background (PangoAttrList **attrs, gint start, gint end)
 }
 
 static void
-im_hangul_preedit_nothing (PangoAttrList **attrs, gint start, gint end)
+im_hangul_preedit_normal (GtkIMContextHangul *hic,
+			  PangoAttrList **attrs, gint start, gint end)
 {
   /* we do nothing */
   *attrs = pango_attr_list_new ();
@@ -1110,7 +1187,7 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
 
   if (attrs)
     {
-      im_hangul_preedit_attr (attrs, 0, len);
+      im_hangul_preedit_attr (hcontext, attrs, 0, len);
     }
 
   if (cursor_pos)
@@ -2088,6 +2165,8 @@ im_hangul_key_snooper(GtkWidget *widget, GdkEventKey *event, gpointer data)
 void
 im_hangul_init(void)
 {
+  im_hangul_config_parser();
+
   /* install gtk key snooper
    * this is work around code for the problem:
    *   http://bugzilla.gnome.org/show_bug.cgi?id=62948
@@ -2113,26 +2192,6 @@ im_hangul_finalize (void)
   }
   g_slist_free(toplevels);
   toplevels = NULL;
-
-  /* remove desktop info */
-  for (item = desktops; item != NULL; item = g_slist_next(item)) {
-    DesktopInfo *info = (DesktopInfo*)(item->data);
-    im_hangul_set_input_mode_info_for_screen (info->screen,
-					      INPUT_MODE_INFO_NONE);
-    if (info->status_window_cb > 0)
-      g_signal_handler_disconnect (info->settings, info->status_window_cb);
-    if (info->use_capslock_cb > 0)
-      g_signal_handler_disconnect (info->settings, info->use_capslock_cb);
-    if (info->use_dvorak_cb > 0)
-      g_signal_handler_disconnect (info->settings, info->use_dvorak_cb);
-    if (info->preedit_style_cb > 0)
-      g_signal_handler_disconnect (info->settings, info->preedit_style_cb);
-    if (info->use_manual_mode_cb > 0)
-      g_signal_handler_disconnect (info->settings, info->use_manual_mode_cb);
-    g_free(info);
-  }
-  g_slist_free(desktops);
-  desktops = NULL;
 }
 
 /* composer functions (automata) */
@@ -3191,4 +3250,4 @@ candidate_delete(Candidate *candidate)
   g_free(candidate->label);
   g_free(candidate);
 }
-/* vim: set cindent sw=2 sts=2 ts=8 : */
+/* vim: set cindent sw=4 sts=4 ts=8 : */
