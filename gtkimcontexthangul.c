@@ -48,18 +48,6 @@ enum {
 
 typedef struct _CandidateItem CandidateItem;
 typedef struct _StatusWindow  StatusWindow;
-typedef struct _DesktopInfo   DesktopInfo;
-
-struct _DesktopInfo
-{
-  GdkScreen *screen;
-  GtkSettings *settings;
-  guint status_window_cb;
-  guint use_capslock_cb;
-  guint use_dvorak_cb;
-  guint preedit_style_cb;
-  guint use_manual_mode_cb;
-};
 
 struct _Toplevel
 {
@@ -336,10 +324,7 @@ set_preedit_style (const char *style)
 {
     if (style == NULL) {
 	im_hangul_preedit_attr = im_hangul_preedit_foreground;
-	return;
-    }
-
-    if (g_ascii_strcasecmp(style, "underline") == 0) {
+    } else if (g_ascii_strcasecmp(style, "underline") == 0) {
 	im_hangul_preedit_attr = im_hangul_preedit_underline;
     } else if (g_ascii_strcasecmp(style, "reverse") == 0) {
 	im_hangul_preedit_attr = im_hangul_preedit_reverse;

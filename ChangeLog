@@ -1,3 +1,8 @@
+2005-09-10  Choe Hwanjin <choe.hwanjin@gmail.com>
+	* gtkimcontexthangul.c: 사용하지 않는 DeskopInfo 스트럭쳐 선언 제거
+	* imhangul.conf: 빠진 설명 보충
+	* test.sh: IM_HANGUL_CONF_FILE 환경 변수 사용
+
 2005-09-08  Choe Hwanjin <choe.hwanjin@gmail.com>
 	* gtkimcontexthangul.c: 더이상 gtkrc를 설정파일로 사용하지 않고
 	  $HOME/.imhangul.conf 파일을 로딩하는 루틴을 만들어 넣음
