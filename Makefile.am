@@ -39,12 +39,12 @@ install-data-hook:
 		if test ! -d `dirname $(IM_HANGUL_GTK_IMMODULE_FILE)`; then \
 			$(mkinstalldirs) `dirname $(IM_HANGUL_GTK_IMMODULE_FILE)`; \
 		fi;\
-		gtk-query-immodules-2.0 > $(DESTDIR)$(IM_HANGUL_GTK_IMMODULE_FILE); \
+		gtk-query-immodules-2.0 > $(IM_HANGUL_GTK_IMMODULE_FILE); \
 	fi
 
 uninstall:
 	if test -z "$(DESTDIR)" ; then \
 		if test -f "$(IM_HANGUL_GTK_IMMODULE_FILE)"; then \
-			gtk-query-immodules-2.0 > $(DESTDIR)$(IM_HANGUL_GTK_IMMODULE_FILE); \
+			gtk-query-immodules-2.0 > $(IM_HANGUL_GTK_IMMODULE_FILE); \
 		fi \
 	fi
