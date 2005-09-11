@@ -298,6 +298,7 @@ enum {
     TOKEN_ENABLE_STATUS_WINDOW,
     TOKEN_ENABLE_PREEDIT,
     TOKEN_ENABLE_CAPSLOCK,
+    TOKEN_ENABLE_DVORAK,
     TOKEN_PREEDIT_STYLE,
     TOKEN_PREEDIT_STYLE_FG,
     TOKEN_PREEDIT_STYLE_BG
@@ -314,6 +315,7 @@ static const struct {
     { "enable_status_window", TOKEN_ENABLE_STATUS_WINDOW },
     { "enable_preedit", TOKEN_ENABLE_PREEDIT },
     { "enable_capslock", TOKEN_ENABLE_CAPSLOCK },
+    { "enable_dvorak", TOKEN_ENABLE_DVORAK },
     { "preedit_style", TOKEN_PREEDIT_STYLE },
     { "preedit_style_fg", TOKEN_PREEDIT_STYLE_FG },
     { "preedit_style_bg", TOKEN_PREEDIT_STYLE_BG }
@@ -410,6 +412,16 @@ void im_hangul_config_parser(void)
 		    pref_use_capslock = TRUE;
 		} else {
 		    pref_use_capslock = FALSE;
+		}
+	    }
+	} else if (type == TOKEN_ENABLE_DVORAK) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == TOKEN_TRUE) {
+		    pref_use_dvorak = TRUE;
+		} else {
+		    pref_use_dvorak = FALSE;
 		}
 	    }
 	} else if (type == TOKEN_PREEDIT_STYLE) {
