@@ -2152,7 +2152,6 @@ im_hangul_key_snooper(GtkWidget *widget, GdkEventKey *event, gpointer data)
      * string. So in this case, we catch it first and process the filter
      * function of the input context. Then mostly imhangul will work fine,
      * I think :) */
-    //printf("%s: \n", __func__);
     return im_hangul_ic_filter_keypress(current_focused_ic, event);
   }
 
