@@ -26,29 +26,3 @@ style "imhangul-candidate-style"
 #class "GtkWidget" style "mydefault"
 widget "*imhangul_status*" style "imhangul-status-style"
 widget "*imhangul_candidate*" style "imhangul-candidate-style"
-
-# 상태창을 보이게/안보이게 설정
-# 0 : 안보임
-# 1 : 보임
-gtk-im-hangul-status-window = 1
-
-# Dvorak 자판 사용
-# 0 : 안씀
-# 1 : 씀
-gtk-im-hangul-use-dvorak = 0
-
-# Preedit style
-# 0 : 밑줄
-# 1 : 붉은색 글자
-# 2 : 역상
-# 3 : 회색 배경
-# 4 : 없음
-gtk-im-hangul-preedit-style = 1
-
-# Caps Lock키를 씀/안씀
-# 이 옵션이 켜져 있으면 Caps Lock이 켜져 있을때  첫가끝 코드로 결과를 출력함 
-# 0 : 안씀
-# 1 : 씀
-gtk-im-hangul-use-capslock = 1
-
-gtk-im-hangul-use-manual-mode = 1
