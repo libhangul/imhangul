@@ -3,7 +3,7 @@
 
 SUBDIRS = po
 
-EXTRA_DIST = test.sh gtkrc hanjatable.py
+EXTRA_DIST = test.sh gtkrc hanjatable.py imhangul.conf
 
 # now we use @GTK_BINARY_VERSION@ string
 # moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
