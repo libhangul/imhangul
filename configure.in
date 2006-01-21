@@ -1,6 +1,6 @@
 AC_INIT(imhangul.c)
 
-AM_INIT_AUTOMAKE(imhangul, 0.9.13)
+AM_INIT_AUTOMAKE(imhangul, 0.9.14)
 AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE
 
@@ -36,46 +36,57 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", gettext package name)
 
 dnl check for gtk binary version
-GTK_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
+# GTK_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
+# AC_SUBST(GTK_BINARY_VERSION)
 GTK_PREFIX=`$PKG_CONFIG --variable=prefix gtk+-2.0`
-AC_SUBST(GTK_BINARY_VERSION)
 AC_SUBST(GTK_PREFIX)
+GTK_IM_MODULE_DIR=$GTK_PREFIX/lib/gtk-2.0/immodules
+AC_ARG_WITH(gtk-im-module-dir, [  --with-gtk-im-module-dir=DIR gtk im module files dir])
+if test "$with_gtk_im_module_dir" ; then 
+    GTK_IM_MODULE_DIR="$with_gtk_im_module_dir"
+fi
+AC_SUBST(GTK_IM_MODULE_DIR)
 
 dnl check for sysconfdir
-IM_HANGUL_GTK_IMMODULE_FILE="${sysconfdir}/gtk-2.0/gtk.immodules"
-ac_save_CFLAGS="$CFLAGS"
-ac_save_LIBS="$LIBS"
-CFLAGS="$CFLAGS $GTK_CFLAGS"
-LIBS="$GTK_LIBS $LIBS"
-rm -f conftest.msg
-echo -n "checking for GTK_IM_MODULE_FILE... "
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdio.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
-int main(void) {
-    gchar *str;
-	FILE *file;
-	unsetenv("GTK_IM_MODULE_FILE");
-	str = gtk_rc_get_im_module_file();
-	file = fopen("conftest.msg", "w");
-	if (file) {
-		fprintf(file, "%s", str);
-		fclose(file);
-		g_free(str);
-		return 0;
-	} else {
-		g_free(str);
-		return 1;
-	}
-}]])],
-[IM_HANGUL_GTK_IMMODULE_FILE=`cat conftest.msg`]
-)
-echo "${IM_HANGUL_GTK_IMMODULE_FILE}"
-rm -f conftest.msg
-CFLAGS="$ac_save_CFLAGS"
-LIBS="$ac_save_LIBS"
-AC_SUBST(IM_HANGUL_GTK_IMMODULE_FILE)
+GTK_IM_MODULE_FILE="${sysconfdir}/gtk-2.0/gtk.immodules"
+AC_ARG_WITH(gtk-im-module-file, [  --with-gtk-im-module-file=FILE gtk im modules file])
+if test "$with_gtk_im_module_file" ; then
+    GTK_IM_MODULE_FILE="$with_gtk_im_module_file"
+else
+    ac_save_CFLAGS="$CFLAGS"
+    ac_save_LIBS="$LIBS"
+    CFLAGS="$CFLAGS $GTK_CFLAGS"
+    LIBS="$GTK_LIBS $LIBS"
+    rm -f conftest.msg
+    echo -n "checking for GTK_IM_MODULE_FILE... "
+    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <gtk/gtk.h>
+    int main(void) {
+	gchar *str;
+	    FILE *file;
+	    unsetenv("GTK_IM_MODULE_FILE");
+	    str = gtk_rc_get_im_module_file();
+	    file = fopen("conftest.msg", "w");
+	    if (file) {
+		    fprintf(file, "%s", str);
+		    fclose(file);
+		    g_free(str);
+		    return 0;
+	    } else {
+		    g_free(str);
+		    return 1;
+	    }
+    }]])],
+    [GTK_IM_MODULE_FILE=`cat conftest.msg`]
+    )
+    echo "${GTK_IM_MODULE_FILE}"
+    rm -f conftest.msg
+    CFLAGS="$ac_save_CFLAGS"
+    LIBS="$ac_save_LIBS"
+    AC_SUBST(GTK_IM_MODULE_FILE)
+fi 
 
 dnl default keyboard
 AC_ARG_WITH(default-keyboard, [  --with-default-keyboard=2/39/3f   default hangul keyboard])
@@ -87,6 +98,7 @@ case "$with_default_keyboard" in
                            [Define default hangul keyboard])
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "",
                            [Define default hangul keyboard])
+	DEFAULT_KEYBOARD="2 beol"
         ;;
     39)
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "",
@@ -95,6 +107,7 @@ case "$with_default_keyboard" in
                            [Define default hangul keyboard])
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "",
                            [Define default hangul keyboard])
+	DEFAULT_KEYBOARD="3 beol 390"
         ;;
     3f)
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "",
@@ -103,6 +116,7 @@ case "$with_default_keyboard" in
                            [Define default hangul keyboard])
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "ko",
                            [Define default hangul keyboard])
+	DEFAULT_KEYBOARD="3 beol final"
         ;;
     *)
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "ko",
@@ -111,11 +125,20 @@ case "$with_default_keyboard" in
                            [Define default hangul keyboard])
         AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "",
                            [Define default hangul keyboard])
+	DEFAULT_KEYBOARD="2 beol"
         ;;
 esac
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 po/Makefile.in
 imhangul.spec
 ])
+
+AC_OUTPUT
+
+echo ""
+echo "configuration:"
+echo "	GTK_IM_MODULE_DIR:  $GTK_IM_MODULE_DIR"
+echo "	GTK_IM_MODULE_FILE: $GTK_IM_MODULE_FILE"
+echo "	DEFAULT KEYBOARD:   $DEFAULT_KEYBOARD"

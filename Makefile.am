@@ -5,9 +5,7 @@ SUBDIRS = po
 
 EXTRA_DIST = test.sh gtkrc hanjatable.py imhangul.conf
 
-# now we use @GTK_BINARY_VERSION@ string
-# moduledir = @GTK_PREFIX@/lib/gtk-2.0/@GTK_BINARY_VERSION@/immodules
-moduledir = @GTK_PREFIX@/lib/gtk-2.0/immodules
+moduledir = @GTK_IM_MODULE_DIR@
 
 im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
@@ -36,15 +34,24 @@ entry_LDADD = @GTK_LIBS@
 
 install-data-hook:
 	if test -z "$(DESTDIR)" ; then \
-		if test ! -d `dirname $(IM_HANGUL_GTK_IMMODULE_FILE)`; then \
-			$(mkinstalldirs) `dirname $(IM_HANGUL_GTK_IMMODULE_FILE)`; \
-		fi;\
-		gtk-query-immodules-2.0 > $(IM_HANGUL_GTK_IMMODULE_FILE); \
+		GTK_IM_MODULE_FILE=$(GTK_IM_MODULE_FILE) ; \
+		GTK_QUERY_IM_MODULE=`which gtk-query-immodules-2.0` ; \
+		GTK_IM_MODULE_FILE_DIR=`dirname $$GTK_IM_MODULE_FILE` ; \
+		if test ! -d $$GTK_IM_MODULE_FILE_DIR ; then \
+			if test -w `dirname $$GTK_IM_MODULE_FILE_DIR` ; then \
+			    $(mkinstalldirs) `dirname $$GTK_IM_MODULE_FILE`; \
+			fi; \
+		fi; \
+		if test -x $$GTK_QUERY_IM_MODULE; then \
+		    $$GTK_QUERY_IM_MODULE > $$GTK_IM_MODULE_FILE ; \
+		fi; \
 	fi
 
 uninstall:
 	if test -z "$(DESTDIR)" ; then \
-		if test -f "$(IM_HANGUL_GTK_IMMODULE_FILE)"; then \
-			gtk-query-immodules-2.0 > $(IM_HANGUL_GTK_IMMODULE_FILE); \
-		fi \
+		GTK_IM_MODULE_FILE=$(GTK_IM_MODULE_FILE) ; \
+		GTK_QUERY_IM_MODULE=`which gtk-query-immodules-2.0` ; \
+		if test -x $$GTK_QUERY_IM_MODULE; then \
+		    $$GTK_QUERY_IM_MODULE > $$GTK_IM_MODULE_FILE ; \
+		fi; \
 	fi
