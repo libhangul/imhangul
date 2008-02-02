@@ -1,7 +1,8 @@
-AC_INIT(imhangul.c)
+AC_INIT([imhangul], [0.9.14], [choe.hwanjin@gmail.com], [imhangul])
 
-AM_INIT_AUTOMAKE(imhangul, 0.9.14)
+AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS(config.h)
+AM_INIT_AUTOMAKE([dist-bzip2])
 
 dnl Checks for programs
 AC_PROG_CC
