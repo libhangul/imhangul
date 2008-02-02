@@ -1,7 +1,7 @@
 #!/bin/sh
 
-glib-gettextize
-libtoolize
+glib-gettextize --copy --force
+libtoolize --copy --force
 aclocal
 autoheader
 automake --add-missing --copy
