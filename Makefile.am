@@ -38,20 +38,24 @@ install-data-hook:
 		GTK_QUERY_IM_MODULE=`which gtk-query-immodules-2.0` ; \
 		GTK_IM_MODULE_FILE_DIR=`dirname $$GTK_IM_MODULE_FILE` ; \
 		if test ! -d $$GTK_IM_MODULE_FILE_DIR ; then \
-			if test -w `dirname $$GTK_IM_MODULE_FILE_DIR` ; then \
-			    $(mkinstalldirs) `dirname $$GTK_IM_MODULE_FILE`; \
-			fi; \
+			$(mkinstalldirs) $$GTK_IM_MODULE_FILE_DIR; \
 		fi; \
 		if test -x $$GTK_QUERY_IM_MODULE; then \
-		    $$GTK_QUERY_IM_MODULE > $$GTK_IM_MODULE_FILE ; \
+			if test -w $$GTK_IM_MODULE_FILE_DIR; then \
+				$$GTK_QUERY_IM_MODULE > $$GTK_IM_MODULE_FILE ; \
+			fi; \
 		fi; \
 	fi
 
-uninstall:
+uninstall-hook:
 	if test -z "$(DESTDIR)" ; then \
 		GTK_IM_MODULE_FILE=$(GTK_IM_MODULE_FILE) ; \
 		GTK_QUERY_IM_MODULE=`which gtk-query-immodules-2.0` ; \
 		if test -x $$GTK_QUERY_IM_MODULE; then \
-		    $$GTK_QUERY_IM_MODULE > $$GTK_IM_MODULE_FILE ; \
+			$$GTK_QUERY_IM_MODULE > $$GTK_IM_MODULE_FILE ; \
 		fi; \
 	fi
+
+DISTCHECK_CONFIGURE_FLAGS = \
+	--with-gtk-im-module-dir=$${dc_install_base}/lib/gtk-2.0/immodules \
+	--with-gtk-im-module-file=$${dc_install_base}/etc/gtk-2.0/gtk.immodules
