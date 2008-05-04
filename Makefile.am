@@ -10,7 +10,6 @@ moduledir = @GTK_IM_MODULE_DIR@
 im_hangul_la_SOURCES = \
 	gtkimcontexthangul.c 	\
 	gtkimcontexthangul.h 	\
-	candidatetable.h	\
 	gettext.h		\
 	imhangul.c
 
@@ -20,17 +19,18 @@ im_hangul_la_CFLAGS = \
 	-DGDK_PIXBUF_DISABLE_DEPRECATED                 \
 	-DGDK_DISABLE_DEPRECATED                        \
 	-DGTK_DISABLE_DEPRECATED                        \
-	@GTK_CFLAGS@
+	$(GTK_CFLAGS)					\
+	$(LIBHANGUL_CFLAGS)
 
 im_hangul_la_LDFLAGS = -rpath $(moduledir) -module -avoid-version -no-undefined
-im_hangul_la_LIBADD = @GTK_LIBS@
+im_hangul_la_LIBADD = $(GTK_LIBS) $(LIBHANGUL_LIBS)
 
 module_LTLIBRARIES = im-hangul.la
 
 noinst_PROGRAMS = entry
 entry_SOURCES = entry.c
-entry_CFLAGS = @GTK_CFLAGS@
-entry_LDADD = @GTK_LIBS@
+entry_CFLAGS = $(GTK_CFLAGS)
+entry_LDADD = $(GTK_LIBS)
 
 install-data-hook:
 	if test -z "$(DESTDIR)" ; then \

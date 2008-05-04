@@ -59,9 +59,7 @@ struct _GtkIMContextHangul
   /* window */
   GdkWindow *client_window;
   Toplevel *toplevel;
-  Candidate *candidate;
   GdkRectangle cursor;
-  gint surrounding_delete_length;
 
   /* hangul buffer */
   int index;			/* stack index */
@@ -73,6 +71,10 @@ struct _GtkIMContextHangul
   gunichar choseong[4];
   gunichar jungseong[4];
   gunichar jongseong[4];
+
+  /* candidate data */
+  Candidate *candidate;
+  GArray *candidate_string;
 
   /* options */
   gboolean always_use_jamo : 1;

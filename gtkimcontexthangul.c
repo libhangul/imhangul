@@ -26,6 +26,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include <hangul.h>
+
 #include "gettext.h"
 #include "gtkimcontexthangul.h"
 
@@ -62,14 +64,14 @@ struct _Toplevel
 
 /* Candidate window */
 struct _Candidate {
+  gchar *key;
   GtkIMContextHangul *hangul_context;
   GtkWidget *window;
   GdkWindow *parent;
   GdkRectangle cursor;
-  gchar *label;
   GtkListStore *store;
   GtkWidget *treeview;
-  const CandidateItem *data;
+  HanjaList *list;
   int first;
   int n;
   int n_per_page;
@@ -81,11 +83,9 @@ struct _CandidateItem {
     gchar *comment;
 };
 
-#include "candidatetable.h"
-
-static Candidate*  candidate_new             (char *label_str,
+static Candidate*  candidate_new             (char *key,
 					      int n_per_page,
-					      const CandidateItem *data,
+					      HanjaList *list,
 					      GdkWindow *parent,
 					      GdkRectangle *area,
 					      GtkIMContextHangul *hcontext);
@@ -93,8 +93,8 @@ static void        candidate_prev            (Candidate *candidate);
 static void        candidate_next            (Candidate *candidate);
 static void        candidate_prev_page       (Candidate *candidate);
 static void        candidate_next_page       (Candidate *candidate);
-static gunichar    candidate_get_current     (Candidate *candidate);
-static gunichar    candidate_get_nth         (Candidate *candidate, int index);
+static const Hanja* candidate_get_current    (Candidate *candidate);
+static const Hanja* candidate_get_nth        (Candidate *candidate, int index);
 static void        candidate_delete          (Candidate *candidate);
 
 static void	im_hangul_class_init	     (GtkIMContextHangulClass *klass);
@@ -176,6 +176,8 @@ static void	im_hangul_preedit_normal     (GtkIMContextHangul *hic,
 					      PangoAttrList **attrs,
 					      gint start, gint end);
 
+static char*    im_hangul_get_candidate_string(GtkIMContextHangul *ic);
+
 static void     im_hangul_ic_show_status_window     (GtkIMContextHangul *hcontext);
 static void     im_hangul_ic_hide_status_window     (GtkIMContextHangul *hcontext);
 static int      im_hangul_ic_get_toplevel_input_mode(GtkIMContextHangul *hcontext);
@@ -233,6 +235,8 @@ static guint		snooper_handler_id = 0;
 static GtkIMContext    *current_focused_ic = NULL;
 
 static gint		output_mode = OUTPUT_MODE_SYLLABLE;
+
+static HanjaTable*      hanja_table = NULL;
 
 /* preferences */
 static gboolean		pref_use_capslock = FALSE;
@@ -557,17 +561,18 @@ im_hangul_ic_init (GtkIMContextHangul *hcontext)
 
   hcontext->client_window = NULL;
   hcontext->toplevel = NULL;
-  hcontext->candidate = NULL;
   hcontext->cursor.x = 0;
   hcontext->cursor.y = 0;
   hcontext->cursor.width = -1;
   hcontext->cursor.height = -1;
-  hcontext->surrounding_delete_length = 0;
 
   hcontext->composer = NULL;		/* initial value: composer == null */
   hcontext->keyboard_table = NULL;
   hcontext->compose_table_size = G_N_ELEMENTS(compose_table_default);
   hcontext->compose_table = compose_table_default;
+
+  hcontext->candidate = NULL;
+  hcontext->candidate_string = NULL;
 
   /* options */
   hcontext->always_use_jamo = FALSE;
@@ -1647,33 +1652,68 @@ im_hangul_mapping (GtkIMContextHangul *hcontext,
 }
 
 static void
-im_hangul_candidate_commit(GtkIMContextHangul *hcontext,
-			   gunichar ch)
+im_hangul_candidate_commit(GtkIMContextHangul *ic,
+			   const char* match_key,
+			   const Hanja* hanja)
 {
-  im_hangul_ic_clear_buf (hcontext);
-  im_hangul_ic_emit_preedit_changed (hcontext);
-  if (hcontext->surrounding_delete_length > 0)
-    {
-      gtk_im_context_delete_surrounding (GTK_IM_CONTEXT(hcontext),
-				 0, hcontext->surrounding_delete_length);
-      hcontext->surrounding_delete_length = 0;
+    const char* key;
+    const char* value;
+
+    key = hanja_get_key(hanja);
+    value = hanja_get_value(hanja);
+    if (value != NULL) {
+	gunichar* str = (gunichar*)ic->candidate_string->data;
+	int len = ic->candidate_string->len;
+	int len_to_delete = g_utf8_strlen(key, -1);
+	int match_keylen = g_utf8_strlen(match_key, -1);
+
+	if (!im_hangul_ic_is_empty(ic)) {
+	    char preedit[40];
+	    int preedit_len;
+	    preedit[0] = '\0';
+	    im_hangul_make_preedit_string(ic, preedit);
+	    preedit_len = g_utf8_strlen(preedit, -1);
+
+	    len_to_delete--;
+	    match_keylen--;
+	    len -= preedit_len;
+	    im_hangul_ic_clear_buf(ic);
+	    im_hangul_ic_emit_preedit_changed(ic);
+	}
+
+	if (len_to_delete > 0) {
+	    while (match_keylen > len_to_delete) {
+		int n = hangul_syllable_len(str, len);
+		str += n;
+		len -= n;
+		match_keylen--;
+	    }
+
+	    gtk_im_context_delete_surrounding(GTK_IM_CONTEXT(ic), -len, len);
+	}
+
+	g_signal_emit_by_name(ic, "commit", value);
+	candidate_delete(ic->candidate);
+	ic->candidate = NULL;
+	if (ic->candidate_string != NULL &&
+	    ic->candidate_string->len > 0) {
+	    g_array_remove_range(ic->candidate_string,
+				 0, ic->candidate_string->len);
+	}
     }
-  im_hangul_ic_commit_unicode (hcontext, ch);
-  candidate_delete (hcontext->candidate);
-  hcontext->candidate = NULL;
 }
 
 static gboolean
 im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
 				    GdkEventKey *key)
 {
-  gunichar ch = 0;
+  const Hanja* hanja = NULL;
 
   switch (key->keyval)
     {
       case GDK_Return:
       case GDK_KP_Enter:
-	ch = candidate_get_current(hcontext->candidate);
+	hanja = candidate_get_current(hcontext->candidate);
 	break;
       case GDK_Left:
       case GDK_h:
@@ -1703,7 +1743,7 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
 	hcontext->candidate = NULL;
 	break;
       case GDK_0:
-	ch = candidate_get_nth(hcontext->candidate, 9);
+	hanja = candidate_get_nth(hcontext->candidate, 9);
 	break;
       case GDK_1:
       case GDK_2:
@@ -1714,14 +1754,14 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
       case GDK_7:
       case GDK_8:
       case GDK_9:
-	ch = candidate_get_nth(hcontext->candidate, key->keyval - GDK_1);
+	hanja = candidate_get_nth(hcontext->candidate, key->keyval - GDK_1);
 	break;
       default:
 	break;
     }
 
-  if (ch != 0)
-    im_hangul_candidate_commit(hcontext, ch);
+  if (hanja != NULL)
+      im_hangul_candidate_commit(hcontext, hcontext->candidate->key, hanja);
 
   return TRUE;
 }
@@ -2051,77 +2091,71 @@ im_hangul_ic_set_toplevel_input_mode(GtkIMContextHangul *hcontext, int mode)
 /*
  * candidate selection window
  */
-static gint
-get_index_of_candidate_table (gunichar ch)
+static char*
+im_hangul_get_candidate_string(GtkIMContextHangul *ic)
 {
-  int first, last, mid;
-
-  /* binary search */
-  first = 0;
-  last = G_N_ELEMENTS (candidate_table) - 1;
-  while (first <= last)
-    {
-      mid = (first + last) / 2;
-
-      if (ch == candidate_table[mid][0].ch)
-	return mid;
-
-      if (ch < candidate_table[mid][0].ch)
-	last = mid - 1;
-      else
-	first = mid + 1;
-    }
-  return -1;
-}
-
-static gboolean
-get_candidate_table (GtkIMContextHangul *hcontext,
-		     gchar *label_buf,
-		     gsize buf_size,
-		     const CandidateItem **table)
-{
-  gunichar ch = 0;
-
-  if (im_hangul_ic_is_empty (hcontext)) {
-    gchar *text = NULL;
+    int n;
+    gboolean res;
+    gchar* text = NULL;
     gint cursor_index = 0;
-    gtk_im_context_get_surrounding (GTK_IM_CONTEXT(hcontext),
-				    &text, &cursor_index);
-    if (text != NULL) {
-      ch = g_utf8_get_char_validated (text + cursor_index, 3);
-      g_free(text);
-      hcontext->surrounding_delete_length = 1;
-    }
-  } else if (hcontext->choseong[0] != 0 &&
-	     hcontext->jungseong[0] == 0 &&
-	     hcontext->jongseong[0] == 0) {
-    ch = im_hangul_choseong_to_cjamo(hcontext->choseong[0]);
-  } else {
-    ch = im_hangul_jamo_to_syllable (hcontext->choseong[0],
-				     hcontext->jungseong[0],
-				     hcontext->jongseong[0]);
-  }
+    gunichar buf[20] = { 0, };
+    char* str = NULL;
 
-  if (ch > 0) {
-    int index = get_index_of_candidate_table (ch);
-    if (index != -1) {
-      int n;
-      n = g_unichar_to_utf8(ch, label_buf);
-      label_buf[n] = '\0';
-      *table = candidate_table[index] + 1;
-      return TRUE;
-    }
-  }
+    n = G_N_ELEMENTS(buf);
+    if (!im_hangul_ic_is_empty(ic)) {
+	char* p;
+	char preedit[40];
+	int i, preedit_len;
+	preedit[0] = '\0';
+	im_hangul_make_preedit_string(ic, preedit);
+	preedit_len = g_utf8_strlen(preedit, -1);
 
-  return FALSE;
+	n -= preedit_len;
+	p = preedit;
+	for (i = 0; i < preedit_len; i++) {
+	    buf[n + i] = g_utf8_get_char(p);
+	    p = g_utf8_next_char(p);
+	}
+    }
+
+    res = gtk_im_context_get_surrounding(GTK_IM_CONTEXT(ic),
+					 &text, &cursor_index);
+    if (res && text != NULL) {
+	gchar* p;
+
+	p = g_utf8_find_prev_char(text, text + cursor_index);
+	while (n > 0 && p != NULL) {
+	    if (*p == ' ')
+		break;
+
+	    buf[n - 1] = g_utf8_get_char(p);
+
+	    p = g_utf8_find_prev_char(text, p);
+	    n--;
+	}
+
+	g_free(text);
+    }
+
+    if (n < G_N_ELEMENTS(buf)) {
+	int len = G_N_ELEMENTS(buf) - n;
+	if (ic->candidate_string == NULL)
+	    ic->candidate_string = g_array_sized_new(FALSE, FALSE,
+						     sizeof(gunichar), len);
+	g_array_insert_vals(ic->candidate_string, 0, buf + n, len);
+
+	len = hangul_jamos_to_syllables(buf, G_N_ELEMENTS(buf), buf + n, len);
+	str = g_ucs4_to_utf8(buf, len, NULL, NULL, NULL);
+    }
+
+    return str;
 }
 
 static void
 popup_candidate_window (GtkIMContextHangul *hcontext)
 {
-  gchar buf[12];
-  const CandidateItem *table;
-  gboolean ret;
+  char* key;
+  HanjaList* list;
 
   if (hcontext->candidate != NULL)
     {
@@ -2129,16 +2163,20 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
       hcontext->candidate = NULL;
     }
 
-  ret = get_candidate_table (hcontext, buf, sizeof(buf), &table);
-  if (ret)
-    {
-      hcontext->candidate = candidate_new (buf,
+  if (hanja_table == NULL)
+      hanja_table = hanja_table_load(NULL);
+
+  key = im_hangul_get_candidate_string(hcontext);
+  list = hanja_table_match_suffix(hanja_table, key);
+  if (list != NULL) {
+      hcontext->candidate = candidate_new (key,
 					   9,
-					   table,
+					   list,
 					   hcontext->client_window,
 					   &hcontext->cursor,
 					   hcontext);
-    }
+  }
+  g_free(key);
 }
 
 static gint
@@ -2823,7 +2861,8 @@ done:
 /* candidate window */
 enum {
   COLUMN_INDEX,
-  COLUMN_CHARACTER,
+  COLUMN_KEY,
+  COLUMN_VALUE,
   COLUMN_COMMENT,
   NO_OF_COLUMNS
 };
@@ -2837,12 +2876,13 @@ candidate_on_row_activated(GtkWidget *widget,
   if (path != NULL)
     {
       int *indices;
+      const Hanja* hanja;
       GtkIMContextHangul *hcontext = candidate->hangul_context;
 
       indices = gtk_tree_path_get_indices(path);
       candidate->current = candidate->first + indices[0];
-      im_hangul_candidate_commit(hcontext,
-				 candidate->data[candidate->current].ch);
+      hanja = candidate_get_current(candidate);
+      im_hangul_candidate_commit(hcontext, candidate->key, hanja);
     }
 }
 
@@ -2892,7 +2932,7 @@ candidate_on_key_press(GtkWidget *widget,
 		       gpointer data)
 {
   Candidate *candidate;
-  gunichar ch = 0;
+  const Hanja* hanja = NULL;
 
   if (data == NULL)
     return FALSE;
@@ -2901,7 +2941,7 @@ candidate_on_key_press(GtkWidget *widget,
   switch (event->keyval) {
     case GDK_Return:
     case GDK_KP_Enter:
-      ch = candidate_get_current(candidate);
+      hanja = candidate_get_current(candidate);
       break;
     case GDK_Left:
     case GDK_h:
@@ -2931,7 +2971,7 @@ candidate_on_key_press(GtkWidget *widget,
       candidate_delete(candidate);
       break;
     case GDK_0:
-      ch = candidate_get_nth(candidate, 9);
+      hanja = candidate_get_nth(candidate, 9);
       break;
     case GDK_1:
     case GDK_2:
@@ -2942,14 +2982,15 @@ candidate_on_key_press(GtkWidget *widget,
     case GDK_7:
     case GDK_8:
     case GDK_9:
-      ch = candidate_get_nth(candidate, event->keyval - GDK_1);
+      hanja = candidate_get_nth(candidate, event->keyval - GDK_1);
       break;
     default:
       return FALSE;
   }
 
-  if (ch != 0)
-    im_hangul_candidate_commit(candidate->hangul_context, ch);
+  if (hanja != NULL)
+    im_hangul_candidate_commit(candidate->hangul_context,
+			       candidate->key, hanja);
   return TRUE;
 }
 
@@ -3017,8 +3058,7 @@ candidate_set_window_position (Candidate *candidate)
 static void
 candidate_update_list(Candidate *candidate)
 {
-  int i, len;
-  gchar buf[16];
+  int i;
   GtkTreeIter iter;
 
   gtk_list_store_clear(candidate->store);
@@ -3026,15 +3066,20 @@ candidate_update_list(Candidate *candidate)
        i < candidate->n_per_page && candidate->first + i < candidate->n;
        i++)
     {
-      len = g_unichar_to_utf8(candidate->data[candidate->first + i].ch,
-			      buf);
-      buf[len] = '\0';
+      const char* value;
+      const char* comment;
+      const Hanja* hanja;
+      
+      hanja = hanja_list_get_nth(candidate->list, candidate->first + i);
+      value = hanja_get_value(hanja);
+      comment = hanja_get_comment(hanja);
+
       gtk_list_store_append(candidate->store, &iter);
       gtk_list_store_set(candidate->store, &iter,
-	  COLUMN_INDEX, (i + 1) % 10,
-	  COLUMN_CHARACTER, buf,
-	  COLUMN_COMMENT, candidate->data[candidate->first + i].comment,
-	  -1);
+	      COLUMN_INDEX, (i + 1) % 10,
+	      COLUMN_VALUE, value,
+	      COLUMN_COMMENT, comment,
+	      -1);
     }
   candidate_set_window_position (candidate);
 }
@@ -3051,7 +3096,7 @@ candidate_create_window(Candidate *candidate)
 
   candidate_update_list(candidate);
 
-  frame = gtk_frame_new(candidate->label);
+  frame = gtk_frame_new(candidate->key);
   gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_NONE);
   gtk_container_add(GTK_CONTAINER(candidate->window), frame);
 
@@ -3075,7 +3120,7 @@ candidate_create_window(Candidate *candidate)
   g_object_set(renderer, "scale", 2.0, NULL);
   column = gtk_tree_view_column_new_with_attributes("Character",
 						    renderer,
-						    "text", COLUMN_CHARACTER,
+						    "text", COLUMN_VALUE,
 						    NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
@@ -3108,39 +3153,33 @@ candidate_create_window(Candidate *candidate)
 }
 
 static Candidate*
-candidate_new(char *label_str,
+candidate_new(char *key,
 	      int n_per_page,
-	      const CandidateItem *data,
+	      HanjaList *list,
 	      GdkWindow *parent,
 	      GdkRectangle *area,
 	      GtkIMContextHangul *hcontext)
 {
-  int n;
   Candidate *candidate;
 
   candidate = (Candidate*)g_malloc(sizeof(Candidate));
+  candidate->key = g_strdup(key);
   candidate->first = 0;
   candidate->current = 0;
   candidate->n_per_page = n_per_page;
-  candidate->n = 0;
-  candidate->data = NULL;
+  candidate->list = list;
+  candidate->n = hanja_list_get_size(list);
   candidate->parent = parent;
   candidate->cursor = *area;
-  candidate->label = g_strdup(label_str);
   candidate->store = NULL;
   candidate->treeview = NULL;
   candidate->hangul_context = hcontext;
 
-  for (n = 0; data[n].ch != 0; n++)
-    continue;
-
-  candidate->data = data;
-  candidate->n = n;
   if (n_per_page == 0)
     candidate->n_per_page = candidate->n;
 
   candidate->store = gtk_list_store_new(NO_OF_COLUMNS,
-				    G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING);
+		    G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
   candidate_create_window(candidate);
 
   return candidate;
@@ -3214,26 +3253,26 @@ candidate_next_page(Candidate *candidate)
   candidate_update_cursor(candidate);
 }
 
-static gunichar
+static const Hanja*
 candidate_get_current(Candidate *candidate)
 {
   if (candidate == NULL)
     return 0;
 
-  return candidate->data[candidate->current].ch;
+  return hanja_list_get_nth(candidate->list, candidate->current);
 }
 
-static gunichar
-candidate_get_nth(Candidate *candidate, int index)
+static const Hanja*
+candidate_get_nth(Candidate *candidate, int index_)
 {
   if (candidate == NULL)
     return 0;
 
-  index += candidate->first;
-  if (index < 0 || index >= candidate->n)
+  index_ += candidate->first;
+  if (index_ < 0 || index_ >= candidate->n)
     return 0;
 
-  return candidate->data[index].ch;
+  return hanja_list_get_nth(candidate->list, index_);
 }
 
 void
@@ -3244,7 +3283,8 @@ candidate_delete(Candidate *candidate)
 
   gtk_grab_remove(candidate->window);
   gtk_widget_destroy(candidate->window);
-  g_free(candidate->label);
+  hanja_list_delete(candidate->list);
+  g_free(candidate->key);
   g_free(candidate);
 }
 /* vim: set cindent sw=4 sts=4 ts=8 : */
