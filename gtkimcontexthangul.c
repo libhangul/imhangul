@@ -482,7 +482,6 @@ im_hangul_ic_init (GtkIMContextHangul *hcontext)
   hcontext->candidate_string = NULL;
 
   /* options */
-  hcontext->always_use_jamo = FALSE;
   hcontext->use_preedit = TRUE;
 }
 
@@ -1174,8 +1173,8 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     return im_hangul_cadidate_filter_keypress (hcontext, key);
 
   /* on capslock, we use Hangul Jamo */
-  if (!hcontext->always_use_jamo) {
-      if (pref_use_capslock && key->state & GDK_LOCK_MASK)
+  if (pref_use_capslock) {
+      if (key->state & GDK_LOCK_MASK)
 	  hangul_ic_set_output_mode(hcontext->hic, HANGUL_OUTPUT_JAMO);
       else
 	  hangul_ic_set_output_mode(hcontext->hic, HANGUL_OUTPUT_SYLLABLE);
