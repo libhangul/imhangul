@@ -1,5 +1,5 @@
 /* ImHangul - Gtk+ 2.0 Input Method Module for Hangul
- * Copyright (C) 2002,2003,2004 Choe Hwanjin
+ * Copyright (C) 2002-2008 Choe Hwanjin
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,8 +20,8 @@
 #ifndef __GTK_IM_CONTEXT_HANGUL_H__
 #define __GTK_IM_CONTEXT_HANGUL_H__
 
+#include <hangul.h>
 #include <gtk/gtkimcontext.h>
-
 
 extern GType gtk_type_im_context_hangul;
 
@@ -33,9 +33,6 @@ typedef struct _GtkIMContextHangul	GtkIMContextHangul;
 typedef struct _GtkIMContextHangulClass	GtkIMContextHangulClass;
 typedef struct _Candidate               Candidate;
 typedef struct _Toplevel                Toplevel;
-
-typedef struct _IMHangulCombination	IMHangulCombination;
-typedef gboolean (*IMHangulComposer)   (GtkIMContextHangul *, GdkEventKey *);
 
 typedef enum
 {
@@ -50,46 +47,25 @@ struct _GtkIMContextHangul
   /* default input module: simple */
   GtkIMContext *slave;
 
-  /* hangul keyboard information */
-  IMHangulComposer composer;
-  const gunichar *keyboard_table;
-  int compose_table_size;
-  const IMHangulCombination *compose_table;
-
   /* window */
   GdkWindow *client_window;
   Toplevel *toplevel;
   GdkRectangle cursor;
 
-  /* hangul buffer */
-  int index;			/* stack index */
-  gunichar stack[12];
-
-  int lindex;			/* leading consonant index */
-  int vindex;			/* vowel index */
-  int tindex;			/* trailing consonant index */
-  gunichar choseong[4];
-  gunichar jungseong[4];
-  gunichar jongseong[4];
+  /* hangul ic */
+  HangulInputContext* hic;
 
   /* candidate data */
   Candidate *candidate;
   GArray *candidate_string;
 
   /* options */
-  gboolean always_use_jamo : 1;
   gboolean use_preedit : 1;
 };
 
 struct _GtkIMContextHangulClass
 {
   GtkIMContextClass parent_class;
-};
-
-struct _IMHangulCombination 
-{
-  guint32 key;
-  gunichar code;
 };
 
 void          gtk_im_context_hangul_register_type (GTypeModule *type_module);
@@ -99,15 +75,8 @@ void          im_hangul_finalize (void);
 GtkIMContext *gtk_im_context_hangul_new      (void);
 
 /* configuration */
-void gtk_im_context_hangul_set_composer       (GtkIMContextHangul        *hcontext,
-		                               IMHangulComposerType       type);
-void gtk_im_context_hangul_set_keyboard_table (GtkIMContextHangul        *hcontext,
-		                               const gunichar            *keyboard_table);
-void gtk_im_context_hangul_set_compose_table  (GtkIMContextHangul        *hcontext,
-		                               const IMHangulCombination *compose_table,
-		                               int                        compose_table_size);
-void gtk_im_context_hangul_set_use_jamo       (GtkIMContextHangul        *hcontext,
-    				               gboolean		          use_jamo);
+void gtk_im_context_hangul_select_keyboard(GtkIMContextHangul *hcontext,
+		                           const char         *keyboard);
 
 #endif /* __GTK_IM_CONTEXT_HANGUL_H__ */
 
