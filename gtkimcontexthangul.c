@@ -847,9 +847,10 @@ im_hangul_is_backspace (GdkEventKey *key)
 static void
 im_hangul_ic_reset (GtkIMContext *context)
 {
+    const ucschar* flush;
     GtkIMContextHangul *hic = GTK_IM_CONTEXT_HANGUL (context);
 
-    const ucschar* flush = hangul_ic_flush(hic->hic);
+    flush = hangul_ic_flush(hic->hic);
     if (flush[0] != 0) {
 	char* str = g_ucs4_to_utf8(flush, -1, NULL, NULL, NULL);
 	im_hangul_ic_emit_preedit_changed(hic);
@@ -1150,6 +1151,9 @@ im_hangul_ic_slave_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 static gboolean
 im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 {
+  int keyval;
+  bool res;
+  const ucschar* commit;
   GtkIMContextHangul *hcontext;
 
   g_return_val_if_fail (context != NULL, FALSE);
@@ -1212,17 +1216,17 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 
   /* backspace */
   if (im_hangul_is_backspace(key)) {
-      bool res = hangul_ic_backspace(hcontext->hic);
+      res = hangul_ic_backspace(hcontext->hic);
       if (res)
 	  im_hangul_ic_emit_preedit_changed(hcontext);
       return res;
   }
 
   /* process */
-  int keyval = im_hangul_get_keyval(hcontext, key->keyval, key->state);
-  bool res = hangul_ic_process(hcontext->hic, keyval);
+  keyval = im_hangul_get_keyval(hcontext, key->keyval, key->state);
+  res = hangul_ic_process(hcontext->hic, keyval);
 
-  const ucschar* commit = hangul_ic_get_commit_string(hcontext->hic);
+  commit = hangul_ic_get_commit_string(hcontext->hic);
   if (commit[0] != 0) {
       char* str = g_ucs4_to_utf8(commit, -1, NULL, NULL, NULL);
       g_signal_emit_by_name (hcontext, "commit", str);
