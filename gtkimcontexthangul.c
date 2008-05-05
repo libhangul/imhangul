@@ -38,12 +38,6 @@ enum {
 } IMHangulInputMode;
 
 enum {
-  OUTPUT_MODE_SYLLABLE = 0,
-  OUTPUT_MODE_JAMO     = 1 << 1,
-  OUTPUT_MODE_JAMO_EXT = 1 << 2
-} IMHangulOutputMode;
-
-enum {
   INPUT_MODE_INFO_NONE,
   INPUT_MODE_INFO_ENGLISH,
   INPUT_MODE_INFO_HANGUL
@@ -477,6 +471,7 @@ im_hangul_ic_init (GtkIMContextHangul *hcontext)
   hcontext->cursor.height = -1;
 
   hcontext->hic = hangul_ic_new("2");
+  hcontext->preedit = g_string_new(NULL);
 
   hcontext->candidate = NULL;
   hcontext->candidate_string = NULL;
@@ -494,6 +489,7 @@ im_hangul_ic_finalize (GObject *object)
     toplevel_remove_context(hic->toplevel, hic);
 
   hangul_ic_delete(hic->hic);
+  g_string_free(hic->preedit, TRUE);
 
   gtk_im_context_reset(hic->slave);
   g_signal_handlers_disconnect_by_func(hic->slave,
@@ -737,14 +733,12 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
 			      gint *cursor_pos)
 {
     int len;
-    const ucschar* preedit;
     GtkIMContextHangul *ic;
 
     g_return_if_fail (context != NULL);
 
     ic = GTK_IM_CONTEXT_HANGUL(context);
-    preedit = hangul_ic_get_preedit_string(ic->hic);
-    len = ucschar_strlen(preedit);
+    len = g_utf8_strlen(ic->preedit->str, -1);
 
     if (attrs)
 	im_hangul_preedit_attr(ic, attrs, 0, len);
@@ -753,7 +747,7 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
 	*cursor_pos = len;
 
     if (str)
-	*str = g_ucs4_to_utf8(preedit, len, NULL, NULL, NULL);
+	*str = g_strdup(ic->preedit->str);
 }
 
 static void
@@ -769,6 +763,19 @@ im_hangul_ic_focus_in (GtkIMContext *context)
   im_hangul_set_input_mode(hcontext, input_mode);
 
   current_focused_ic = context;
+}
+
+static inline void
+im_hangul_ic_update_preedit(GtkIMContextHangul* hic)
+{
+    int i;
+    const ucschar* preedit;
+
+    preedit = hangul_ic_get_preedit_string(hic->hic);
+    g_string_truncate(hic->preedit, 0);
+    for (i = 0; preedit[i] != 0; i++) {
+	g_string_append_unichar(hic->preedit, preedit[i]);
+    }
 }
 
 static inline void
@@ -850,9 +857,10 @@ im_hangul_ic_reset (GtkIMContext *context)
     GtkIMContextHangul *hic = GTK_IM_CONTEXT_HANGUL (context);
 
     flush = hangul_ic_flush(hic->hic);
+    g_string_truncate(hic->preedit, 0);
+    im_hangul_ic_emit_preedit_changed(hic);
     if (flush[0] != 0) {
 	char* str = g_ucs4_to_utf8(flush, -1, NULL, NULL, NULL);
-	im_hangul_ic_emit_preedit_changed(hic);
 	g_signal_emit_by_name(hic, "commit", str);
 	g_free(str);
     }
@@ -1046,6 +1054,7 @@ im_hangul_candidate_commit(GtkIMContextHangul *ic,
 	    match_keylen--;
 	    len -= preedit_len;
 	    hangul_ic_reset(ic->hic);
+	    g_string_truncate(ic->preedit, 0);
 	    im_hangul_ic_emit_preedit_changed(ic);
 	}
 
@@ -1216,8 +1225,10 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   /* backspace */
   if (im_hangul_is_backspace(key)) {
       res = hangul_ic_backspace(hcontext->hic);
-      if (res)
+      if (res) {
+	  im_hangul_ic_update_preedit(hcontext);
 	  im_hangul_ic_emit_preedit_changed(hcontext);
+      }
       return res;
   }
 
@@ -1228,10 +1239,17 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   commit = hangul_ic_get_commit_string(hcontext->hic);
   if (commit[0] != 0) {
       char* str = g_ucs4_to_utf8(commit, -1, NULL, NULL, NULL);
+      /* 몇몇 어플리케이션에서 입력기 관련 구현에 버그가 있어서
+       * commit하기 전에 preedit string을 빈 스트링으로 만들지 
+       * 않으면 오작동하는 경우가 있다. 이 문제를 피하기 위해서
+       * commit하기 전에 preedit string을 빈 스트링으로 만든다. */
+      g_string_truncate(hcontext->preedit, 0);
+      im_hangul_ic_emit_preedit_changed (hcontext);
       g_signal_emit_by_name (hcontext, "commit", str);
       g_free(str);
   }
 
+  im_hangul_ic_update_preedit(hcontext);
   im_hangul_ic_emit_preedit_changed(hcontext);
 
   return res;

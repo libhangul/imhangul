@@ -54,6 +54,7 @@ struct _GtkIMContextHangul
 
   /* hangul ic */
   HangulInputContext* hic;
+  GString* preedit;
 
   /* candidate data */
   Candidate *candidate;
