@@ -4,95 +4,6 @@
 #include <gtk/gtk.h>
 
 void
-on_status_window_clicked (GtkWidget *window) 
-{
-    static gboolean value = TRUE;
-    GdkScreen *screen;
-    GtkSettings *settings;
-
-    screen = gdk_drawable_get_screen (window->window);
-    settings = gtk_settings_get_for_screen (screen);
-
-    g_object_set (settings,
-	    	  "gtk-im-hangul-status-window", value,
-		  NULL);
-    g_print ("gtk-im-hangul-status-window: %d\n", value);
-    value = !value;
-}
-
-void
-on_use_capslock_clicked (GtkWidget *window) 
-{
-    static gboolean value = TRUE;
-    GdkScreen *screen;
-    GtkSettings *settings;
-
-    screen = gdk_drawable_get_screen (window->window);
-    settings = gtk_settings_get_for_screen (screen);
-
-    g_object_set (settings,
-	    	  "gtk-im-hangul-use-capslock", value,
-		  NULL);
-    g_print ("gtk-im-hangul-use-capslock: %d\n", value);
-    value = !value;
-}
-
-void
-on_use_dvorak_clicked (GtkWidget *window) 
-{
-    static gboolean value = TRUE;
-    GdkScreen *screen;
-    GtkSettings *settings;
-
-    screen = gdk_drawable_get_screen (window->window);
-    settings = gtk_settings_get_for_screen (screen);
-
-    g_object_set (settings,
-	    	  "gtk-im-hangul-use-dvorak", value,
-		  NULL);
-    g_print ("gtk-im-hangul-use-dvorak: %d\n", value);
-    value = !value;
-}
-
-void
-on_preedit_style_clicked (GtkWidget *window) 
-{
-    static gint value = 0;
-    GdkScreen *screen;
-    GtkSettings *settings;
-
-    screen = gdk_drawable_get_screen (window->window);
-    settings = gtk_settings_get_for_screen (screen);
-
-    g_object_set (settings,
-	    	  "gtk-im-hangul-preedit-style", value,
-		  NULL);
-    g_print ("gtk-im-hangul-preedit-style: %d\n", value);
-    value++;
-    if (value > 4)
-	value = 0;
-}
-
-void
-on_quit_clicked (GtkWidget *window)
-{
-    gtk_widget_destroy (window);
-    gtk_main_quit();
-}
-
-void
-on_popup_new_window(GtkWidget *widget)
-{
-	GtkWidget *window;
-    GtkWidget *entry;
-
-    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    entry = gtk_entry_new ();
-    gtk_container_add (GTK_CONTAINER (window), entry);
-	gtk_widget_show_all(window);
-}
-
-void
 on_destroy (GtkWidget *window, gpointer data)
 {
     gtk_main_quit();
@@ -103,9 +14,11 @@ int main (int argc, char *argv[])
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *entry;
-    GtkWidget *button;
+    GtkWidget *scrolled;
+    GtkWidget *textview;
 
     gtk_init (&argc, &argv);
+
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_signal_connect (G_OBJECT (window), "destroy",
                       G_CALLBACK(on_destroy), NULL);
@@ -114,47 +27,16 @@ int main (int argc, char *argv[])
     gtk_container_add (GTK_CONTAINER (window), vbox);
 
     entry = gtk_entry_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
-    entry = gtk_entry_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
-    entry = gtk_entry_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
-    entry = gtk_entry_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
-    entry = gtk_entry_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
-    entry = gtk_entry_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), entry, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), entry, FALSE, TRUE, 0);
 
-    button = gtk_button_new_with_label ("Popup new window");
-    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
-    g_signal_connect_swapped (G_OBJECT (button), "clicked",
-		              G_CALLBACK(on_popup_new_window), window);
+    scrolled = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled),
+				GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start (GTK_BOX (vbox), scrolled, TRUE, TRUE, 0);
 
-    button = gtk_button_new_with_label ("gtk-im-hangul-status-window");
-    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
-    g_signal_connect_swapped (G_OBJECT (button), "clicked",
-		              G_CALLBACK(on_status_window_clicked), window);
-
-    button = gtk_button_new_with_label ("gtk-im-hangul-user-capslock");
-    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
-    g_signal_connect_swapped (G_OBJECT (button), "clicked",
-		              G_CALLBACK(on_use_capslock_clicked), window);
-
-    button = gtk_button_new_with_label ("gtk-im-hangul-use-dvorak");
-    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
-    g_signal_connect_swapped (G_OBJECT (button), "clicked",
-		              G_CALLBACK(on_use_dvorak_clicked), window);
-
-    button = gtk_button_new_with_label ("gtk-im-hangul-preedit-style");
-    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
-    g_signal_connect_swapped (G_OBJECT (button), "clicked",
-		              G_CALLBACK(on_preedit_style_clicked), window);
-
-    button = gtk_button_new_with_label ("quit");
-    gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, TRUE, 0);
-    g_signal_connect_swapped (G_OBJECT (button), "clicked",
-		              G_CALLBACK(on_quit_clicked), window);
+    textview = gtk_text_view_new();
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textview), GTK_WRAP_WORD);
+    gtk_container_add(GTK_CONTAINER(scrolled), textview);
 
     gtk_widget_show_all(window);
 
