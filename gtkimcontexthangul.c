@@ -168,6 +168,7 @@ static void       toplevel_delete(Toplevel *toplevel);
 static GtkWidget* status_window_new(GtkWidget *parent);
 
 static void popup_candidate_window  (GtkIMContextHangul *hcontext);
+static void close_candidate_window  (GtkIMContextHangul *hic);
 
 GType gtk_type_im_context_hangul = 0;
 
@@ -1070,13 +1071,7 @@ im_hangul_candidate_commit(GtkIMContextHangul *ic,
 	}
 
 	g_signal_emit_by_name(ic, "commit", value);
-	candidate_delete(ic->candidate);
-	ic->candidate = NULL;
-	if (ic->candidate_string != NULL &&
-	    ic->candidate_string->len > 0) {
-	    g_array_remove_range(ic->candidate_string,
-				 0, ic->candidate_string->len);
-	}
+	close_candidate_window(ic);
     }
 }
 
@@ -1116,8 +1111,7 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
 	candidate_next(hcontext->candidate);
 	break;
       case GDK_Escape:
-	candidate_delete(hcontext->candidate);
-	hcontext->candidate = NULL;
+	close_candidate_window(hcontext);
 	break;
       case GDK_0:
 	hanja = candidate_get_nth(hcontext->candidate, 9);
@@ -1550,8 +1544,7 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
 
   if (hcontext->candidate != NULL)
     {
-      candidate_delete(hcontext->candidate);
-      hcontext->candidate = NULL;
+      close_candidate_window(hcontext);
     }
 
   if (hanja_table == NULL)
@@ -1568,6 +1561,15 @@ popup_candidate_window (GtkIMContextHangul *hcontext)
 					   hcontext);
   }
   g_free(key);
+}
+
+static void
+close_candidate_window (GtkIMContextHangul *hic)
+{
+    if (hic->candidate_string != NULL && hic->candidate_string->len > 0)
+	g_array_set_size(hic->candidate_string, 0);
+    candidate_delete(hic->candidate);
+    hic->candidate = NULL;
 }
 
 static gint
@@ -1729,8 +1731,7 @@ candidate_on_key_press(GtkWidget *widget,
       candidate_next(candidate);
       break;
     case GDK_Escape:
-      candidate->hangul_context->candidate = NULL;
-      candidate_delete(candidate);
+      close_candidate_window(candidate->hangul_context);
       break;
     case GDK_0:
       hanja = candidate_get_nth(candidate, 9);
