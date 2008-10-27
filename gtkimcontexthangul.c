@@ -795,6 +795,7 @@ im_hangul_ic_focus_out (GtkIMContext *context)
 
   im_hangul_ic_reset(context);
 
+  hcontext = GTK_IM_CONTEXT_HANGUL(context);
   im_hangul_ic_hide_status_window (hcontext);
   im_hangul_set_input_mode_info (hcontext->client_window, INPUT_MODE_INFO_NONE);
   if (current_focused_ic == context)
