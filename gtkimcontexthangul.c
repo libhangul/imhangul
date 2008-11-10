@@ -1849,6 +1849,19 @@ candidate_update_list(Candidate *candidate)
 }
 
 static void
+candidate_on_realize(GtkWidget* widget, gpointer data)
+{
+    gtk_widget_modify_fg  (widget, GTK_STATE_ACTIVE,
+		    &widget->style->fg[GTK_STATE_SELECTED]);
+    gtk_widget_modify_bg  (widget, GTK_STATE_ACTIVE,
+		    &widget->style->bg[GTK_STATE_SELECTED]);
+    gtk_widget_modify_text(widget, GTK_STATE_ACTIVE,
+		    &widget->style->text[GTK_STATE_SELECTED]);
+    gtk_widget_modify_base(widget, GTK_STATE_ACTIVE,
+		    &widget->style->base[GTK_STATE_SELECTED]);
+}
+
+static void
 candidate_create_window(Candidate *candidate)
 {
   GtkWidget *frame;
@@ -1898,6 +1911,13 @@ candidate_create_window(Candidate *candidate)
 
   candidate_update_cursor(candidate);
 
+  /* 테마에 따라서 active 색상이 normal 색상과 같은 것들이 있다.
+   * 그런 경우에 active 상태의 row가 표시가 안되므로 
+   * focus를 받지 못하는 candidat window에서는 구분이 안된다.
+   * 이를 피하기 위해서 widget의 스타일을 수정해서 
+   * activate와 select를 같은 색으로 그려주도록 한다. */
+  g_signal_connect_after(G_OBJECT(treeview), "realize",
+                         G_CALLBACK(candidate_on_realize), NULL);
   g_signal_connect(G_OBJECT(treeview), "row-activated",
 		   G_CALLBACK(candidate_on_row_activated), candidate);
   g_signal_connect(G_OBJECT(treeview), "cursor-changed",
