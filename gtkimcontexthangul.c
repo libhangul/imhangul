@@ -1041,33 +1041,43 @@ im_hangul_candidate_commit(GtkIMContextHangul *ic,
     key = hanja_get_key(hanja);
     value = hanja_get_value(hanja);
     if (value != NULL) {
-	gunichar* str = (gunichar*)ic->candidate_string->data;
-	int len = ic->candidate_string->len;
+	ucschar* candidate_str = (gunichar*)ic->candidate_string->data;
+	int candidate_str_len = ic->candidate_string->len;
 	int len_to_delete = g_utf8_strlen(key, -1);
-	int match_keylen = g_utf8_strlen(match_key, -1);
 
+	// 먼저 hangul_ic의 preedit string을 제거한다.
 	if (!hangul_ic_is_empty(ic->hic)) {
 	    const ucschar* preedit;
 	    int preedit_len;
 	    preedit = hangul_ic_get_preedit_string(ic->hic);
 	    preedit_len = ucschar_strlen(preedit);
 
-	    len_to_delete--;
-	    match_keylen--;
-	    len -= preedit_len;
+	    // 여기서 preedit가 자모 스트링이라면 preedit_len을 바로 빼면 
+	    // 안되고, NFC normalize 한 스트링으로 해야 하는데
+	    // 편의상 hangul_ic는 한번에 한 음절만 가지고 있다고 보고
+	    // 1만 빼서 계산 한다.
+	    len_to_delete -= 1;
+	    // candidate_str에는 preedit 조차도 자모 스트링으로 들어 있을 수 
+	    // 있으므로 preedit_len을 뺀다.
+	    candidate_str_len -= preedit_len;
 	    hangul_ic_reset(ic->hic);
 	    g_string_truncate(ic->preedit, 0);
 	    im_hangul_ic_emit_preedit_changed(ic);
 	}
 
+	// candidate string은 자모스트링일 수도 있으므로 
+	// 주의한다.
 	if (len_to_delete > 0) {
-	    while (match_keylen > len_to_delete) {
-		int n = hangul_syllable_len(str, len);
-		str += n;
-		len -= n;
-		match_keylen--;
-	    }
+	    int len = 0;
+	    ucschar* end = candidate_str + candidate_str_len;
+	    const ucschar* p = end;
 
+	    // 끝에서부터 한음절씩 빼본다.
+	    while (len_to_delete > 0) {
+		p = hangul_syllable_iterator_prev(p, candidate_str);
+		len_to_delete--;
+	    }
+	    len = end - p;
 	    gtk_im_context_delete_surrounding(GTK_IM_CONTEXT(ic), -len, len);
 	}
 
@@ -1524,14 +1534,20 @@ im_hangul_get_candidate_string(GtkIMContextHangul *ic)
     }
 
     if (n < G_N_ELEMENTS(buf)) {
+	char* utf8;
 	int len = G_N_ELEMENTS(buf) - n;
-	if (ic->candidate_string == NULL)
+	if (ic->candidate_string == NULL) {
 	    ic->candidate_string = g_array_sized_new(FALSE, FALSE,
 						     sizeof(gunichar), len);
-	g_array_insert_vals(ic->candidate_string, 0, buf + n, len);
+	} else if (ic->candidate_string->len > 0) {
+	    g_array_set_size(ic->candidate_string, 0);
+	}
 
-	len = hangul_jamos_to_syllables(buf, G_N_ELEMENTS(buf), buf + n, len);
-	str = g_ucs4_to_utf8(buf, len, NULL, NULL, NULL);
+	g_array_insert_vals(ic->candidate_string, 0, buf + n, len);
+	utf8 = g_ucs4_to_utf8((const gunichar*)ic->candidate_string->data,
+			      len, NULL, NULL, NULL);
+	str = g_utf8_normalize(utf8, -1, G_NORMALIZE_DEFAULT_COMPOSE);
+	g_free(utf8);
     }
 
     return str;
