@@ -59,3 +59,10 @@ uninstall-hook:
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-gtk-im-module-dir=$${dc_install_base}/lib/gtk-2.0/immodules \
 	--with-gtk-im-module-file=$${dc_install_base}/etc/gtk-2.0/gtk.immodules
+
+.PHONY: log
+log:
+	unset LC_ALL; \
+	export LANG=C ; \
+	export LC_CTYPE=ko_KR.UTF-8; \
+	svn log -v > ChangeLog

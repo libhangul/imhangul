@@ -1,5 +1,6 @@
 #!/bin/sh
 
+touch ChangeLog
 glib-gettextize --copy --force
 libtoolize --copy --force
 aclocal
