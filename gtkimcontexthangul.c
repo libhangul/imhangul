@@ -766,17 +766,29 @@ im_hangul_ic_focus_in (GtkIMContext *context)
   current_focused_ic = context;
 }
 
-static inline void
-im_hangul_ic_update_preedit(GtkIMContextHangul* hic)
+static void
+im_hangul_ic_set_preedit(GtkIMContextHangul* hic, const ucschar* preedit)
 {
     int i;
-    const ucschar* preedit;
+    char* old;
 
-    preedit = hangul_ic_get_preedit_string(hic->hic);
-    g_string_truncate(hic->preedit, 0);
-    for (i = 0; preedit[i] != 0; i++) {
-	g_string_append_unichar(hic->preedit, preedit[i]);
+    old = g_strdup(hic->preedit->str);
+
+    g_string_assign(hic->preedit, "");
+    if (preedit != NULL) {
+	for (i = 0; preedit[i] != 0; i++) {
+	    g_string_append_unichar(hic->preedit, preedit[i]);
+	}
     }
+
+    // preedit string이 바뀌지 않았는데도 preedit changed signal을 너무 자주
+    // 보내게 되면 오작동하는 프로그램이 있을 수 있다.
+    // GtkHtml 같은 것은 backspace키를 처리하는 과정에서도 reset을 부르는데
+    // 여기서 매번 preedit changed signal을 보내면 오작동한다.
+    if (strcmp(hic->preedit->str, old) != 0)
+	im_hangul_ic_emit_preedit_changed(hic);
+
+    g_free(old);
 }
 
 static inline void
@@ -855,12 +867,15 @@ im_hangul_is_backspace (GdkEventKey *key)
 static void
 im_hangul_ic_reset (GtkIMContext *context)
 {
+    const ucschar* preedit;
     const ucschar* flush;
     GtkIMContextHangul *hic = GTK_IM_CONTEXT_HANGUL (context);
 
     flush = hangul_ic_flush(hic->hic);
-    g_string_truncate(hic->preedit, 0);
-    im_hangul_ic_emit_preedit_changed(hic);
+
+    preedit = hangul_ic_get_preedit_string(hic->hic);
+    im_hangul_ic_set_preedit(hic, preedit);
+
     if (flush[0] != 0) {
 	char* str = g_ucs4_to_utf8(flush, -1, NULL, NULL, NULL);
 	g_signal_emit_by_name(hic, "commit", str);
@@ -1061,8 +1076,7 @@ im_hangul_candidate_commit(GtkIMContextHangul *ic,
 	    // 있으므로 preedit_len을 뺀다.
 	    candidate_str_len -= preedit_len;
 	    hangul_ic_reset(ic->hic);
-	    g_string_truncate(ic->preedit, 0);
-	    im_hangul_ic_emit_preedit_changed(ic);
+	    im_hangul_ic_set_preedit(ic, NULL);
 	}
 
 	// candidate string은 자모스트링일 수도 있으므로 
@@ -1167,6 +1181,7 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   int keyval;
   bool res;
   const ucschar* commit;
+  const ucschar* preedit;
   GtkIMContextHangul *hcontext;
 
   g_return_val_if_fail (context != NULL, FALSE);
@@ -1231,8 +1246,8 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   if (im_hangul_is_backspace(key)) {
       res = hangul_ic_backspace(hcontext->hic);
       if (res) {
-	  im_hangul_ic_update_preedit(hcontext);
-	  im_hangul_ic_emit_preedit_changed(hcontext);
+	  preedit = hangul_ic_get_preedit_string(hcontext->hic);
+	  im_hangul_ic_set_preedit(hcontext, preedit);
       }
       return res;
   }
@@ -1248,14 +1263,13 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
        * commit하기 전에 preedit string을 빈 스트링으로 만들지 
        * 않으면 오작동하는 경우가 있다. 이 문제를 피하기 위해서
        * commit하기 전에 preedit string을 빈 스트링으로 만든다. */
-      g_string_truncate(hcontext->preedit, 0);
-      im_hangul_ic_emit_preedit_changed (hcontext);
+      im_hangul_ic_set_preedit(hcontext, NULL);
       g_signal_emit_by_name (hcontext, "commit", str);
       g_free(str);
   }
 
-  im_hangul_ic_update_preedit(hcontext);
-  im_hangul_ic_emit_preedit_changed(hcontext);
+  preedit = hangul_ic_get_preedit_string(hcontext->hic);
+  im_hangul_ic_set_preedit(hcontext, preedit);
 
   return res;
 }
