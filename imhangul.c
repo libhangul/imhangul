@@ -36,6 +36,7 @@ static GtkIMContext *im_hangul_new_390    (void);
 static GtkIMContext *im_hangul_new_3final (void);
 static GtkIMContext *im_hangul_new_3sun   (void);
 static GtkIMContext *im_hangul_new_3yet   (void);
+static GtkIMContext *im_hangul_new_roma   (void);
 
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
@@ -85,13 +86,22 @@ static const GtkIMContextInfo hangul3y_info = {
   ""
 };
 
+static const GtkIMContextInfo hangulro_info = {
+  "hangulro",
+  N_("Hangul Romaja"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
+  ""
+};
+
 static const GtkIMContextInfo *info_list[] = {
   &hangul2_info,
   &hangul32_info,
   &hangul39_info,
   &hangul3f_info,
   &hangul3s_info,
-  &hangul3y_info
+  &hangul3y_info,
+  &hangulro_info
 };
 
 void
@@ -130,6 +140,8 @@ im_module_create (const gchar *context_id)
     return im_hangul_new_3sun ();
   } else if (strcmp (context_id, "hangul3y") == 0) {
     return im_hangul_new_3yet ();
+  } else if (strcmp (context_id, "hangulro") == 0) {
+    return im_hangul_new_roma ();
   }
 
   g_warning("imhangul:unknown context id: %s", context_id); 
@@ -200,6 +212,17 @@ im_hangul_new_3yet (void)
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
   
   gtk_im_context_hangul_select_keyboard(hcontext, "3y");
+
+  return context;
+}
+
+static GtkIMContext *
+im_hangul_new_roma (void)
+{
+  GtkIMContext *context = gtk_im_context_hangul_new ();
+  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
+  
+  gtk_im_context_hangul_select_keyboard(hcontext, "ro");
 
   return context;
 }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: imhangul 0.9.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-20 23:08+0900\n"
+"POT-Creation-Date: 2009-10-16 22:58+0900\n"
 "PO-Revision-Date: 2004-07-10 11:18+0900\n"
 "Last-Translator: Choe Hwanjin <krisna@kldp.org>\n"
 "Language-Team: Choe Hwanjin <krisna@kldp.org>\n"
@@ -16,30 +16,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. hangul status window label
-#: gtkimcontexthangul.c:1324
+#: gtkimcontexthangul.c:1338
 msgid "hangul"
 msgstr "한글"
 
-#: imhangul.c:42
+#: imhangul.c:43
 msgid "Hangul 2bul"
 msgstr "한글 두벌식"
 
-#: imhangul.c:50
+#: imhangul.c:51
 msgid "Hangul 3bul 2bul-shifted"
 msgstr "한글 세벌식 두벌자판"
 
-#: imhangul.c:58
+#: imhangul.c:59
 msgid "Hangul 3bul 390"
 msgstr "한글 세벌식 390"
 
-#: imhangul.c:66
+#: imhangul.c:67
 msgid "Hangul 3bul Final"
 msgstr "한글 세벌식 최종"
 
-#: imhangul.c:74
+#: imhangul.c:75
 msgid "Hangul 3bul No-Shift"
 msgstr "한글 세벌식 순아래"
 
-#: imhangul.c:82
+#: imhangul.c:83
 msgid "Hangul 3bul Yetgeul"
 msgstr "한글 세벌식 옛글"
+
+#: imhangul.c:91
+msgid "Hangul Romaja"
+msgstr "한글 로마자"
