@@ -1,7 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Copyright (C) 2009 Choe Hwanjin
+# This file is distributed under the same license as the imhangul package.
+# Choe Hwanjin <choe.hwanjin@gmail.com>, 2009.
 #
 msgid ""
 msgstr ""
@@ -9,8 +8,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-10-16 22:58+0900\n"
 "PO-Revision-Date: 2004-07-10 11:18+0900\n"
-"Last-Translator: Choe Hwanjin <krisna@kldp.org>\n"
-"Language-Team: Choe Hwanjin <krisna@kldp.org>\n"
+"Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
+"Language-Team: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
