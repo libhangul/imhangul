@@ -30,13 +30,7 @@
 #include "gettext.h"
 #include "gtkimcontexthangul.h"
 
-static GtkIMContext *im_hangul_new_2      (void);
-static GtkIMContext *im_hangul_new_32     (void);
-static GtkIMContext *im_hangul_new_390    (void);
-static GtkIMContext *im_hangul_new_3final (void);
-static GtkIMContext *im_hangul_new_3sun   (void);
-static GtkIMContext *im_hangul_new_3yet   (void);
-static GtkIMContext *im_hangul_new_roma   (void);
+static GtkIMContext *im_hangul_new (const char *libhangul_id);
 
 static const GtkIMContextInfo hangul2_info = {
   "hangul2",
@@ -94,6 +88,14 @@ static const GtkIMContextInfo hangulro_info = {
   ""
 };
 
+static const GtkIMContextInfo hangulahn_info = {
+  "hangulahn",
+  N_("Hangul Ahnmatae"),
+  GETTEXT_PACKAGE,
+  IM_HANGUL_LOCALEDIR,
+  ""
+};
+
 static const GtkIMContextInfo *info_list[] = {
   &hangul2_info,
   &hangul32_info,
@@ -101,7 +103,8 @@ static const GtkIMContextInfo *info_list[] = {
   &hangul3f_info,
   &hangul3s_info,
   &hangul3y_info,
-  &hangulro_info
+  &hangulro_info,
+  &hangulahn_info
 };
 
 void
@@ -128,101 +131,24 @@ im_module_list (const GtkIMContextInfo ***contexts,
 GtkIMContext *
 im_module_create (const gchar *context_id)
 {
-  if (strcmp (context_id, "hangul2") == 0) {
-    return im_hangul_new_2 ();
-  } else if (strcmp (context_id, "hangul32") == 0) {
-    return im_hangul_new_32 ();
-  } else if (strcmp (context_id, "hangul39") == 0) {
-    return im_hangul_new_390 ();
-  } else if (strcmp (context_id, "hangul3f") == 0) {
-    return im_hangul_new_3final ();
-  } else if (strcmp (context_id, "hangul3s") == 0) {
-    return im_hangul_new_3sun ();
-  } else if (strcmp (context_id, "hangul3y") == 0) {
-    return im_hangul_new_3yet ();
-  } else if (strcmp (context_id, "hangulro") == 0) {
-    return im_hangul_new_roma ();
-  }
+    if (strncmp(context_id, "hangul", 6) == 0) {
+	const char *id = context_id + 6;
+	return im_hangul_new(id);
+    }
 
-  g_warning("imhangul:unknown context id: %s", context_id); 
-  g_assert_not_reached ();
+    g_warning("imhangul:unknown context id: %s", context_id);
+    g_assert_not_reached();
 
-  return NULL;
+    return NULL;
 }
 
 static GtkIMContext *
-im_hangul_new_2 (void)
+im_hangul_new (const char *libhangul_id)
 {
   GtkIMContext *context = gtk_im_context_hangul_new ();
   GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
   
-  gtk_im_context_hangul_select_keyboard(hcontext, "2");
-
-  return context;
-}
-
-static GtkIMContext *
-im_hangul_new_32 (void)
-{
-  GtkIMContext *context = gtk_im_context_hangul_new ();
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
-  
-  gtk_im_context_hangul_select_keyboard(hcontext, "32");
-
-  return context;
-}
-
-static GtkIMContext *
-im_hangul_new_390 (void)
-{
-  GtkIMContext *context = gtk_im_context_hangul_new ();
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
-  
-  gtk_im_context_hangul_select_keyboard(hcontext, "39");
-
-  return context;
-}
-
-static GtkIMContext *
-im_hangul_new_3final (void)
-{
-  GtkIMContext *context = gtk_im_context_hangul_new ();
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
-  
-  gtk_im_context_hangul_select_keyboard(hcontext, "3f");
-
-  return context;
-}
-
-static GtkIMContext *
-im_hangul_new_3sun (void)
-{
-  GtkIMContext *context = gtk_im_context_hangul_new ();
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
-  
-  gtk_im_context_hangul_select_keyboard(hcontext, "3s");
-
-  return context;
-}
-
-static GtkIMContext *
-im_hangul_new_3yet (void)
-{
-  GtkIMContext *context = gtk_im_context_hangul_new ();
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
-  
-  gtk_im_context_hangul_select_keyboard(hcontext, "3y");
-
-  return context;
-}
-
-static GtkIMContext *
-im_hangul_new_roma (void)
-{
-  GtkIMContext *context = gtk_im_context_hangul_new ();
-  GtkIMContextHangul *hcontext = GTK_IM_CONTEXT_HANGUL (context);
-  
-  gtk_im_context_hangul_select_keyboard(hcontext, "ro");
+  gtk_im_context_hangul_select_keyboard(hcontext, libhangul_id);
 
   return context;
 }
