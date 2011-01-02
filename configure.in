@@ -17,8 +17,8 @@ dnl AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.2.0,,
 		  AC_MSG_ERROR([im-hangul needs GTK+ 2.2.0 or higher]))
 
-PKG_CHECK_MODULES(LIBHANGUL, libhangul >= 0.0.10,,
-		  AC_MSG_ERROR([im-hangul needs libhangul 0.0.10 or higher]))
+PKG_CHECK_MODULES(LIBHANGUL, libhangul >= 0.0.12,,
+		  AC_MSG_ERROR([im-hangul needs libhangul 0.0.12 or higher]))
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -95,40 +95,24 @@ dnl default keyboard
 AC_ARG_WITH(default-keyboard, [  --with-default-keyboard=2/39/3f   default hangul keyboard])
 case "$with_default_keyboard" in
     2)
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "ko",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_39, "",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "",
-                           [Define default hangul keyboard])
 	DEFAULT_KEYBOARD="2 beol"
+        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_ID, "2",
+                           [Define default hangul keyboard])
         ;;
     39)
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_39, "ko",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "",
-                           [Define default hangul keyboard])
 	DEFAULT_KEYBOARD="3 beol 390"
+        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_ID, "39",
+                           [Define default hangul keyboard])
         ;;
     3f)
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_39, "",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "ko",
-                           [Define default hangul keyboard])
 	DEFAULT_KEYBOARD="3 beol final"
+        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_ID, "3f",
+                           [Define default hangul keyboard])
         ;;
     *)
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_2, "ko",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_39, "",
-                           [Define default hangul keyboard])
-        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_3F, "",
-                           [Define default hangul keyboard])
 	DEFAULT_KEYBOARD="2 beol"
+        AC_DEFINE_UNQUOTED(DEFAULT_KEYBOARD_ID, "2",
+                           [Define default hangul keyboard])
         ;;
 esac
 
