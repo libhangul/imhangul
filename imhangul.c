@@ -30,17 +30,8 @@
 #include "gettext.h"
 #include "gtkimcontexthangul.h"
 
-/* 키보드 이름의 번역을 위해서 여기에 사용하지 않는 매크로로 키보드 이름을 
- * 리스팅 한다.
- * GTK+는 im_module_list() 함수로 지원하는 context 리스트를 얻은후 나중에 
- * 메뉴에 보여 줄때에는 그 스트링에 해당하는 번역 스트링을 각 모듈에서 지정한
- * mo 파일에서 로딩을 시도한다. 따라서 키보드 이름에 해당하는 번역 스트링을 
- * imhangul의 mo 파일이 가지고 있어야 한다. 그러므로 imhangul이 libhangul의 
- * 키보드 리스트를 동적으로 얻는다 하더라도, po 파일에 추가할 스트링은 
- * 여기에 하드코딩할 수밖에 없다. 
- * 아래에 리스팅한 키보드 이름은 번역되어 나타나겠지만, 없는 것들은 번역이 
- * 안된상태로 메뉴에 나타나게 될 것이다. */
-#define CONTEXT_NAME_LIST 		    \
+/* hangul keyboard list */
+#define IM_HANGUL_CONTEXT_NAME_LIST 	    \
     N_("Hangul Dubeolsik")		    \
     N_("Hangul Dubeolsik yetgeul")	    \
     N_("Hangul Sebeolsik dubeol layout")    \
@@ -49,8 +40,22 @@
     N_("Hangul Sebeolsik no-shift")	    \
     N_("Hangul Sebeolsik yetgeul")	    \
     N_("Hangul Romaja")			    \
-    N_("Hangul Ahnmatae")		    \
-}
+    N_("Hangul Ahnmatae")
+
+/* xgettext 에서 ASCII 가 아닌 문자열이라고 워닝 나는 것을 방지하기 위해서
+ * 주석을 아래쪽에 단다.
+ *
+ * 키보드 이름의 번역을 위해서 여기에 사용하지 않는 매크로로 키보드 이름을 
+ * 리스팅 한다.
+ * GTK+는 im_module_list() 함수로 지원하는 context 리스트를 얻은후 나중에 
+ * 메뉴에 보여 줄때에는 그 스트링에 해당하는 번역 스트링을 각 모듈에서 지정한
+ * mo 파일에서 로딩을 시도한다. 따라서 키보드 이름에 해당하는 번역 스트링을 
+ * imhangul의 mo 파일이 가지고 있어야 한다. 그러므로 imhangul이 libhangul의 
+ * 키보드 리스트를 동적으로 얻는다 하더라도, po 파일에 추가할 스트링은 
+ * 여기에 하드코딩할 수밖에 없다. 
+ * 아래에 리스팅한 키보드 이름은 번역되어 나타나겠지만, 없는 것들은 번역이 
+ * 안된상태로 메뉴에 나타나게 될 것이다.
+ */
 
 static GtkIMContext *im_hangul_new (const char *libhangul_id);
 
