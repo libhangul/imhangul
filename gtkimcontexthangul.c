@@ -186,6 +186,7 @@ static HanjaTable*      hanja_table = NULL;
 static gboolean		pref_use_capslock = FALSE;
 static gboolean		pref_use_status_window = FALSE;
 static gboolean		pref_use_dvorak = FALSE;
+static gboolean		pref_use_system_keymap = FALSE;
 static gboolean		pref_use_preedit_string = TRUE;
 static void		(*im_hangul_preedit_attr)(GtkIMContextHangul *hic,
 						  PangoAttrList **attrs,
@@ -247,6 +248,7 @@ enum {
     TOKEN_ENABLE_PREEDIT,
     TOKEN_ENABLE_CAPSLOCK,
     TOKEN_ENABLE_DVORAK,
+    TOKEN_ENABLE_SYSTEM_KEYMAP,
     TOKEN_PREEDIT_STYLE,
     TOKEN_PREEDIT_STYLE_FG,
     TOKEN_PREEDIT_STYLE_BG
@@ -264,6 +266,7 @@ static const struct {
     { "enable_preedit", TOKEN_ENABLE_PREEDIT },
     { "enable_capslock", TOKEN_ENABLE_CAPSLOCK },
     { "enable_dvorak", TOKEN_ENABLE_DVORAK },
+    { "enable_system_keymap", TOKEN_ENABLE_SYSTEM_KEYMAP },
     { "preedit_style", TOKEN_PREEDIT_STYLE },
     { "preedit_style_fg", TOKEN_PREEDIT_STYLE_FG },
     { "preedit_style_bg", TOKEN_PREEDIT_STYLE_BG }
@@ -370,6 +373,16 @@ void im_hangul_config_parser(void)
 		    pref_use_dvorak = TRUE;
 		} else {
 		    pref_use_dvorak = FALSE;
+		}
+	    }
+	} else if (type == TOKEN_ENABLE_SYSTEM_KEYMAP) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		type = g_scanner_get_next_token(scanner);
+		if (type == TOKEN_TRUE) {
+		    pref_use_system_keymap = TRUE;
+		} else {
+		    pref_use_system_keymap = FALSE;
 		}
 	    }
 	} else if (type == TOKEN_PREEDIT_STYLE) {
@@ -1009,40 +1022,114 @@ im_hangul_dvorak_to_qwerty (guint code)
   return table[code - GDK_exclam];
 }
 
+static const guint keymap[][2] = {
+    { GDK_1,             GDK_exclam         },  /* 10 */
+    { GDK_2,             GDK_at             },  /* 11 */
+    { GDK_3,             GDK_numbersign     },  /* 12 */
+    { GDK_4,             GDK_dollar         },  /* 13 */
+    { GDK_5,             GDK_percent        },  /* 14 */
+    { GDK_6,             GDK_asciicircum    },  /* 15 */
+    { GDK_7,             GDK_ampersand      },  /* 16 */
+    { GDK_8,             GDK_asterisk       },  /* 17 */
+    { GDK_9,             GDK_parenleft      },  /* 18 */
+    { GDK_0,             GDK_parenright     },  /* 19 */
+    { GDK_minus,         GDK_underscore     },  /* 20 */
+    { GDK_equal,         GDK_plus           },  /* 21 */
+    { GDK_BackSpace,     GDK_BackSpace      },  /* 22 */
+    { GDK_Tab,           GDK_Tab            },  /* 23 */
+    { GDK_q,             GDK_Q              },  /* 24 */
+    { GDK_w,             GDK_W              },  /* 25 */
+    { GDK_e,             GDK_E              },  /* 26 */
+    { GDK_r,             GDK_R              },  /* 27 */
+    { GDK_t,             GDK_T              },  /* 28 */
+    { GDK_y,             GDK_Y              },  /* 29 */
+    { GDK_u,             GDK_U              },  /* 30 */
+    { GDK_i,             GDK_I              },  /* 31 */
+    { GDK_o,             GDK_O              },  /* 32 */
+    { GDK_p,             GDK_P              },  /* 33 */
+    { GDK_bracketleft,   GDK_braceleft      },  /* 34 */
+    { GDK_bracketright,  GDK_braceright     },  /* 35 */
+    { GDK_Return,        GDK_Return         },  /* 36 */
+    { GDK_Control_L,     GDK_Control_L      },  /* 37 */
+    { GDK_a,             GDK_A              },  /* 38 */
+    { GDK_s,             GDK_S              },  /* 39 */
+    { GDK_d,             GDK_D              },  /* 40 */
+    { GDK_f,             GDK_F              },  /* 41 */
+    { GDK_g,             GDK_G              },  /* 42 */
+    { GDK_h,             GDK_H              },  /* 43 */
+    { GDK_j,             GDK_J              },  /* 44 */
+    { GDK_k,             GDK_K              },  /* 45 */
+    { GDK_l,             GDK_L              },  /* 46 */
+    { GDK_semicolon,     GDK_colon          },  /* 47 */
+    { GDK_apostrophe,    GDK_quotedbl       },  /* 48 */
+    { GDK_grave,         GDK_asciitilde     },  /* 49 */
+    { GDK_Shift_L,       GDK_Shift_L        },  /* 50 */
+    { GDK_backslash,     GDK_bar            },  /* 51 */
+    { GDK_z,             GDK_Z              },  /* 52 */
+    { GDK_x,             GDK_X              },  /* 53 */
+    { GDK_c,             GDK_C              },  /* 54 */
+    { GDK_v,             GDK_V              },  /* 55 */
+    { GDK_b,             GDK_B              },  /* 56 */
+    { GDK_n,             GDK_N              },  /* 57 */
+    { GDK_m,             GDK_M              },  /* 58 */
+    { GDK_comma,         GDK_less           },  /* 59 */
+    { GDK_period,        GDK_greater        },  /* 60 */
+    { GDK_slash,         GDK_question       },  /* 61 */
+};
 
+/* 한글 입력기는 각 키의 위치에 따라서 입력되는 자모가 결정되어 있다. 
+ * 그래서 키보드를 드보락이라든가, 유럽언어로 바꾸게 되면 각 키가 생성하는
+ * 라틴문자가 qwerty와 달라지게 된다. 그 상태에서 keyval을 그대로 사용하면
+ * 키의 영문자가 그 위치에 대한 정보를 가지지 못한 상태가 되므로 libhangul의 
+ * 조합 함수를 사용할 수 없게 된다.
+ * 그래서 GDK의 hardware_keycode값에서 keyval로 변환하는 내장 테이블을 사용하여
+ * 어떤 경우에든 US qwerty 자판인 것과 같은 변환을 해줌으로써 사용자가 설정한
+ * 자판 정보에 관계없이, 한글 입력이 제대로 되도록 한다.
+ * 이렇게 고치게 되면, capslock 처리라던가, dvorak을 위한 처리가 따로 필요 없다.
+ * 단 키보드 하드웨어가 달라서 hardware_keycode(scancode)가 다른 값이 나오는 
+ * 키보드의 경우에는 한글 입력에 문제가 발생하게 될 가능성이 있다.
+ * 그런 경우에는 예전과 같은 방식으로 동작하도록 system_keymap 옵션을 
+ * 켜도록 한다.
+ */
 static gunichar
 im_hangul_get_keyval(GtkIMContextHangul *hcontext,
+		     guint	       keycode,
 		     guint	       keyval,
 		     guint	       state)
 {
-  /* treat for dvorak */
-  if (pref_use_dvorak)
-    keyval = im_hangul_dvorak_to_qwerty (keyval);
+    /* hangul jamo keysym */
+    if (keyval >= 0x01001100 && keyval <= 0x010011ff)
+	return keyval & 0x0000ffff;
 
-  /* hangul jamo keysym */
-  if (keyval >= 0x01001100 && keyval <= 0x010011ff)
-    return keyval & 0x0000ffff;
+    if (pref_use_system_keymap) {
+	/* treat for dvorak */
+	if (pref_use_dvorak)
+	    keyval = im_hangul_dvorak_to_qwerty (keyval);
 
-  if (keyval >= GDK_exclam && keyval <= GDK_asciitilde)
-    {
-      /* treat capslock, as capslock is not on */
-      if (state & GDK_LOCK_MASK)
-	{
-	  if (state & GDK_SHIFT_MASK)
-	    {
-	      if (keyval >= GDK_a && keyval <= GDK_z)
-		keyval -= (GDK_a - GDK_A);
-	    }
-	  else
-	    {
-	      if (keyval >= GDK_A && keyval <= GDK_Z)
-		keyval += (GDK_a - GDK_A);
+	if (keyval >= GDK_exclam && keyval <= GDK_asciitilde) {
+	    /* treat capslock, as capslock is not on */
+	    if (state & GDK_LOCK_MASK) {
+		if (state & GDK_SHIFT_MASK) {
+		    if (keyval >= GDK_a && keyval <= GDK_z)
+			keyval -= (GDK_a - GDK_A);
+		} else {
+		    if (keyval >= GDK_A && keyval <= GDK_Z)
+			keyval += (GDK_a - GDK_A);
+		}
 	    }
 	}
-      return keyval;
+    } else {
+	/* keycode가 10에서 61 범위에 있으면 내장 keymap을 이용해서 변환한다. */
+	if (keycode >= 10 && keycode <= 61) {
+	    if (state & GDK_SHIFT_MASK) {
+		keyval = keymap[keycode - 10][1];
+	    } else {
+		keyval = keymap[keycode - 10][0];
+	    }
+	}
     }
 
-  return 0;
+    return keyval;
 }
 
 static void
@@ -1253,7 +1340,8 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   }
 
   /* process */
-  keyval = im_hangul_get_keyval(hcontext, key->keyval, key->state);
+  keyval = im_hangul_get_keyval(hcontext,
+			     key->hardware_keycode, key->keyval, key->state);
   res = hangul_ic_process(hcontext->hic, keyval);
 
   commit = hangul_ic_get_commit_string(hcontext->hic);
