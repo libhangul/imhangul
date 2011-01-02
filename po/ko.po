@@ -1,48 +1,61 @@
-# Copyright (C) 2009 Choe Hwanjin
+# Copyright (C) 2009-2011 Choe Hwanjin
 # This file is distributed under the same license as the imhangul package.
-# Choe Hwanjin <choe.hwanjin@gmail.com>, 2009.
+# Choe Hwanjin <choe.hwanjin@gmail.com>, 2009-2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: imhangul 0.9.10\n"
+"Project-Id-Version: imhangul 0.9.16\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-16 22:58+0900\n"
+"POT-Creation-Date: 2011-01-02 23:23+0900\n"
 "PO-Revision-Date: 2004-07-10 11:18+0900\n"
 "Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "Language-Team: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. hangul status window label
-#: gtkimcontexthangul.c:1338
+#: gtkimcontexthangul.c:1426
 msgid "hangul"
 msgstr "한글"
 
-#: imhangul.c:43
-msgid "Hangul 2bul"
+#. hangul keyboard list
+#: imhangul.c:35
+msgid "Hangul Dubeolsik"
 msgstr "한글 두벌식"
 
-#: imhangul.c:51
-msgid "Hangul 3bul 2bul-shifted"
+#: imhangul.c:36
+msgid "Hangul Dubeolsik yetgeul"
+msgstr "한글 두벌식 옛글"
+
+#: imhangul.c:37
+msgid "Hangul Sebeolsik dubeol layout"
 msgstr "한글 세벌식 두벌자판"
 
-#: imhangul.c:59
-msgid "Hangul 3bul 390"
+#: imhangul.c:38
+msgid "Hangul Sebeolsik 390"
 msgstr "한글 세벌식 390"
 
-#: imhangul.c:67
-msgid "Hangul 3bul Final"
+#: imhangul.c:39
+msgid "Hangul Sebeolsik final"
 msgstr "한글 세벌식 최종"
 
-#: imhangul.c:75
-msgid "Hangul 3bul No-Shift"
+#: imhangul.c:40
+msgid "Hangul Sebeolsik no-shift"
 msgstr "한글 세벌식 순아래"
 
-#: imhangul.c:83
-msgid "Hangul 3bul Yetgeul"
+#: imhangul.c:41
+msgid "Hangul Sebeolsik yetgeul"
 msgstr "한글 세벌식 옛글"
 
-#: imhangul.c:91
+#: imhangul.c:42
 msgid "Hangul Romaja"
 msgstr "한글 로마자"
+
+#: imhangul.c:43
+msgid "Hangul Ahnmatae"
+msgstr "한글 안마태"
+
+#~ msgid "Hangul 3bul Yetgeul"
+#~ msgstr "한글 세벌식 옛글"
