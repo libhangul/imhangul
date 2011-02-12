@@ -126,6 +126,18 @@ static inline void     im_hangul_ic_emit_preedit_changed (GtkIMContextHangul *hc
 /* commit functions */
 static void     im_hangul_ic_commit_by_slave (GtkIMContext *context,
 					      gchar *str, gpointer data);
+static void     im_hangul_ic_preedit_start_by_slave (GtkIMContext* context,
+						gpointer data);
+static void     im_hangul_ic_preedit_end_by_slave (GtkIMContext* context,
+						gpointer data);
+static void     im_hangul_ic_preedit_changed_by_slave (GtkIMContext* context,
+						gpointer data);
+static gboolean im_hangul_ic_delete_surrounding_by_slave (GtkIMContext *context,
+						gint offset,
+						gint n_chars,
+						gpointer data);
+static gboolean im_hangul_ic_retrieve_surrounding_by_slave (GtkIMContext *context,
+						gpointer data);
 
 /* for feedback (preedit attribute) */
 static void	im_hangul_preedit_underline  (GtkIMContextHangul *hic,
@@ -474,8 +486,19 @@ static void
 im_hangul_ic_init (GtkIMContextHangul *hcontext)
 {
   hcontext->slave = gtk_im_context_simple_new();
-  g_signal_connect(G_OBJECT(hcontext->slave), "commit",
+  hcontext->slave_preedit_started = FALSE;
+  g_signal_connect(hcontext->slave, "commit",
 		   G_CALLBACK(im_hangul_ic_commit_by_slave), hcontext);
+  g_signal_connect(hcontext->slave, "preedit-start",
+		   G_CALLBACK(im_hangul_ic_preedit_start_by_slave), hcontext);
+  g_signal_connect(hcontext->slave, "preedit-end",
+		   G_CALLBACK(im_hangul_ic_preedit_end_by_slave), hcontext);
+  g_signal_connect(hcontext->slave, "preedit-changed",
+		   G_CALLBACK(im_hangul_ic_preedit_changed_by_slave), hcontext);
+  g_signal_connect(hcontext->slave, "delete-surrounding",
+		   G_CALLBACK(im_hangul_ic_delete_surrounding_by_slave), hcontext);
+  g_signal_connect(hcontext->slave, "retrieve-surrounding",
+		   G_CALLBACK(im_hangul_ic_retrieve_surrounding_by_slave), hcontext);
 
   hcontext->client_window = NULL;
   hcontext->toplevel = NULL;
@@ -752,16 +775,20 @@ im_hangul_get_preedit_string (GtkIMContext *context, gchar **str,
     g_return_if_fail (context != NULL);
 
     ic = GTK_IM_CONTEXT_HANGUL(context);
-    len = g_utf8_strlen(ic->preedit->str, -1);
 
-    if (attrs)
-	im_hangul_preedit_attr(ic, attrs, 0, ic->preedit->len);
+    if (ic->slave_preedit_started) {
+	gtk_im_context_get_preedit_string(ic->slave, str, attrs, cursor_pos); 
+    } else {
+	len = g_utf8_strlen(ic->preedit->str, -1);
+	if (attrs)
+	    im_hangul_preedit_attr(ic, attrs, 0, ic->preedit->len);
 
-    if (cursor_pos)
-	*cursor_pos = len;
+	if (cursor_pos)
+	    *cursor_pos = len;
 
-    if (str)
-	*str = g_strdup(ic->preedit->str);
+	if (str)
+	    *str = g_strdup(ic->preedit->str);
+    }
 }
 
 static void
@@ -912,6 +939,51 @@ static void
 im_hangul_ic_commit_by_slave (GtkIMContext *context, gchar *str, gpointer data)
 {
   g_signal_emit_by_name (GTK_IM_CONTEXT_HANGUL(data), "commit", str);
+}
+
+static void
+im_hangul_ic_preedit_start_by_slave (GtkIMContext *context, gpointer data)
+{
+    GtkIMContextHangul *ic = GTK_IM_CONTEXT_HANGUL (data);
+
+    ic->slave_preedit_started = TRUE;
+    g_signal_emit_by_name (ic, "preedit-start");
+}
+
+static void
+im_hangul_ic_preedit_end_by_slave (GtkIMContext *context, gpointer data)
+{
+    GtkIMContextHangul *ic = GTK_IM_CONTEXT_HANGUL (data);
+
+    ic->slave_preedit_started = FALSE;
+    g_signal_emit_by_name (ic, "preedit-end");
+}
+
+static void
+im_hangul_ic_preedit_changed_by_slave (GtkIMContext *context, gpointer data)
+{
+    g_signal_emit_by_name (GTK_IM_CONTEXT_HANGUL(data), "preedit-changed");
+}
+
+static gboolean
+im_hangul_ic_delete_surrounding_by_slave (GtkIMContext *context,
+					  gint offset,
+					  gint n_chars,
+					  gpointer data)
+{
+    gboolean ret = FALSE;
+    g_signal_emit_by_name (GTK_IM_CONTEXT_HANGUL(data), "delete-surrounding",
+			     offset, n_chars, &ret);
+    return ret;
+}
+
+static gboolean
+im_hangul_ic_retrieve_surrounding_by_slave (GtkIMContext *context, gpointer data)
+{
+    gboolean ret = FALSE;
+    g_signal_emit_by_name (GTK_IM_CONTEXT_HANGUL(data), "retrieve-surrounding",
+			     &ret);
+    return ret;
 }
 
 /* this is a very dangerous function:
@@ -1275,6 +1347,11 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
   g_return_val_if_fail (key != NULL, FALSE);
 
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
+
+  /* process GtkIMContextSimple first if it has preedit string */
+  if (hcontext->slave_preedit_started) {
+    return FALSE;
+  }
 
   /* ignore key release */
   if (key->type == GDK_KEY_RELEASE)

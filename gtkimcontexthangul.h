@@ -46,6 +46,7 @@ struct _GtkIMContextHangul
 
   /* default input module: simple */
   GtkIMContext *slave;
+  gboolean slave_preedit_started;
 
   /* window */
   GdkWindow *client_window;
