@@ -21,7 +21,7 @@
 #define __GTK_IM_CONTEXT_HANGUL_H__
 
 #include <hangul.h>
-#include <gtk/gtkimcontext.h>
+#include <gtk/gtk.h>
 
 extern GType gtk_type_im_context_hangul;
 

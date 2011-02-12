@@ -23,8 +23,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include <hangul.h>
 
