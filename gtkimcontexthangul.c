@@ -119,7 +119,7 @@ static void	im_hangul_ic_cursor_location (GtkIMContext *context,
 
 /* asistant function for hangul composer */
 static inline gboolean im_hangul_is_modifier  (guint state);
-static inline gboolean im_hangul_is_trigger   (GdkEventKey *key);
+static inline gboolean im_hangul_is_hangul_key(GdkEventKey *key);
 static inline gboolean im_hangul_is_backspace (GdkEventKey *key);
 static inline void     im_hangul_ic_emit_preedit_changed (GtkIMContextHangul *hcontext);
 
@@ -193,6 +193,8 @@ static guint		snooper_handler_id = 0;
 static GtkIMContext    *current_focused_ic = NULL;
 
 static HanjaTable*      hanja_table = NULL;
+static GArray*          hangul_keys = NULL;
+static GArray*          hanja_keys = NULL;
 
 /* preferences */
 static gboolean		pref_use_capslock = FALSE;
@@ -263,7 +265,9 @@ enum {
     TOKEN_ENABLE_SYSTEM_KEYMAP,
     TOKEN_PREEDIT_STYLE,
     TOKEN_PREEDIT_STYLE_FG,
-    TOKEN_PREEDIT_STYLE_BG
+    TOKEN_PREEDIT_STYLE_BG,
+    TOKEN_HANGUL_KEYS,
+    TOKEN_HANJA_KEYS,
 };
 
 static const struct {
@@ -281,8 +285,55 @@ static const struct {
     { "enable_system_keymap", TOKEN_ENABLE_SYSTEM_KEYMAP },
     { "preedit_style", TOKEN_PREEDIT_STYLE },
     { "preedit_style_fg", TOKEN_PREEDIT_STYLE_FG },
-    { "preedit_style_bg", TOKEN_PREEDIT_STYLE_BG }
+    { "preedit_style_bg", TOKEN_PREEDIT_STYLE_BG },
+    { "hangul_keys", TOKEN_HANGUL_KEYS },
+    { "hanja_keys", TOKEN_HANJA_KEYS },
 };
+
+typedef struct _IMHangulAccelKey IMHangulAccelKey;
+struct _IMHangulAccelKey {
+    guint keyval;
+    GdkModifierType modifier;
+};
+
+static inline GArray*
+im_hangul_accel_list_new()
+{
+    return g_array_new(FALSE, FALSE, sizeof(IMHangulAccelKey));
+}
+
+static inline void
+im_hangul_accel_list_free(GArray* accel_list)
+{
+    g_array_free(accel_list, TRUE);
+}
+
+static inline void
+im_hangul_accel_list_append(GArray* accel_list,
+			    guint keyval, GdkModifierType modifier)
+{
+    IMHangulAccelKey accel_key = { keyval, modifier };
+    g_array_append_val(accel_list, accel_key);
+}
+
+static gboolean
+im_hangul_accel_list_has_key (GArray* accel_list, GdkEventKey* key)
+{
+    guint i; 
+    GdkModifierType default_mask = gtk_accelerator_get_default_mod_mask();
+
+    for (i = 0; i < accel_list->len; ++i) {
+	IMHangulAccelKey item;
+
+	item = g_array_index(accel_list, IMHangulAccelKey, i);
+	if (key->keyval == item.keyval &&
+	    (key->state & default_mask) == item.modifier) {
+	    return TRUE;
+	}
+    }
+
+    return FALSE;
+}
 
 static void
 set_preedit_style (const char *style)
@@ -308,7 +359,68 @@ set_preedit_style (const char *style)
     }
 }
 
-void im_hangul_config_parser(void)
+static void
+im_hangul_config_unknown_token(GScanner* scanner)
+{
+    guint type;
+    GTokenValue value;
+
+    type = g_scanner_cur_token(scanner);
+    value = g_scanner_cur_value(scanner);
+
+    switch (type) {
+    case G_TOKEN_CHAR: 
+	g_scanner_warn(scanner, _("Unknown token: %c"), value.v_char);
+	break;
+    case G_TOKEN_IDENTIFIER:
+    case G_TOKEN_STRING:
+	g_scanner_warn(scanner, _("Unknown token: %s"), value.v_string);
+	break;
+    case G_TOKEN_BINARY: 
+    case G_TOKEN_OCTAL: 
+    case G_TOKEN_INT: 
+    case G_TOKEN_HEX: 
+	g_scanner_warn(scanner, _("Unknown token: %ld"), value.v_int);
+	break;
+    case G_TOKEN_FLOAT: 
+	g_scanner_warn(scanner, _("Unknown token: %lf"), value.v_float);
+	break;
+    case G_TOKEN_ERROR: 
+	g_scanner_warn(scanner, _("Unknown token: %d"), value.v_error);
+	break;
+    }
+}
+
+static void
+im_hangul_config_accel_list_parse(GScanner* scanner, GArray* accel_list)
+{
+    guint type;
+
+start:
+    type = g_scanner_get_next_token(scanner);
+    if (type == G_TOKEN_STRING) {
+	guint keyval;
+	GdkModifierType modifier;
+	GTokenValue value;
+
+	value = g_scanner_cur_value(scanner);
+	gtk_accelerator_parse(value.v_string, &keyval, &modifier);
+	if (keyval != 0) {
+	    im_hangul_accel_list_append(accel_list, keyval, modifier);
+	}
+
+	type = g_scanner_peek_next_token(scanner);
+	if (type == G_TOKEN_COMMA) {
+	    g_scanner_get_next_token(scanner);
+	    goto start;
+	}
+    } else {
+	im_hangul_config_unknown_token(scanner);
+    }
+}
+
+static void
+im_hangul_config_parse(void)
 {
     int i;
     int fd;
@@ -332,13 +444,15 @@ void im_hangul_config_parser(void)
     }
 
     file = fopen(conf_file, "r");
-    g_free(conf_file);
-    if (file == NULL)
+    if (file == NULL) {
+	g_free(conf_file);
 	return;
+    }
 
     fd = fileno(file);
     scanner = g_scanner_new(&im_hangul_scanner_config);
     g_scanner_input_file(scanner, fd);
+    scanner->input_name = conf_file;
 
     for (i = 0; i < G_N_ELEMENTS (symbols); i++) {
 	g_scanner_scope_add_symbol(scanner, 0,
@@ -347,7 +461,9 @@ void im_hangul_config_parser(void)
 
     do {
 	type = g_scanner_get_next_token(scanner);
-	if (type == TOKEN_ENABLE_PREEDIT) {
+	if (type == G_TOKEN_EOF) {
+	    break;
+	} else if (type == TOKEN_ENABLE_PREEDIT) {
 	    type = g_scanner_get_next_token(scanner);
 	    if (type == G_TOKEN_EQUAL_SIGN) {
 		type = g_scanner_get_next_token(scanner);
@@ -427,17 +543,26 @@ void im_hangul_config_parser(void)
 		    gdk_color_parse(str, &pref_bg);
 		}
 	    }
-	} else {
+	} else if (type == TOKEN_HANGUL_KEYS) {
 	    type = g_scanner_get_next_token(scanner);
 	    if (type == G_TOKEN_EQUAL_SIGN) {
-		type = g_scanner_get_next_token(scanner);
+		im_hangul_config_accel_list_parse(scanner, hangul_keys);
 	    }
+	} else if (type == TOKEN_HANJA_KEYS) {
+	    type = g_scanner_get_next_token(scanner);
+	    if (type == G_TOKEN_EQUAL_SIGN) {
+		im_hangul_config_accel_list_parse(scanner, hanja_keys);
+	    }
+	} else {
+	    im_hangul_config_unknown_token(scanner);
 	}
     } while (!g_scanner_eof(scanner));
 
     g_scanner_destroy(scanner);
 
     fclose(file);
+
+    g_free(conf_file);
 }
 
 void
@@ -883,19 +1008,15 @@ im_hangul_is_modifier (guint state)
 }
 
 static inline gboolean
-im_hangul_is_trigger (GdkEventKey *key)
+im_hangul_is_hangul_key (GdkEventKey *key)
 {
-  return ( key->keyval == GDK_Hangul || 
-	   key->keyval == GDK_Alt_R ||
-	  (key->keyval == GDK_space && (key->state & GDK_SHIFT_MASK)));
+    return im_hangul_accel_list_has_key(hangul_keys, key);
 }
 
 static inline gboolean
-im_hangul_is_candidate (GdkEventKey *key)
+im_hangul_is_hanja_key (GdkEventKey *key)
 {
-  return (key->keyval == GDK_Hangul_Hanja ||
-	  key->keyval == GDK_F9 ||
-          key->keyval == GDK_Control_R);
+    return im_hangul_accel_list_has_key(hanja_keys, key);
 }
 
 static inline gboolean
@@ -927,7 +1048,7 @@ static gboolean
 im_hangul_handle_direct_mode (GtkIMContextHangul *hcontext,
 			      GdkEventKey *key)
 {
-    if (im_hangul_is_trigger (key)) {
+    if (im_hangul_is_hangul_key (key)) {
 	im_hangul_ic_reset(GTK_IM_CONTEXT(hcontext));
 	im_hangul_set_input_mode(hcontext, INPUT_MODE_HANGUL);
 	return TRUE;
@@ -1393,14 +1514,14 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     }
 
   /* hanja key */
-  if (im_hangul_is_candidate(key))
+  if (im_hangul_is_hanja_key(key))
     {
       popup_candidate_window (hcontext);
       return TRUE;
     }
 
-  /* trigger key: mode change to direct mode */
-  if (im_hangul_is_trigger(key)) {
+  /* hangul key: mode change to direct mode */
+  if (im_hangul_is_hangul_key(key)) {
       im_hangul_ic_reset(context);
       im_hangul_set_input_mode(hcontext, INPUT_MODE_DIRECT);
       return TRUE;
@@ -1789,7 +1910,20 @@ im_hangul_key_snooper(GtkWidget *widget, GdkEventKey *event, gpointer data)
 void
 im_hangul_init(void)
 {
-  im_hangul_config_parser();
+  hangul_keys = im_hangul_accel_list_new();
+  hanja_keys  = im_hangul_accel_list_new();
+  
+  im_hangul_config_parse();
+
+  if (hangul_keys->len == 0) {
+    im_hangul_accel_list_append(hangul_keys, GDK_Hangul, 0);
+    im_hangul_accel_list_append(hangul_keys, GDK_space, GDK_SHIFT_MASK);
+  }
+
+  if (hanja_keys->len == 0) {
+    im_hangul_accel_list_append(hangul_keys, GDK_Hangul_Hanja, 0);
+    im_hangul_accel_list_append(hangul_keys, GDK_F9, 0);
+  }
 
   /* install gtk key snooper
    * this is work around code for the problem:
@@ -1816,6 +1950,12 @@ im_hangul_finalize (void)
   }
   g_slist_free(toplevels);
   toplevels = NULL;
+
+  im_hangul_accel_list_free(hanja_keys);
+  hanja_keys = NULL;
+
+  im_hangul_accel_list_free(hangul_keys);
+  hangul_keys = NULL;
 }
 
 /* candidate window */
