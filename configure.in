@@ -14,8 +14,8 @@ AC_PROG_LIBTOOL
 
 dnl Checks for libraries.
 dnl AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.2.0,,
-		  AC_MSG_ERROR([im-hangul needs GTK+ 2.2.0 or higher]))
+PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 2.99.3,,
+		  AC_MSG_ERROR([im-hangul needs GTK+ 2.99.3 or higher]))
 
 PKG_CHECK_MODULES(LIBHANGUL, libhangul >= 0.0.12,,
 		  AC_MSG_ERROR([im-hangul needs libhangul 0.0.12 or higher]))
@@ -41,7 +41,7 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", gettext package name)
 dnl check for gtk binary version
 # GTK_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
 # AC_SUBST(GTK_BINARY_VERSION)
-GTK_PREFIX=`$PKG_CONFIG --variable=prefix gtk+-2.0`
+GTK_PREFIX=`$PKG_CONFIG --variable=prefix gtk+-3.0`
 AC_SUBST(GTK_PREFIX)
 GTK_IM_MODULE_DIR=$GTK_PREFIX/lib/gtk-2.0/immodules
 AC_ARG_WITH(gtk-im-module-dir, [  --with-gtk-im-module-dir=DIR gtk im module files dir])
@@ -51,7 +51,7 @@ fi
 AC_SUBST(GTK_IM_MODULE_DIR)
 
 dnl check for sysconfdir
-GTK_IM_MODULE_FILE="${sysconfdir}/gtk-2.0/gtk.immodules"
+GTK_IM_MODULE_FILE="${sysconfdir}/gtk-3.0/gtk.immodules"
 AC_ARG_WITH(gtk-im-module-file, [  --with-gtk-im-module-file=FILE gtk im modules file])
 if test "$with_gtk_im_module_file" ; then
     GTK_IM_MODULE_FILE="$with_gtk_im_module_file"

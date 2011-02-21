@@ -726,7 +726,7 @@ static void
 im_hangul_set_input_mode_info (GdkWindow *window, int state)
 {
   if (window != NULL) {
-    GdkScreen *screen = gdk_drawable_get_screen(window);
+    GdkScreen *screen = gdk_window_get_screen(window);
     im_hangul_set_input_mode_info_for_screen (screen, state);
   }
 }
@@ -768,28 +768,37 @@ static void
 im_hangul_preedit_reverse (GtkIMContextHangul *hic,
 			   PangoAttrList **attrs, gint start, gint end)
 {
-    static GdkColor default_base = { 0, 0xffff, 0xffff, 0xffff };
-    static GdkColor default_text = { 0, 0, 0, 0 };
-
     PangoAttribute *attr;
     GtkWidget *widget = NULL;
-    GdkColor *fg = &default_base;
-    GdkColor *bg = &default_text;
+    GdkColor fg = { 0, 0xffff, 0xffff, 0xffff };
+    GdkColor bg = { 0, 0, 0, 0 };
 
     gdk_window_get_user_data(hic->client_window, (gpointer)&widget);
-    if (widget != NULL) {
-	GtkStyle *style = gtk_widget_get_style(widget);
-	fg = &style->base[GTK_STATE_NORMAL];
-	bg = &style->text[GTK_STATE_NORMAL];
+    if (widget != NULL && GTK_IS_WIDGET(widget)) {
+	GtkStyleContext *sc = gtk_widget_get_style_context(widget);
+	if (sc != NULL) {
+	    GdkRGBA f;
+	    GdkRGBA b;
+
+	    gtk_style_context_get_color(sc, GTK_STATE_FLAG_NORMAL, &f);
+	    gtk_style_context_get_background_color(sc, GTK_STATE_FLAG_NORMAL, &b);
+	    fg.red   = b.red   * 0xffff;
+	    fg.green = b.green * 0xffff;
+	    fg.blue  = b.blue  * 0xffff;
+
+	    bg.red   = f.red   * 0xffff;
+	    bg.green = f.green * 0xffff;
+	    bg.blue  = f.blue  * 0xffff;
+	}
     }
 
     *attrs = pango_attr_list_new ();
-    attr = pango_attr_foreground_new (fg->red, fg->green, fg->blue);
+    attr = pango_attr_foreground_new (fg.red, fg.green, fg.blue);
     attr->start_index = start;
     attr->end_index = end;
     pango_attr_list_insert (*attrs, attr);
 
-    attr = pango_attr_background_new (bg->red, bg->green, bg->blue);
+    attr = pango_attr_background_new (bg.red, bg.green, bg.blue);
     attr->start_index = start;
     attr->end_index = end;
     pango_attr_list_insert (*attrs, attr);
@@ -799,29 +808,30 @@ static void
 im_hangul_preedit_shade (GtkIMContextHangul *hic,
 			   PangoAttrList **attrs, gint start, gint end)
 {
-    static const GdkColor default_text = { 0, 0, 0, 0 };
-    static const GdkColor default_base = { 0, 0xffff * 90 / 100,
-					      0xffff * 90 / 100,
-					      0xffff * 90 / 100 };
-
     PangoAttribute *attr;
     GtkWidget *widget = NULL;
-    GdkColor fg = default_text;
-    GdkColor bg = default_base;
+    GdkColor fg = { 0, 0, 0, 0 };
+    GdkColor bg = { 0, 0xffff * 90 / 100,
+		       0xffff * 90 / 100,
+		       0xffff * 90 / 100 };
 
     gdk_window_get_user_data(hic->client_window, (gpointer)&widget);
-    if (widget != NULL) {
-	GtkStyle *style = gtk_widget_get_style(widget);
-	if (style != NULL) {
-	    fg.red   = style->text[GTK_STATE_NORMAL].red;
-	    fg.green = style->text[GTK_STATE_NORMAL].green;
-	    fg.blue  = style->text[GTK_STATE_NORMAL].blue;
-	    bg.red   = (style->base[GTK_STATE_NORMAL].red   * 90 +
-			style->text[GTK_STATE_NORMAL].red   * 10) / 100;
-	    bg.green = (style->base[GTK_STATE_NORMAL].green * 90 +
-			style->text[GTK_STATE_NORMAL].green * 10) / 100;
-	    bg.blue  = (style->base[GTK_STATE_NORMAL].blue  * 90 +
-			style->text[GTK_STATE_NORMAL].blue  * 10) / 100;
+    if (widget != NULL && GTK_IS_WIDGET(widget)) {
+	GtkStyleContext *sc = gtk_widget_get_style_context(widget);
+	if (sc != NULL) {
+	    GdkRGBA f;
+	    GdkRGBA b;
+
+	    gtk_style_context_get_color(sc, GTK_STATE_FLAG_NORMAL, &f);
+	    gtk_style_context_get_background_color(sc, GTK_STATE_FLAG_NORMAL, &b);
+
+	    fg.red   = f.red   * 0xffff;
+	    fg.green = f.green * 0xffff;
+	    fg.blue  = f.blue  * 0xffff;
+
+	    bg.red   = (b.red   * 0.9 + f.red   * 0.1) * 0xffff;
+	    bg.green = (b.green * 0.9 + f.green * 0.1) * 0xffff;
+	    bg.blue  = (b.blue  * 0.9 + f.blue  * 0.1) * 0xffff;
 	}
     }
 
@@ -1022,7 +1032,7 @@ im_hangul_is_hanja_key (GdkEventKey *key)
 static inline gboolean
 im_hangul_is_backspace (GdkEventKey *key)
 {
-  return (key->keyval == GDK_BackSpace);
+  return (key->keyval == GDK_KEY_BackSpace);
 }
 
 static void
@@ -1114,160 +1124,160 @@ im_hangul_dvorak_to_qwerty (guint code)
 {
   /* maybe safe if we use switch statement */
   static guint table[] = {
-    GDK_exclam,			/* GDK_exclam */
-    GDK_Q,			/* GDK_quotedbl */
-    GDK_numbersign,		/* GDK_numbersign */
-    GDK_dollar,			/* GDK_dollar */
-    GDK_percent,		/* GDK_percent */
-    GDK_ampersand,		/* GDK_ampersand */
-    GDK_q,			/* GDK_apostrophe */
-    GDK_parenleft,		/* GDK_parenleft */
-    GDK_parenright,		/* GDK_parenright */
-    GDK_asterisk,		/* GDK_asterisk */
-    GDK_braceright,		/* GDK_plus */
-    GDK_w,			/* GDK_comma */
-    GDK_apostrophe,		/* GDK_minus */
-    GDK_e,			/* GDK_period */
-    GDK_bracketleft,		/* GDK_slash */
-    GDK_0,			/* GDK_0 */
-    GDK_1,			/* GDK_1 */
-    GDK_2,			/* GDK_2 */
-    GDK_3,			/* GDK_3 */
-    GDK_4,			/* GDK_4 */
-    GDK_5,			/* GDK_5 */
-    GDK_6,			/* GDK_6 */
-    GDK_7,			/* GDK_7 */
-    GDK_8,			/* GDK_8 */
-    GDK_9,			/* GDK_9 */
-    GDK_Z,			/* GDK_colon */
-    GDK_z,			/* GDK_semicolon */
-    GDK_W,			/* GDK_less */
-    GDK_bracketright,		/* GDK_qual */
-    GDK_E,			/* GDK_greater */
-    GDK_braceleft,		/* GDK_question */
-    GDK_at,			/* GDK_at */
-    GDK_A,			/* GDK_A */
-    GDK_N,			/* GDK_B */
-    GDK_I,			/* GDK_C */
-    GDK_H,			/* GDK_D */
-    GDK_D,			/* GDK_E */
-    GDK_Y,			/* GDK_F */
-    GDK_U,			/* GDK_G */
-    GDK_J,			/* GDK_H */
-    GDK_G,			/* GDK_I */
-    GDK_C,			/* GDK_J */
-    GDK_V,			/* GDK_K */
-    GDK_P,			/* GDK_L */
-    GDK_M,			/* GDK_M */
-    GDK_L,			/* GDK_N */
-    GDK_S,			/* GDK_O */
-    GDK_R,			/* GDK_P */
-    GDK_X,			/* GDK_Q */
-    GDK_O,			/* GDK_R */
-    GDK_colon,			/* GDK_S */
-    GDK_K,			/* GDK_T */
-    GDK_F,			/* GDK_U */
-    GDK_greater,		/* GDK_V */
-    GDK_less,			/* GDK_W */
-    GDK_B,			/* GDK_X */
-    GDK_T,			/* GDK_Y */
-    GDK_question,		/* GDK_Z */
-    GDK_minus,			/* GDK_bracketleft */
-    GDK_backslash,		/* GDK_backslash */
-    GDK_equal,			/* GDK_bracketright */
-    GDK_asciicircum,		/* GDK_asciicircum */
-    GDK_quotedbl,		/* GDK_underscore */
-    GDK_grave,			/* GDK_grave */
-    GDK_a,			/* GDK_a */
-    GDK_n,			/* GDK_b */
-    GDK_i,			/* GDK_c */
-    GDK_h,			/* GDK_d */
-    GDK_d,			/* GDK_e */
-    GDK_y,			/* GDK_f */
-    GDK_u,			/* GDK_g */
-    GDK_j,			/* GDK_h */
-    GDK_g,			/* GDK_i */
-    GDK_c,			/* GDK_j */
-    GDK_v,			/* GDK_k */
-    GDK_p,			/* GDK_l */
-    GDK_m,			/* GDK_m */
-    GDK_l,			/* GDK_n */
-    GDK_s,			/* GDK_o */
-    GDK_r,			/* GDK_p */
-    GDK_x,			/* GDK_q */
-    GDK_o,			/* GDK_r */
-    GDK_semicolon,		/* GDK_s */
-    GDK_k,			/* GDK_t */
-    GDK_f,			/* GDK_u */
-    GDK_period,			/* GDK_v */
-    GDK_comma,			/* GDK_w */
-    GDK_b,			/* GDK_x */
-    GDK_t,			/* GDK_y */
-    GDK_slash,			/* GDK_z */
-    GDK_underscore,		/* GDK_braceleft */
-    GDK_bar,			/* GDK_bar */
-    GDK_plus,			/* GDK_braceright */
-    GDK_asciitilde,		/* GDK_asciitilde */
+    GDK_KEY_exclam,			/* GDK_KEY_exclam */
+    GDK_KEY_Q,			/* GDK_KEY_quotedbl */
+    GDK_KEY_numbersign,		/* GDK_KEY_numbersign */
+    GDK_KEY_dollar,			/* GDK_KEY_dollar */
+    GDK_KEY_percent,		/* GDK_KEY_percent */
+    GDK_KEY_ampersand,		/* GDK_KEY_ampersand */
+    GDK_KEY_q,			/* GDK_KEY_apostrophe */
+    GDK_KEY_parenleft,		/* GDK_KEY_parenleft */
+    GDK_KEY_parenright,		/* GDK_KEY_parenright */
+    GDK_KEY_asterisk,		/* GDK_KEY_asterisk */
+    GDK_KEY_braceright,		/* GDK_KEY_plus */
+    GDK_KEY_w,			/* GDK_KEY_comma */
+    GDK_KEY_apostrophe,		/* GDK_KEY_minus */
+    GDK_KEY_e,			/* GDK_KEY_period */
+    GDK_KEY_bracketleft,		/* GDK_KEY_slash */
+    GDK_KEY_0,			/* GDK_KEY_0 */
+    GDK_KEY_1,			/* GDK_KEY_1 */
+    GDK_KEY_2,			/* GDK_KEY_2 */
+    GDK_KEY_3,			/* GDK_KEY_3 */
+    GDK_KEY_4,			/* GDK_KEY_4 */
+    GDK_KEY_5,			/* GDK_KEY_5 */
+    GDK_KEY_6,			/* GDK_KEY_6 */
+    GDK_KEY_7,			/* GDK_KEY_7 */
+    GDK_KEY_8,			/* GDK_KEY_8 */
+    GDK_KEY_9,			/* GDK_KEY_9 */
+    GDK_KEY_Z,			/* GDK_KEY_colon */
+    GDK_KEY_z,			/* GDK_KEY_semicolon */
+    GDK_KEY_W,			/* GDK_KEY_less */
+    GDK_KEY_bracketright,		/* GDK_KEY_qual */
+    GDK_KEY_E,			/* GDK_KEY_greater */
+    GDK_KEY_braceleft,		/* GDK_KEY_question */
+    GDK_KEY_at,			/* GDK_KEY_at */
+    GDK_KEY_A,			/* GDK_KEY_A */
+    GDK_KEY_N,			/* GDK_KEY_B */
+    GDK_KEY_I,			/* GDK_KEY_C */
+    GDK_KEY_H,			/* GDK_KEY_D */
+    GDK_KEY_D,			/* GDK_KEY_E */
+    GDK_KEY_Y,			/* GDK_KEY_F */
+    GDK_KEY_U,			/* GDK_KEY_G */
+    GDK_KEY_J,			/* GDK_KEY_H */
+    GDK_KEY_G,			/* GDK_KEY_I */
+    GDK_KEY_C,			/* GDK_KEY_J */
+    GDK_KEY_V,			/* GDK_KEY_K */
+    GDK_KEY_P,			/* GDK_KEY_L */
+    GDK_KEY_M,			/* GDK_KEY_M */
+    GDK_KEY_L,			/* GDK_KEY_N */
+    GDK_KEY_S,			/* GDK_KEY_O */
+    GDK_KEY_R,			/* GDK_KEY_P */
+    GDK_KEY_X,			/* GDK_KEY_Q */
+    GDK_KEY_O,			/* GDK_KEY_R */
+    GDK_KEY_colon,			/* GDK_KEY_S */
+    GDK_KEY_K,			/* GDK_KEY_T */
+    GDK_KEY_F,			/* GDK_KEY_U */
+    GDK_KEY_greater,		/* GDK_KEY_V */
+    GDK_KEY_less,			/* GDK_KEY_W */
+    GDK_KEY_B,			/* GDK_KEY_X */
+    GDK_KEY_T,			/* GDK_KEY_Y */
+    GDK_KEY_question,		/* GDK_KEY_Z */
+    GDK_KEY_minus,			/* GDK_KEY_bracketleft */
+    GDK_KEY_backslash,		/* GDK_KEY_backslash */
+    GDK_KEY_equal,			/* GDK_KEY_bracketright */
+    GDK_KEY_asciicircum,		/* GDK_KEY_asciicircum */
+    GDK_KEY_quotedbl,		/* GDK_KEY_underscore */
+    GDK_KEY_grave,			/* GDK_KEY_grave */
+    GDK_KEY_a,			/* GDK_KEY_a */
+    GDK_KEY_n,			/* GDK_KEY_b */
+    GDK_KEY_i,			/* GDK_KEY_c */
+    GDK_KEY_h,			/* GDK_KEY_d */
+    GDK_KEY_d,			/* GDK_KEY_e */
+    GDK_KEY_y,			/* GDK_KEY_f */
+    GDK_KEY_u,			/* GDK_KEY_g */
+    GDK_KEY_j,			/* GDK_KEY_h */
+    GDK_KEY_g,			/* GDK_KEY_i */
+    GDK_KEY_c,			/* GDK_KEY_j */
+    GDK_KEY_v,			/* GDK_KEY_k */
+    GDK_KEY_p,			/* GDK_KEY_l */
+    GDK_KEY_m,			/* GDK_KEY_m */
+    GDK_KEY_l,			/* GDK_KEY_n */
+    GDK_KEY_s,			/* GDK_KEY_o */
+    GDK_KEY_r,			/* GDK_KEY_p */
+    GDK_KEY_x,			/* GDK_KEY_q */
+    GDK_KEY_o,			/* GDK_KEY_r */
+    GDK_KEY_semicolon,		/* GDK_KEY_s */
+    GDK_KEY_k,			/* GDK_KEY_t */
+    GDK_KEY_f,			/* GDK_KEY_u */
+    GDK_KEY_period,			/* GDK_KEY_v */
+    GDK_KEY_comma,			/* GDK_KEY_w */
+    GDK_KEY_b,			/* GDK_KEY_x */
+    GDK_KEY_t,			/* GDK_KEY_y */
+    GDK_KEY_slash,			/* GDK_KEY_z */
+    GDK_KEY_underscore,		/* GDK_KEY_braceleft */
+    GDK_KEY_bar,			/* GDK_KEY_bar */
+    GDK_KEY_plus,			/* GDK_KEY_braceright */
+    GDK_KEY_asciitilde,		/* GDK_KEY_asciitilde */
   };
 
-  if (code < GDK_exclam || code > GDK_asciitilde)
+  if (code < GDK_KEY_exclam || code > GDK_KEY_asciitilde)
     return code;
-  return table[code - GDK_exclam];
+  return table[code - GDK_KEY_exclam];
 }
 
 static const guint keymap[][2] = {
-    { GDK_1,             GDK_exclam         },  /* 10 */
-    { GDK_2,             GDK_at             },  /* 11 */
-    { GDK_3,             GDK_numbersign     },  /* 12 */
-    { GDK_4,             GDK_dollar         },  /* 13 */
-    { GDK_5,             GDK_percent        },  /* 14 */
-    { GDK_6,             GDK_asciicircum    },  /* 15 */
-    { GDK_7,             GDK_ampersand      },  /* 16 */
-    { GDK_8,             GDK_asterisk       },  /* 17 */
-    { GDK_9,             GDK_parenleft      },  /* 18 */
-    { GDK_0,             GDK_parenright     },  /* 19 */
-    { GDK_minus,         GDK_underscore     },  /* 20 */
-    { GDK_equal,         GDK_plus           },  /* 21 */
-    { GDK_BackSpace,     GDK_BackSpace      },  /* 22 */
-    { GDK_Tab,           GDK_Tab            },  /* 23 */
-    { GDK_q,             GDK_Q              },  /* 24 */
-    { GDK_w,             GDK_W              },  /* 25 */
-    { GDK_e,             GDK_E              },  /* 26 */
-    { GDK_r,             GDK_R              },  /* 27 */
-    { GDK_t,             GDK_T              },  /* 28 */
-    { GDK_y,             GDK_Y              },  /* 29 */
-    { GDK_u,             GDK_U              },  /* 30 */
-    { GDK_i,             GDK_I              },  /* 31 */
-    { GDK_o,             GDK_O              },  /* 32 */
-    { GDK_p,             GDK_P              },  /* 33 */
-    { GDK_bracketleft,   GDK_braceleft      },  /* 34 */
-    { GDK_bracketright,  GDK_braceright     },  /* 35 */
-    { GDK_Return,        GDK_Return         },  /* 36 */
-    { GDK_Control_L,     GDK_Control_L      },  /* 37 */
-    { GDK_a,             GDK_A              },  /* 38 */
-    { GDK_s,             GDK_S              },  /* 39 */
-    { GDK_d,             GDK_D              },  /* 40 */
-    { GDK_f,             GDK_F              },  /* 41 */
-    { GDK_g,             GDK_G              },  /* 42 */
-    { GDK_h,             GDK_H              },  /* 43 */
-    { GDK_j,             GDK_J              },  /* 44 */
-    { GDK_k,             GDK_K              },  /* 45 */
-    { GDK_l,             GDK_L              },  /* 46 */
-    { GDK_semicolon,     GDK_colon          },  /* 47 */
-    { GDK_apostrophe,    GDK_quotedbl       },  /* 48 */
-    { GDK_grave,         GDK_asciitilde     },  /* 49 */
-    { GDK_Shift_L,       GDK_Shift_L        },  /* 50 */
-    { GDK_backslash,     GDK_bar            },  /* 51 */
-    { GDK_z,             GDK_Z              },  /* 52 */
-    { GDK_x,             GDK_X              },  /* 53 */
-    { GDK_c,             GDK_C              },  /* 54 */
-    { GDK_v,             GDK_V              },  /* 55 */
-    { GDK_b,             GDK_B              },  /* 56 */
-    { GDK_n,             GDK_N              },  /* 57 */
-    { GDK_m,             GDK_M              },  /* 58 */
-    { GDK_comma,         GDK_less           },  /* 59 */
-    { GDK_period,        GDK_greater        },  /* 60 */
-    { GDK_slash,         GDK_question       },  /* 61 */
+    { GDK_KEY_1,             GDK_KEY_exclam         },  /* 10 */
+    { GDK_KEY_2,             GDK_KEY_at             },  /* 11 */
+    { GDK_KEY_3,             GDK_KEY_numbersign     },  /* 12 */
+    { GDK_KEY_4,             GDK_KEY_dollar         },  /* 13 */
+    { GDK_KEY_5,             GDK_KEY_percent        },  /* 14 */
+    { GDK_KEY_6,             GDK_KEY_asciicircum    },  /* 15 */
+    { GDK_KEY_7,             GDK_KEY_ampersand      },  /* 16 */
+    { GDK_KEY_8,             GDK_KEY_asterisk       },  /* 17 */
+    { GDK_KEY_9,             GDK_KEY_parenleft      },  /* 18 */
+    { GDK_KEY_0,             GDK_KEY_parenright     },  /* 19 */
+    { GDK_KEY_minus,         GDK_KEY_underscore     },  /* 20 */
+    { GDK_KEY_equal,         GDK_KEY_plus           },  /* 21 */
+    { GDK_KEY_BackSpace,     GDK_KEY_BackSpace      },  /* 22 */
+    { GDK_KEY_Tab,           GDK_KEY_Tab            },  /* 23 */
+    { GDK_KEY_q,             GDK_KEY_Q              },  /* 24 */
+    { GDK_KEY_w,             GDK_KEY_W              },  /* 25 */
+    { GDK_KEY_e,             GDK_KEY_E              },  /* 26 */
+    { GDK_KEY_r,             GDK_KEY_R              },  /* 27 */
+    { GDK_KEY_t,             GDK_KEY_T              },  /* 28 */
+    { GDK_KEY_y,             GDK_KEY_Y              },  /* 29 */
+    { GDK_KEY_u,             GDK_KEY_U              },  /* 30 */
+    { GDK_KEY_i,             GDK_KEY_I              },  /* 31 */
+    { GDK_KEY_o,             GDK_KEY_O              },  /* 32 */
+    { GDK_KEY_p,             GDK_KEY_P              },  /* 33 */
+    { GDK_KEY_bracketleft,   GDK_KEY_braceleft      },  /* 34 */
+    { GDK_KEY_bracketright,  GDK_KEY_braceright     },  /* 35 */
+    { GDK_KEY_Return,        GDK_KEY_Return         },  /* 36 */
+    { GDK_KEY_Control_L,     GDK_KEY_Control_L      },  /* 37 */
+    { GDK_KEY_a,             GDK_KEY_A              },  /* 38 */
+    { GDK_KEY_s,             GDK_KEY_S              },  /* 39 */
+    { GDK_KEY_d,             GDK_KEY_D              },  /* 40 */
+    { GDK_KEY_f,             GDK_KEY_F              },  /* 41 */
+    { GDK_KEY_g,             GDK_KEY_G              },  /* 42 */
+    { GDK_KEY_h,             GDK_KEY_H              },  /* 43 */
+    { GDK_KEY_j,             GDK_KEY_J              },  /* 44 */
+    { GDK_KEY_k,             GDK_KEY_K              },  /* 45 */
+    { GDK_KEY_l,             GDK_KEY_L              },  /* 46 */
+    { GDK_KEY_semicolon,     GDK_KEY_colon          },  /* 47 */
+    { GDK_KEY_apostrophe,    GDK_KEY_quotedbl       },  /* 48 */
+    { GDK_KEY_grave,         GDK_KEY_asciitilde     },  /* 49 */
+    { GDK_KEY_Shift_L,       GDK_KEY_Shift_L        },  /* 50 */
+    { GDK_KEY_backslash,     GDK_KEY_bar            },  /* 51 */
+    { GDK_KEY_z,             GDK_KEY_Z              },  /* 52 */
+    { GDK_KEY_x,             GDK_KEY_X              },  /* 53 */
+    { GDK_KEY_c,             GDK_KEY_C              },  /* 54 */
+    { GDK_KEY_v,             GDK_KEY_V              },  /* 55 */
+    { GDK_KEY_b,             GDK_KEY_B              },  /* 56 */
+    { GDK_KEY_n,             GDK_KEY_N              },  /* 57 */
+    { GDK_KEY_m,             GDK_KEY_M              },  /* 58 */
+    { GDK_KEY_comma,         GDK_KEY_less           },  /* 59 */
+    { GDK_KEY_period,        GDK_KEY_greater        },  /* 60 */
+    { GDK_KEY_slash,         GDK_KEY_question       },  /* 61 */
 };
 
 /* 한글 입력기는 각 키의 위치에 따라서 입력되는 자모가 결정되어 있다. 
@@ -1299,15 +1309,15 @@ im_hangul_get_keyval(GtkIMContextHangul *hcontext,
 	if (pref_use_dvorak)
 	    keyval = im_hangul_dvorak_to_qwerty (keyval);
 
-	if (keyval >= GDK_exclam && keyval <= GDK_asciitilde) {
+	if (keyval >= GDK_KEY_exclam && keyval <= GDK_KEY_asciitilde) {
 	    /* treat capslock, as capslock is not on */
 	    if (state & GDK_LOCK_MASK) {
 		if (state & GDK_SHIFT_MASK) {
-		    if (keyval >= GDK_a && keyval <= GDK_z)
-			keyval -= (GDK_a - GDK_A);
+		    if (keyval >= GDK_KEY_a && keyval <= GDK_KEY_z)
+			keyval -= (GDK_KEY_a - GDK_KEY_A);
 		} else {
-		    if (keyval >= GDK_A && keyval <= GDK_Z)
-			keyval += (GDK_a - GDK_A);
+		    if (keyval >= GDK_KEY_A && keyval <= GDK_KEY_Z)
+			keyval += (GDK_KEY_a - GDK_KEY_A);
 		}
 	    }
 	}
@@ -1388,49 +1398,49 @@ im_hangul_cadidate_filter_keypress (GtkIMContextHangul *hcontext,
 
   switch (key->keyval)
     {
-      case GDK_Return:
-      case GDK_KP_Enter:
+      case GDK_KEY_Return:
+      case GDK_KEY_KP_Enter:
 	hanja = candidate_get_current(hcontext->candidate);
 	break;
-      case GDK_Left:
-      case GDK_h:
-      case GDK_Page_Up:
+      case GDK_KEY_Left:
+      case GDK_KEY_h:
+      case GDK_KEY_Page_Up:
 	candidate_prev_page(hcontext->candidate);
 	break;
-      case GDK_Right:
-      case GDK_l:
-      case GDK_Page_Down:
+      case GDK_KEY_Right:
+      case GDK_KEY_l:
+      case GDK_KEY_Page_Down:
 	candidate_next_page(hcontext->candidate);
 	break;
-      case GDK_Up:
-      case GDK_k:
-      case GDK_BackSpace:
-      case GDK_KP_Subtract:
+      case GDK_KEY_Up:
+      case GDK_KEY_k:
+      case GDK_KEY_BackSpace:
+      case GDK_KEY_KP_Subtract:
 	candidate_prev(hcontext->candidate);
 	break;
-      case GDK_Down:
-      case GDK_j:
-      case GDK_space:
-      case GDK_KP_Add:
-      case GDK_KP_Tab:
+      case GDK_KEY_Down:
+      case GDK_KEY_j:
+      case GDK_KEY_space:
+      case GDK_KEY_KP_Add:
+      case GDK_KEY_KP_Tab:
 	candidate_next(hcontext->candidate);
 	break;
-      case GDK_Escape:
+      case GDK_KEY_Escape:
 	close_candidate_window(hcontext);
 	break;
-      case GDK_0:
+      case GDK_KEY_0:
 	hanja = candidate_get_nth(hcontext->candidate, 9);
 	break;
-      case GDK_1:
-      case GDK_2:
-      case GDK_3:
-      case GDK_4:
-      case GDK_5:
-      case GDK_6:
-      case GDK_7:
-      case GDK_8:
-      case GDK_9:
-	hanja = candidate_get_nth(hcontext->candidate, key->keyval - GDK_1);
+      case GDK_KEY_1:
+      case GDK_KEY_2:
+      case GDK_KEY_3:
+      case GDK_KEY_4:
+      case GDK_KEY_5:
+      case GDK_KEY_6:
+      case GDK_KEY_7:
+      case GDK_KEY_8:
+      case GDK_KEY_9:
+	hanja = candidate_get_nth(hcontext->candidate, key->keyval - GDK_KEY_1);
 	break;
       default:
 	break;
@@ -1479,7 +1489,7 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     return FALSE;
 
   /* we silently ignore shift keys */
-  if (key->keyval == GDK_Shift_L || key->keyval == GDK_Shift_R)
+  if (key->keyval == GDK_KEY_Shift_L || key->keyval == GDK_KEY_Shift_R)
     return FALSE;
 
   /* candidate window mode */
@@ -1499,7 +1509,7 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
     return im_hangul_handle_direct_mode (hcontext, key);
 
   /* handle Escape key: automaticaly change to direct mode */
-  if (key->keyval == GDK_Escape)
+  if (key->keyval == GDK_KEY_Escape)
     {
       im_hangul_ic_reset(context);
       im_hangul_set_input_mode(hcontext, INPUT_MODE_DIRECT);
@@ -1562,15 +1572,15 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 
 /* status window */
 static gboolean
-status_window_expose_event (GtkWidget *widget, GdkEventExpose *event)
+status_window_on_draw (GtkWidget *widget, cairo_t* cr, gpointer data)
 {
-  gdk_draw_rectangle (widget->window,
-		      widget->style->fg_gc[GTK_STATE_NORMAL],
-		      FALSE,
-		      0, 0,
-		      widget->allocation.width-1, widget->allocation.height-1);
+    GtkStyleContext* sc = gtk_widget_get_style_context(widget);
+    int width = gtk_widget_get_allocated_width(widget);
+    int height = gtk_widget_get_allocated_height(widget);
 
-  return FALSE;
+    gtk_render_frame(sc, cr, 0, 0, width, height);
+
+    return FALSE;
 }
 
 static gboolean
@@ -1579,19 +1589,22 @@ status_window_configure	(GtkWidget *widget,
 			 Toplevel *toplevel)
 {
   GdkRectangle rect;
-  GtkRequisition requisition;
+  GdkWindow* window;
   gint y;
+  gint width = 0;
+  gint height = 0;
 
   if (toplevel == NULL || toplevel->status == NULL)
     return FALSE;
 
-  gdk_window_get_frame_extents (widget->window, &rect);
-  gtk_widget_size_request (toplevel->status, &requisition);
+  window = gtk_widget_get_window(widget);
+  gdk_window_get_frame_extents (window, &rect);
+  gtk_widget_get_size_request (toplevel->status, &width, &height);
 
-  if (rect.y + rect.height + requisition.height < gdk_screen_height ())
+  if (rect.y + rect.height + height < gdk_screen_height ())
     y = rect.y + rect.height;
   else
-    y = gdk_screen_height () - requisition.height;
+    y = gdk_screen_height () - height;
 
   gtk_window_move (GTK_WINDOW(toplevel->status), rect.x, y);
   return FALSE;
@@ -1625,8 +1638,8 @@ status_window_new(GtkWidget *parent)
   gtk_container_add (GTK_CONTAINER(frame), label);
   gtk_widget_show (label);
 
-  g_signal_connect (G_OBJECT(window), "expose-event",
-		   G_CALLBACK(status_window_expose_event), NULL);
+  g_signal_connect (G_OBJECT(window), "draw",
+		   G_CALLBACK(status_window_on_draw), NULL);
 
   return window;
 }
@@ -1916,13 +1929,13 @@ im_hangul_init(void)
   im_hangul_config_parse();
 
   if (hangul_keys->len == 0) {
-    im_hangul_accel_list_append(hangul_keys, GDK_Hangul, 0);
-    im_hangul_accel_list_append(hangul_keys, GDK_space, GDK_SHIFT_MASK);
+    im_hangul_accel_list_append(hangul_keys, GDK_KEY_Hangul, 0);
+    im_hangul_accel_list_append(hangul_keys, GDK_KEY_space, GDK_SHIFT_MASK);
   }
 
   if (hanja_keys->len == 0) {
-    im_hangul_accel_list_append(hangul_keys, GDK_Hangul_Hanja, 0);
-    im_hangul_accel_list_append(hangul_keys, GDK_F9, 0);
+    im_hangul_accel_list_append(hangul_keys, GDK_KEY_Hangul_Hanja, 0);
+    im_hangul_accel_list_append(hangul_keys, GDK_KEY_F9, 0);
   }
 
   /* install gtk key snooper
@@ -2039,49 +2052,49 @@ candidate_on_key_press(GtkWidget *widget,
 
   candidate = (Candidate*)data;
   switch (event->keyval) {
-    case GDK_Return:
-    case GDK_KP_Enter:
+    case GDK_KEY_Return:
+    case GDK_KEY_KP_Enter:
       hanja = candidate_get_current(candidate);
       break;
-    case GDK_Left:
-    case GDK_h:
-    case GDK_Page_Up:
+    case GDK_KEY_Left:
+    case GDK_KEY_h:
+    case GDK_KEY_Page_Up:
       candidate_prev_page(candidate);
       break;
-    case GDK_Right:
-    case GDK_l:
-    case GDK_Page_Down:
+    case GDK_KEY_Right:
+    case GDK_KEY_l:
+    case GDK_KEY_Page_Down:
       candidate_next_page(candidate);
       break;
-    case GDK_Up:
-    case GDK_k:
-    case GDK_BackSpace:
-    case GDK_KP_Subtract:
+    case GDK_KEY_Up:
+    case GDK_KEY_k:
+    case GDK_KEY_BackSpace:
+    case GDK_KEY_KP_Subtract:
       candidate_prev(candidate);
       break;
-    case GDK_Down:
-    case GDK_j:
-    case GDK_space:
-    case GDK_KP_Add:
-    case GDK_KP_Tab:
+    case GDK_KEY_Down:
+    case GDK_KEY_j:
+    case GDK_KEY_space:
+    case GDK_KEY_KP_Add:
+    case GDK_KEY_KP_Tab:
       candidate_next(candidate);
       break;
-    case GDK_Escape:
+    case GDK_KEY_Escape:
       close_candidate_window(candidate->hangul_context);
       break;
-    case GDK_0:
+    case GDK_KEY_0:
       hanja = candidate_get_nth(candidate, 9);
       break;
-    case GDK_1:
-    case GDK_2:
-    case GDK_3:
-    case GDK_4:
-    case GDK_5:
-    case GDK_6:
-    case GDK_7:
-    case GDK_8:
-    case GDK_9:
-      hanja = candidate_get_nth(candidate, event->keyval - GDK_1);
+    case GDK_KEY_1:
+    case GDK_KEY_2:
+    case GDK_KEY_3:
+    case GDK_KEY_4:
+    case GDK_KEY_5:
+    case GDK_KEY_6:
+    case GDK_KEY_7:
+    case GDK_KEY_8:
+    case GDK_KEY_9:
+      hanja = candidate_get_nth(candidate, event->keyval - GDK_KEY_1);
       break;
     default:
       return FALSE;
@@ -2091,21 +2104,6 @@ candidate_on_key_press(GtkWidget *widget,
     im_hangul_candidate_commit(candidate->hangul_context,
 			       candidate->key, hanja);
   return TRUE;
-}
-
-static void
-candidate_on_expose (GtkWidget *widget,
-		     GdkEventExpose *event,
-		     gpointer data)
-{
-  GtkStyle *style;
-  GtkAllocation alloc;
-
-  style = gtk_widget_get_style(widget);
-  alloc = GTK_WIDGET(widget)->allocation;
-  gdk_draw_rectangle(widget->window, style->black_gc,
-		     FALSE,
-		     0, 0, alloc.width - 1, alloc.height - 1);
 }
 
 static void
@@ -2128,20 +2126,18 @@ candidate_set_window_position (Candidate *candidate)
     gint width = 0, height = 0;
     gint absx = 0, absy = 0;
     gint root_w, root_h, cand_w, cand_h;
-    GtkRequisition requisition;
 
     if (candidate->parent == NULL)
       return;
 
     gdk_window_get_origin (GDK_WINDOW(candidate->parent), &absx, &absy);
-    gdk_drawable_get_size (GDK_DRAWABLE(candidate->parent), &width, &height);
+    width = gdk_window_get_width(GDK_WINDOW(candidate->parent));
+    height = gdk_window_get_height(GDK_WINDOW(candidate->parent));
 
     root_w = gdk_screen_width();
     root_h = gdk_screen_height();
 
-    gtk_widget_size_request(GTK_WIDGET(candidate->window), &requisition);
-    cand_w = requisition.width;
-    cand_h = requisition.height;
+    gtk_widget_get_size_request(GTK_WIDGET(candidate->window), &cand_w, &cand_h);
 
     absx += candidate->cursor.x;
     absy += (candidate->cursor.height < 0)? 
@@ -2186,14 +2182,16 @@ candidate_update_list(Candidate *candidate)
 static void
 candidate_on_realize(GtkWidget* widget, gpointer data)
 {
-    gtk_widget_modify_fg  (widget, GTK_STATE_ACTIVE,
-		    &widget->style->fg[GTK_STATE_SELECTED]);
-    gtk_widget_modify_bg  (widget, GTK_STATE_ACTIVE,
-		    &widget->style->bg[GTK_STATE_SELECTED]);
-    gtk_widget_modify_text(widget, GTK_STATE_ACTIVE,
-		    &widget->style->text[GTK_STATE_SELECTED]);
-    gtk_widget_modify_base(widget, GTK_STATE_ACTIVE,
-		    &widget->style->base[GTK_STATE_SELECTED]);
+    GtkStyleContext* sc = gtk_widget_get_style_context(widget);
+
+    GdkRGBA fg;
+    GdkRGBA bg;
+
+    gtk_style_context_get_color(sc, GTK_STATE_FLAG_SELECTED, &fg);
+    gtk_style_context_get_background_color(sc, GTK_STATE_FLAG_SELECTED, &bg);
+
+    gtk_widget_override_color(widget, GTK_STATE_FLAG_ACTIVE, &fg);
+    gtk_widget_override_background_color(widget, GTK_STATE_FLAG_ACTIVE, &bg);
 }
 
 static void
@@ -2261,8 +2259,6 @@ candidate_create_window(Candidate *candidate)
 		   G_CALLBACK(candidate_on_scroll), candidate);
   g_signal_connect(G_OBJECT(candidate->window), "key-press-event",
 		   G_CALLBACK(candidate_on_key_press), candidate);
-  g_signal_connect_after(G_OBJECT(candidate->window), "expose-event",
-			 G_CALLBACK(candidate_on_expose), candidate);
   g_signal_connect_swapped(G_OBJECT(candidate->window), "realize",
 			   G_CALLBACK(candidate_set_window_position),
 			   candidate);
