@@ -31,10 +31,10 @@ AC_C_INLINE
 dnl Checks for library functions.
 
 # gettext stuff
-ALL_LINGUAS="ko"
+ALL_LINGUAS="`grep -v '^#' "$srcdir/po/LINGUAS" | tr '\n' ' '`"
 AM_GLIB_GNU_GETTEXT
 
-GETTEXT_PACKAGE="im-hangul"
+GETTEXT_PACKAGE="im-hangul-3.0"
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", gettext package name)
 
@@ -43,7 +43,7 @@ dnl check for gtk binary version
 # AC_SUBST(GTK_BINARY_VERSION)
 GTK_PREFIX=`$PKG_CONFIG --variable=prefix gtk+-3.0`
 AC_SUBST(GTK_PREFIX)
-GTK_IM_MODULE_DIR=$GTK_PREFIX/lib/gtk-2.0/immodules
+GTK_IM_MODULE_DIR=$GTK_PREFIX/lib/gtk-3.0/immodules
 AC_ARG_WITH(gtk-im-module-dir, [  --with-gtk-im-module-dir=DIR gtk im module files dir])
 if test "$with_gtk_im_module_dir" ; then 
     GTK_IM_MODULE_DIR="$with_gtk_im_module_dir"
