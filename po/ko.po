@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: imhangul 0.9.16\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-02 23:23+0900\n"
+"POT-Creation-Date: 2011-04-04 21:35+0900\n"
 "PO-Revision-Date: 2004-07-10 11:18+0900\n"
 "Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "Language-Team: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
@@ -15,45 +15,70 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: gtkimcontexthangul.c:373
+#, c-format
+msgid "Unknown token: %c"
+msgstr ""
+
+#: gtkimcontexthangul.c:377
+#, c-format
+msgid "Unknown token: %s"
+msgstr ""
+
+#: gtkimcontexthangul.c:383
+#, c-format
+msgid "Unknown token: %ld"
+msgstr ""
+
+#: gtkimcontexthangul.c:386
+#, c-format
+msgid "Unknown token: %lf"
+msgstr ""
+
+#: gtkimcontexthangul.c:389
+#, c-format
+msgid "Unknown token: %d"
+msgstr ""
+
 #. hangul status window label
-#: gtkimcontexthangul.c:1426
+#: gtkimcontexthangul.c:1637
 msgid "hangul"
 msgstr "한글"
 
 #. hangul keyboard list
-#: imhangul.c:35
+#: imhangul.c:33
 msgid "Hangul Dubeolsik"
 msgstr "한글 두벌식"
 
-#: imhangul.c:36
-msgid "Hangul Dubeolsik yetgeul"
+#: imhangul.c:34
+msgid "Hangul Dubeolsik Yetgeul"
 msgstr "한글 두벌식 옛글"
 
-#: imhangul.c:37
-msgid "Hangul Sebeolsik dubeol layout"
+#: imhangul.c:35
+msgid "Hangul Sebeolsik Dubeol Layout"
 msgstr "한글 세벌식 두벌자판"
 
-#: imhangul.c:38
+#: imhangul.c:36
 msgid "Hangul Sebeolsik 390"
 msgstr "한글 세벌식 390"
 
-#: imhangul.c:39
-msgid "Hangul Sebeolsik final"
+#: imhangul.c:37
+msgid "Hangul Sebeolsik Final"
 msgstr "한글 세벌식 최종"
 
-#: imhangul.c:40
-msgid "Hangul Sebeolsik no-shift"
+#: imhangul.c:38
+msgid "Hangul Sebeolsik Noshift"
 msgstr "한글 세벌식 순아래"
 
-#: imhangul.c:41
-msgid "Hangul Sebeolsik yetgeul"
+#: imhangul.c:39
+msgid "Hangul Sebeolsik Yetgeul"
 msgstr "한글 세벌식 옛글"
 
-#: imhangul.c:42
+#: imhangul.c:40
 msgid "Hangul Romaja"
 msgstr "한글 로마자"
 
-#: imhangul.c:43
+#: imhangul.c:41
 msgid "Hangul Ahnmatae"
 msgstr "한글 안마태"
 

@@ -31,12 +31,12 @@
 /* hangul keyboard list */
 #define IM_HANGUL_CONTEXT_NAME_LIST 	    \
     N_("Hangul Dubeolsik")		    \
-    N_("Hangul Dubeolsik yetgeul")	    \
-    N_("Hangul Sebeolsik dubeol layout")    \
+    N_("Hangul Dubeolsik Yetgeul")	    \
+    N_("Hangul Sebeolsik Dubeol Layout")    \
     N_("Hangul Sebeolsik 390")		    \
-    N_("Hangul Sebeolsik final")	    \
-    N_("Hangul Sebeolsik no-shift")	    \
-    N_("Hangul Sebeolsik yetgeul")	    \
+    N_("Hangul Sebeolsik Final")	    \
+    N_("Hangul Sebeolsik Noshift")	    \
+    N_("Hangul Sebeolsik Yetgeul")	    \
     N_("Hangul Romaja")			    \
     N_("Hangul Ahnmatae")
 
