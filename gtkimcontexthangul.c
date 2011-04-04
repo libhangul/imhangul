@@ -739,13 +739,11 @@ im_hangul_set_input_mode(GtkIMContextHangul *hcontext, int mode)
       im_hangul_set_input_mode_info (hcontext->client_window,
 				     INPUT_MODE_INFO_ENGLISH);
       im_hangul_ic_hide_status_window(hcontext);
-      g_signal_emit_by_name (hcontext, "preedit_end");
       break;
     case INPUT_MODE_HANGUL:
       im_hangul_set_input_mode_info (hcontext->client_window,
 				     INPUT_MODE_INFO_HANGUL);
       im_hangul_ic_show_status_window(hcontext);
-      g_signal_emit_by_name (hcontext, "preedit_start");
       break;
   }
   im_hangul_ic_set_toplevel_input_mode(hcontext, mode);
@@ -956,12 +954,18 @@ im_hangul_ic_set_preedit(GtkIMContextHangul* hic, const ucschar* preedit)
 	}
     }
 
+    if (old[0] == '\0' && hic->preedit->len > 0)
+	g_signal_emit_by_name (hic, "preedit_start");
+
     // preedit string이 바뀌지 않았는데도 preedit changed signal을 너무 자주
     // 보내게 되면 오작동하는 프로그램이 있을 수 있다.
     // GtkHtml 같은 것은 backspace키를 처리하는 과정에서도 reset을 부르는데
     // 여기서 매번 preedit changed signal을 보내면 오작동한다.
     if (strcmp(hic->preedit->str, old) != 0)
 	im_hangul_ic_emit_preedit_changed(hic);
+
+    if (old[0] != '\0' && hic->preedit->len == 0)
+	g_signal_emit_by_name (hic, "preedit_end");
 
     g_free(old);
 }
