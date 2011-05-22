@@ -1,3 +1,13 @@
+2.0.0
+ * GTK+ 2.0을 위한 버전을 2.0으로 함
+ * #315984 firefox 4.0에서 backspace로 글자가 지워지지 않는 문제 해결
+ * #315980 자판 명칭이 libhangul과 달라 번역이 안되는 문제 해결
+ * #306326 한영키를 설정할 수 있는 기능 추가
+   - imhangul.conf 파일에 gtk_accelerator_parse()가 인식하는 문자열로
+     설정
+ * gtk의 simple 입력기 기능 관련 버그 수정
+   - Ctrl+Shift+U 로 입력할때 preedit string이 보이게 함
+
 0.9.16
  * 두벌식 옛글, 세벌식 옛글, 안마태 자판 지원
  * 시스템의 키보드가 US qwerty 가 아닌 경우에도 한글 입력 지원
