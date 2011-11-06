@@ -1925,8 +1925,8 @@ im_hangul_init(void)
   }
 
   if (hanja_keys->len == 0) {
-    im_hangul_accel_list_append(hangul_keys, GDK_Hangul_Hanja, 0);
-    im_hangul_accel_list_append(hangul_keys, GDK_F9, 0);
+    im_hangul_accel_list_append(hanja_keys, GDK_Hangul_Hanja, 0);
+    im_hangul_accel_list_append(hanja_keys, GDK_F9, 0);
   }
 
   /* install gtk key snooper
