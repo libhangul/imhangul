@@ -166,6 +166,7 @@ static char*    im_hangul_get_candidate_string(GtkIMContextHangul *ic);
 
 static void     im_hangul_ic_show_status_window     (GtkIMContextHangul *hcontext);
 static void     im_hangul_ic_hide_status_window     (GtkIMContextHangul *hcontext);
+static void     im_hangul_ic_update_status_window_position(GtkIMContextHangul *hic);
 static int      im_hangul_ic_get_toplevel_input_mode(GtkIMContextHangul *hcontext);
 static void     im_hangul_ic_set_toplevel_input_mode(GtkIMContextHangul *hcontext,
 						  int mode);
@@ -177,6 +178,7 @@ static void       toplevel_append_context(Toplevel *toplevel,
 static void       toplevel_remove_context(Toplevel *toplevel,
 					  GtkIMContextHangul *context);
 static void       toplevel_delete(Toplevel *toplevel);
+
 static GtkWidget* status_window_new(GtkWidget *parent);
 
 static void popup_candidate_window  (GtkIMContextHangul *hcontext);
@@ -1003,6 +1005,8 @@ im_hangul_ic_cursor_location (GtkIMContext *context, GdkRectangle *area)
 
   hcontext = GTK_IM_CONTEXT_HANGUL(context);
   hcontext->cursor = *area;
+
+  im_hangul_ic_update_status_window_position(hcontext);
 }
 
 static inline gboolean
@@ -1566,90 +1570,63 @@ im_hangul_ic_filter_keypress (GtkIMContext *context, GdkEventKey *key)
 
 /* status window */
 static gboolean
-status_window_expose_event (GtkWidget *widget, GdkEventExpose *event)
+status_window_on_expose_event (GtkWidget *widget, GdkEventExpose *event)
 {
-  gdk_draw_rectangle (widget->window,
-		      widget->style->fg_gc[GTK_STATE_NORMAL],
-		      FALSE,
-		      0, 0,
-		      widget->allocation.width-1, widget->allocation.height-1);
-
-  return FALSE;
-}
-
-static gboolean
-status_window_configure	(GtkWidget *widget,
-			 GdkEventConfigure *event,
-			 Toplevel *toplevel)
-{
-  GdkRectangle rect;
-  GtkRequisition requisition;
-  gint y;
-
-  if (toplevel == NULL || toplevel->status == NULL)
+    gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL,
+	    GTK_SHADOW_OUT, NULL, widget, "tooltip", 0, 0,
+	    widget->allocation.width, widget->allocation.height);
     return FALSE;
-
-  gdk_window_get_frame_extents (widget->window, &rect);
-  gtk_widget_size_request (toplevel->status, &requisition);
-
-  if (rect.y + rect.height + requisition.height < gdk_screen_height ())
-    y = rect.y + rect.height;
-  else
-    y = gdk_screen_height () - requisition.height;
-
-  gtk_window_move (GTK_WINDOW(toplevel->status), rect.x, y);
-  return FALSE;
 }
 
 static GtkWidget*
 status_window_new(GtkWidget *parent)
 {
-  GtkWidget *window;
-  GtkWidget *frame;
-  GtkWidget *label;
+    GtkWidget *window;
+    GtkWidget *alignment;
+    GtkWidget *label;
 
-  if (parent == NULL)
-    return NULL;
+    if (parent == NULL)
+	return NULL;
 
-  window = gtk_window_new (GTK_WINDOW_POPUP);
+    window = gtk_window_new (GTK_WINDOW_POPUP);
 
-  gtk_container_set_border_width (GTK_CONTAINER(window), 1);
-  /* gtk_window_set_decorated (GTK_WINDOW(window), FALSE); */
-  gtk_widget_set_name (window, "imhangul_status");
-  gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
-  gtk_widget_set_app_paintable (window, TRUE);
+    gtk_container_set_border_width (GTK_CONTAINER(window), 1);
+    gtk_window_set_type_hint (GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_TOOLTIP);
 
-  frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME(frame), GTK_SHADOW_OUT);
-  gtk_widget_show (frame);
-  gtk_container_add (GTK_CONTAINER(window), frame);
+    gtk_widget_set_name (window, "imhangul_status");
+    gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
+    gtk_widget_set_app_paintable (window, TRUE);
 
-  /* hangul status window label */
-  label = gtk_label_new (_("hangul")); 
-  gtk_container_add (GTK_CONTAINER(frame), label);
-  gtk_widget_show (label);
+    alignment = gtk_alignment_new (0.5, 0.5, 1.0, 1.0);
+    gtk_alignment_set_padding (GTK_ALIGNMENT(alignment), 2, 2, 5, 5);
+    gtk_container_add (GTK_CONTAINER(window), alignment);
+    gtk_widget_show (alignment);
 
-  g_signal_connect (G_OBJECT(window), "expose-event",
-		   G_CALLBACK(status_window_expose_event), NULL);
+    /* hangul status window label */
+    label = gtk_label_new (_("hangul"));
+    gtk_container_add (GTK_CONTAINER(alignment), label);
+    gtk_widget_show (label);
 
-  return window;
+    g_signal_connect (G_OBJECT(window), "expose-event",
+	    G_CALLBACK(status_window_on_expose_event), NULL);
+
+    return window;
 }
 
 static void
 im_hangul_ic_show_status_window (GtkIMContextHangul *hcontext)
 {
-  g_return_if_fail (hcontext != NULL);
+    g_return_if_fail (hcontext != NULL);
 
-  if (pref_use_status_window && hcontext->toplevel != NULL) {
-    if (hcontext->toplevel->status == NULL) {
-      hcontext->toplevel->status =
-	status_window_new(hcontext->toplevel->widget);
-	status_window_configure (hcontext->toplevel->widget,
-				 NULL,
-				 hcontext->toplevel);
+    if (pref_use_status_window && hcontext->toplevel != NULL) {
+	if (hcontext->toplevel->status == NULL) {
+	    hcontext->toplevel->status =
+		status_window_new(hcontext->toplevel->widget);
+	}
+
+	im_hangul_ic_update_status_window_position(hcontext);
+	gtk_widget_show (hcontext->toplevel->status);
     }
-    gtk_widget_show (hcontext->toplevel->status);
-  }
 }
 
 static void
@@ -1660,6 +1637,41 @@ im_hangul_ic_hide_status_window (GtkIMContextHangul *hcontext)
   if (hcontext->toplevel != NULL && hcontext->toplevel->status != NULL) {
     gtk_widget_hide (hcontext->toplevel->status);
   }
+}
+
+static void
+im_hangul_ic_update_status_window_position (GtkIMContextHangul* hic)
+{
+    int x = 0;
+    int y = 0;
+
+    if (hic == NULL)
+	return;
+
+    if (hic->client_window == NULL)
+	return;
+
+    if (hic->toplevel == NULL || hic->toplevel->status == NULL)
+	return;
+
+    gdk_window_get_origin (hic->client_window, &x, &y);
+
+    if (hic->cursor.x < 0) {
+	/* show status window below client window
+	 * if the cursor position is not updated */
+	int height = 0;
+#if GTK_CHECK_VERSION(2, 24, 0)
+	height = gdk_window_get_height(hic->client_window);
+#else
+	gdk_drawable_get_size(hic->client_window, NULL, &height);
+#endif
+	y += height + 3;
+    } else {
+	x += hic->cursor.x + 3;
+	y += hic->cursor.y + hic->cursor.height + 3;
+    }
+
+    gtk_window_move (GTK_WINDOW(hic->toplevel->status), x, y);
 }
 
 static GtkWidget *
@@ -1688,6 +1700,18 @@ toplevel_destroy(Toplevel *toplevel)
   }
 }
 
+static gboolean
+toplevel_on_configure_event(GtkWidget *widget,
+			 GdkEventConfigure *event,
+			 Toplevel *toplevel)
+{
+    if (current_focused_ic != NULL) {
+	GtkIMContextHangul* hic = GTK_IM_CONTEXT_HANGUL(current_focused_ic);
+	im_hangul_ic_update_status_window_position (hic);
+    }
+    return FALSE;
+}
+
 static Toplevel *
 toplevel_new(GtkWidget *toplevel_widget)
 {
@@ -1703,8 +1727,7 @@ toplevel_new(GtkWidget *toplevel_widget)
 			     G_CALLBACK(toplevel_destroy), toplevel);
   toplevel->configure_handler_id = 
 	    g_signal_connect (G_OBJECT(toplevel->widget), "configure-event",
-			     G_CALLBACK(status_window_configure),
-			     toplevel);
+			     G_CALLBACK(toplevel_on_configure_event), NULL);
 
   g_object_set_data(G_OBJECT(toplevel_widget),
 		     "gtk-imhangul-toplevel-info", toplevel);
