@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 
 #include <hangul.h>
@@ -728,7 +729,11 @@ static void
 im_hangul_set_input_mode_info (GdkWindow *window, int state)
 {
   if (window != NULL) {
+#if GTK_CHECK_VERSION(2, 24, 0)
+    GdkScreen *screen = gdk_window_get_screen(window);
+#else
     GdkScreen *screen = gdk_drawable_get_screen(window);
+#endif
     im_hangul_set_input_mode_info_for_screen (screen, state);
   }
 }
@@ -2125,14 +2130,17 @@ candidate_on_expose (GtkWidget *widget,
 		     GdkEventExpose *event,
 		     gpointer data)
 {
-  GtkStyle *style;
-  GtkAllocation alloc;
-
-  style = gtk_widget_get_style(widget);
-  alloc = GTK_WIDGET(widget)->allocation;
-  gdk_draw_rectangle(widget->window, style->black_gc,
-		     FALSE,
-		     0, 0, alloc.width - 1, alloc.height - 1);
+#if GTK_CHECK_VERSION(2, 8, 0)
+    cairo_t* cr = gdk_cairo_create(widget->window);
+    cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+    cairo_rectangle(cr, 0, 0,
+	    widget->allocation.width, widget->allocation.height);
+    cairo_stroke(cr);
+    cairo_destroy(cr);
+#else
+    gdk_draw_rectangle(widget->window, widget->style->black_gc, FALSE, 0, 0,
+	    widget->allocation.width - 1, widget->allocation.height - 1);
+#endif
 }
 
 static void
@@ -2152,7 +2160,7 @@ candidate_update_cursor(Candidate *candidate)
 static void
 candidate_set_window_position (Candidate *candidate)
 {
-    gint width = 0, height = 0;
+    gint height = 0;
     gint absx = 0, absy = 0;
     gint root_w, root_h, cand_w, cand_h;
     GtkRequisition requisition;
@@ -2161,7 +2169,11 @@ candidate_set_window_position (Candidate *candidate)
       return;
 
     gdk_window_get_origin (GDK_WINDOW(candidate->parent), &absx, &absy);
-    gdk_drawable_get_size (GDK_DRAWABLE(candidate->parent), &width, &height);
+#if GTK_CHECK_VERSION(2, 24, 0)
+    height = gdk_window_get_height(GDK_WINDOW(candidate->parent));
+#else
+    gdk_drawable_get_size (GDK_DRAWABLE(candidate->parent), NULL, &height);
+#endif
 
     root_w = gdk_screen_width();
     root_h = gdk_screen_height();
@@ -2232,6 +2244,8 @@ candidate_create_window(Candidate *candidate)
   GtkCellRenderer *renderer;
 
   candidate->window = gtk_window_new(GTK_WINDOW_POPUP);
+  gtk_window_set_type_hint (GTK_WINDOW(candidate->window), GDK_WINDOW_TYPE_HINT_TOOLTIP);
+  gtk_widget_set_app_paintable (candidate->window, TRUE);
 
   candidate_update_list(candidate);
 
