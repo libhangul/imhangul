@@ -164,6 +164,9 @@ static void	im_hangul_preedit_normal     (GtkIMContextHangul *hic,
 					      gint start, gint end);
 
 static char*    im_hangul_get_candidate_string(GtkIMContextHangul *ic);
+static gboolean im_hangul_on_button_press    (GtkWidget *widget,
+					      GdkEvent *event,
+					      gpointer data);
 
 static void     im_hangul_ic_show_status_window     (GtkIMContextHangul *hcontext);
 static void     im_hangul_ic_hide_status_window     (GtkIMContextHangul *hcontext);
@@ -173,7 +176,7 @@ static void     im_hangul_ic_set_toplevel_input_mode(GtkIMContextHangul *hcontex
 						  int mode);
 
 static Toplevel*  toplevel_new(GtkWidget *toplevel_widget);
-static Toplevel*  toplevel_get(GdkWindow *window);
+static Toplevel*  toplevel_get_from_widget(GtkWidget *widget);
 static void       toplevel_append_context(Toplevel *toplevel,
 					  GtkIMContextHangul *context);
 static void       toplevel_remove_context(Toplevel *toplevel,
@@ -630,6 +633,7 @@ im_hangul_ic_init (GtkIMContextHangul *hcontext)
 
   hcontext->client_window = NULL;
   hcontext->toplevel = NULL;
+  hcontext->button_press_handler = 0;
   hcontext->cursor.x = 0;
   hcontext->cursor.y = 0;
   hcontext->cursor.width = -1;
@@ -672,28 +676,43 @@ static void
 im_hangul_ic_set_client_window (GtkIMContext *context,
 			     GdkWindow *client_window)
 {
-  GtkIMContextHangul *hcontext;
+    GtkWidget *widget = NULL;
+    GtkIMContextHangul *hcontext;
 
-  g_return_if_fail (context != NULL);
-  g_return_if_fail (GTK_IS_IM_CONTEXT_HANGUL (context));
+    g_return_if_fail (context != NULL);
+    g_return_if_fail (GTK_IS_IM_CONTEXT_HANGUL (context));
 
-  hcontext = GTK_IM_CONTEXT_HANGUL(context);
+    hcontext = GTK_IM_CONTEXT_HANGUL(context);
 
-  if (hcontext->client_window == client_window)
-    return;
+    if (hcontext->client_window == client_window)
+	return;
 
-  if (hcontext->toplevel != NULL)
-    toplevel_remove_context(hcontext->toplevel, hcontext);
+    if (hcontext->toplevel != NULL)
+	toplevel_remove_context(hcontext->toplevel, hcontext);
 
-  if (client_window == NULL) {
-    hcontext->client_window = NULL;
-    hcontext->toplevel = NULL;
-    return;
-  }
+    if (client_window == NULL) {
+	gdk_window_get_user_data (hcontext->client_window, (gpointer)&widget);
+	if (widget != NULL) {
+	    g_signal_handler_disconnect (widget,
+		    hcontext->button_press_handler);
+	}
+	hcontext->button_press_handler = 0;
+	hcontext->client_window = NULL;
+	hcontext->toplevel = NULL;
+	return;
+    }
 
-  hcontext->client_window = client_window;
-  hcontext->toplevel = toplevel_get (client_window);
-  toplevel_append_context(hcontext->toplevel, hcontext);
+    hcontext->client_window = client_window;
+
+    gdk_window_get_user_data (hcontext->client_window, (gpointer)&widget);
+    if (widget != NULL) {
+	hcontext->toplevel = toplevel_get_from_widget (widget);
+	toplevel_append_context(hcontext->toplevel, hcontext);
+
+	hcontext->button_press_handler =
+		g_signal_connect (G_OBJECT (widget), "button-press-event",
+			G_CALLBACK(im_hangul_on_button_press), hcontext);
+    }
 }
 
 GtkIMContext *
@@ -1679,23 +1698,6 @@ im_hangul_ic_update_status_window_position (GtkIMContextHangul* hic)
     gtk_window_move (GTK_WINDOW(hic->toplevel->status), x, y);
 }
 
-static GtkWidget *
-get_toplevel_widget (GdkWindow *window)
-{
-  GtkWidget *gtk_toplevel;
-  gpointer ptr;
-
-  if (window == NULL)
-    return NULL;
-
-  gdk_window_get_user_data (window, &ptr);
-  memcpy(&gtk_toplevel, &ptr, sizeof(gtk_toplevel));
-  if (gtk_toplevel != NULL)
-    gtk_toplevel = gtk_widget_get_toplevel(GTK_WIDGET(gtk_toplevel));
-
-  return gtk_toplevel;
-}
-
 static void
 toplevel_destroy(Toplevel *toplevel)
 {
@@ -1740,12 +1742,12 @@ toplevel_new(GtkWidget *toplevel_widget)
 }
 
 static Toplevel *
-toplevel_get(GdkWindow *window)
+toplevel_get_from_widget(GtkWidget *widget)
 {
   Toplevel *toplevel = NULL;
   GtkWidget *toplevel_widget;
 
-  toplevel_widget = get_toplevel_widget (window);
+  toplevel_widget = gtk_widget_get_toplevel (widget);
   if (toplevel_widget == NULL) {
     return NULL;
   }
@@ -1817,6 +1819,13 @@ im_hangul_ic_set_toplevel_input_mode(GtkIMContextHangul *hcontext, int mode)
 {
   if (hcontext->toplevel != NULL)
     hcontext->toplevel->input_mode = mode;
+}
+
+static gboolean
+im_hangul_on_button_press(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    im_hangul_ic_reset(data);
+    return false;
 }
 
 /*
