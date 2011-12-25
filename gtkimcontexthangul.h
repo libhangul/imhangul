@@ -52,6 +52,7 @@ struct _GtkIMContextHangul
   GdkWindow *client_window;
   Toplevel *toplevel;
   GdkRectangle cursor;
+  guint button_press_handler;
 
   /* hangul ic */
   HangulInputContext* hic;
