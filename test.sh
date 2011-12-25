@@ -1,7 +1,7 @@
 #!/bin/bash
 
 immodules_file=./gtk.immodules
-gtk-query-immodules-2.0 .libs/*.so > $immodules_file
+gtk-query-immodules-3.0 .libs/*.so > $immodules_file
 
 export IM_HANGUL_CONF_FILE=./test.conf
 export GTK_IM_MODULE=hangul2
