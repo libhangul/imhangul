@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: imhangul 0.9.16\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-22 17:18+0900\n"
+"POT-Creation-Date: 2011-12-19 22:47+0900\n"
 "PO-Revision-Date: 2004-07-10 11:18+0900\n"
 "Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "Language-Team: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
@@ -15,33 +15,33 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: gtkimcontexthangul.c:373
+#: gtkimcontexthangul.c:379
 #, c-format
 msgid "Unknown token: %c"
 msgstr ""
 
-#: gtkimcontexthangul.c:377
+#: gtkimcontexthangul.c:383
 #, c-format
 msgid "Unknown token: %s"
 msgstr ""
 
-#: gtkimcontexthangul.c:383
+#: gtkimcontexthangul.c:389
 #, c-format
 msgid "Unknown token: %ld"
 msgstr ""
 
-#: gtkimcontexthangul.c:386
+#: gtkimcontexthangul.c:392
 #, c-format
 msgid "Unknown token: %lf"
 msgstr ""
 
-#: gtkimcontexthangul.c:389
+#: gtkimcontexthangul.c:395
 #, c-format
 msgid "Unknown token: %d"
 msgstr ""
 
 #. hangul status window label
-#: gtkimcontexthangul.c:1628
+#: gtkimcontexthangul.c:1630
 msgid "hangul"
 msgstr "한글"
 
