@@ -2167,7 +2167,7 @@ candidate_update_cursor(Candidate *candidate)
 static void
 candidate_set_window_position (Candidate *candidate)
 {
-    gint width = 0, height = 0;
+    gint height = 0;
     gint absx = 0, absy = 0;
     gint root_w, root_h, cand_w, cand_h;
 
@@ -2175,7 +2175,6 @@ candidate_set_window_position (Candidate *candidate)
       return;
 
     gdk_window_get_origin (GDK_WINDOW(candidate->parent), &absx, &absy);
-    width = gdk_window_get_width(GDK_WINDOW(candidate->parent));
     height = gdk_window_get_height(GDK_WINDOW(candidate->parent));
 
     root_w = gdk_screen_width();
