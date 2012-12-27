@@ -653,8 +653,9 @@ im_hangul_ic_finalize (GObject *object)
 {
   GtkIMContextHangul *hic = GTK_IM_CONTEXT_HANGUL(object);
 
-  if (hic->toplevel != NULL)
-    toplevel_remove_context(hic->toplevel, hic);
+  if (hic->client_window != NULL) {
+    im_hangul_ic_set_client_window (GTK_IM_CONTEXT(object), NULL);
+  }
 
   hangul_ic_delete(hic->hic);
   g_string_free(hic->preedit, TRUE);
@@ -691,7 +692,7 @@ im_hangul_ic_set_client_window (GtkIMContext *context,
 
     if (client_window == NULL) {
 	gdk_window_get_user_data (hcontext->client_window, (gpointer)&widget);
-	if (widget != NULL) {
+	if (widget != NULL && hcontext->button_press_handler != 0) {
 	    g_signal_handler_disconnect (widget,
 		    hcontext->button_press_handler);
 	}
