@@ -2245,6 +2245,7 @@ candidate_create_window(Candidate *candidate)
   GtkWidget *treeview;
   GtkTreeViewColumn *column;
   GtkCellRenderer *renderer;
+  gint wrap_width = 250;
 
   candidate->window = gtk_window_new(GTK_WINDOW_POPUP);
 
@@ -2284,6 +2285,10 @@ candidate_create_window(Candidate *candidate)
 						    renderer,
 						    "text", COLUMN_COMMENT,
 						    NULL);
+  g_object_set(G_OBJECT(renderer),
+      "wrap-mode", PANGO_WRAP_WORD_CHAR,
+      "wrap-width", wrap_width, NULL);
+
   gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
   candidate_update_cursor(candidate);
