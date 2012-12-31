@@ -1,3 +1,7 @@
+2.1.1
+ * #1 im module을 바꾸면 죽는 문제 수정
+ * candidate 창의 크기를 너무 넓지 않게 제한
+
 2.1.0
  * 한자키가 한자키로 동작하지 않는 문제 수정
  * button press event를 widget보다 먼저 체크하여 preedit string을 commit함
