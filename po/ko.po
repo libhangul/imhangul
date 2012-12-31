@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: imhangul 0.9.16\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-26 13:02+0900\n"
+"POT-Creation-Date: 2012-12-31 22:38+0900\n"
 "PO-Revision-Date: 2004-07-10 11:18+0900\n"
 "Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "Language-Team: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
@@ -41,7 +41,7 @@ msgid "Unknown token: %d"
 msgstr ""
 
 #. hangul status window label
-#: gtkimcontexthangul.c:1650
+#: gtkimcontexthangul.c:1651
 msgid "hangul"
 msgstr "한글"
 
