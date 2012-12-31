@@ -1,4 +1,4 @@
-AC_INIT([imhangul], [2.1.0], [choe.hwanjin@gmail.com], [imhangul])
+AC_INIT([imhangul], [2.1.1], [choe.hwanjin@gmail.com], [imhangul])
 
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS(config.h)
